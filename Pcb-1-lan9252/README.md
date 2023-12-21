@@ -22,5 +22,6 @@ Access the folder with a file browser and click on index.html to make or update 
 and to Twincat esi xml file directory `c:\twincat\3.1\io\modules\ethercat`
 The original EEPROM_generator is found here <https://github.com/kubabuda/EEPROM_generator>
 
+##### **CubeMX-files** are for reference only.
 
-
+The .ioc file can be opened in CubeMX. The STM23F407 processor has functions tied to specific pins, the .ioc file has this info. This is just for reference.
