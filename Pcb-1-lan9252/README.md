@@ -24,4 +24,4 @@ The original EEPROM_generator is found here <https://github.com/kubabuda/EEPROM_
 
 ##### **CubeMX-files** are for reference only.
 
-The .ioc file can be opened in CubeMX. The STM23F407 processor has functions tied to specific pins, the .ioc file has this info. This is just for reference.
+The .ioc file can be opened in CubeMX. The STM32F407 processor has functions tied to specific pins, the .ioc file has this info. This is just for reference.
