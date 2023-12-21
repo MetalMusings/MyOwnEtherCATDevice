@@ -1,7 +1,7 @@
 # Making my own EtherCAT device
 
 This repository contains software, pcb shematics and layouts, reference documentation etc
-that I used during my creation of my own EtherCAT device.
+that I used during the creation of my own EtherCAT device.
 
 This job is documented in a series of Youtube videos, from my first attempts to understand
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
