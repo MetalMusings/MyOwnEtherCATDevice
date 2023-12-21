@@ -25,3 +25,11 @@ The original EEPROM_generator is found here <https://github.com/kubabuda/EEPROM_
 ##### **CubeMX-files** are for reference only.
 
 The .ioc file can be opened in CubeMX. The STM32F407 processor has functions tied to specific pins, the .ioc file has this info. This is just for reference.
+
+##### ESI (EtherCAT Slave Information) files
+
+I have put [Dig_8IN_8OUT.xml](Dig_8IN_8OUT.xml) here, this is an example ESI file for the LAN9252 IC standalone, no MCU needed. It's sometimes handy to have the simplest possible ESI file at ahnd, here it is. You find the ESI file for the Encoder application [here](Firmware/lib/soes/MetalMusings_EaserCAT_2000_encoder.xml)
+
+###License
+
+Don't violate the original licenses. No warranties. Use it any way you like.
