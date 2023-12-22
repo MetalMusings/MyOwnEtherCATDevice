@@ -6,7 +6,7 @@ that I used during the creation of my own EtherCAT device.
 This job is documented in a series of Youtube videos, from my first attempts to understand
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
-## My own EtherCat device 4. The PCB
+## My own EtherCat device 4. The PCB is here
 
 In this video it starts to be interesting. I have got the pcb and I try to make it work.
 Now I finally make documentation available, see [this folder](Pcb-1-lan9252).
