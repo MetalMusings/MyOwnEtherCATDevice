@@ -11,7 +11,7 @@ how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 In this video it starts to be interesting. I have got the pcb and I try to make it work.
 Now I finally make documentation available, see [this folder](Pcb-1-lan9252).
 
-[![Watch the video](https://img.youtube.com/vi/nTQUwghvy5Q/default.jpg)](https://youtu.be/nTQUwghvy5Q)
+[![Watch the video](https://img.youtube.com/vi/An0VrKYAv88/default.jpg)](https://youtu.be/An0VrKYAv88)
 
 ## Make my own EtherCAT device 3. Encoder
 
