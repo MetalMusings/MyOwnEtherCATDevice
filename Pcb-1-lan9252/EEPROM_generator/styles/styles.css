@@ -1,0 +1,195 @@
+:root {
+   --background-color: #fff;
+   --text-color: #000;
+   --input-color: #ffffff;
+   --display-dark: none;
+   --display-light: block;
+}
+ 
+/* dark mode */
+[data-theme="dark"] {
+/* body, .modal-content { */
+   --background-color: #2D2D2D; /* #4D4D4D; */
+   --text-color: white;
+   --input-color: #3D3D3D;
+   --display-dark: block;
+   --display-light: none;
+}
+
+tr td:nth-child(3) { 
+   text-align: center;
+}
+tr td:nth-child(4) { 
+   text-align: center;
+}
+tr td:nth-child(5) { 
+   text-align: center;
+}
+tr td:nth-child(6) { 
+   text-align: center;
+}
+/* The Modal (background) */
+.modal {
+   display: none; /* Hidden by default */
+   position: fixed; /* Stay in place */
+   z-index: 1; /* Sit on top */
+   padding-top: 18%; /* Location of the box */
+   left: 0;
+   top: 0;
+   width: 100%; /* Full width */
+   height: 100%; /* Full height */
+   overflow: auto; /* Enable scroll if needed */
+   background-color: rgb(0,0,0); /* Fallback color */
+   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+   background-color: var(--background-color);
+   margin: auto;
+   padding: 20px;
+   border: 1px solid #888;
+   width: 450px;
+}
+
+#editObjectTitle {
+   margin-bottom: 25px;
+}
+
+/* The Close Button */
+.close {
+   color: #aaaaaa;
+   float: right;
+   font-size: 28px;
+   font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+   color: #000;
+   text-decoration: none;
+   cursor: pointer;
+}
+
+/* Dropdown Button */
+.dropbtn {
+   padding: 6px 16px;
+ }
+ 
+ /* The container <div> - needed to position the dropdown content */
+ .dropdown {
+   position: relative;
+   display: inline-block;
+ }
+ 
+ /* Dropdown Content (Hidden by Default) */
+ .dropdown-content {
+   display: none;
+   position: absolute;
+   background-color: var(--background-color);
+   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+   z-index: 1;
+ }
+ 
+ /* Links inside the dropdown */
+ .dropdown-content a {
+   /* width: 100;  */
+   text-decoration: none;
+   margin: 10px 4px;
+ }
+ 
+ /* Change color of dropdown links on hover */
+ .dropdown-content a:hover {background-color: #ddd;}
+ 
+ /* Show the dropdown menu on hover */
+ .dropdown:hover .dropdown-content {display: block;}
+ 
+ /* Change the background color of the dropdown button when the dropdown content is shown */
+ .dropdown:hover .dropbtn {background-color: var(--background-color);} 
+
+/* main content layout */
+
+body {
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: large;
+}
+
+div.main-wrapper {
+   margin: auto;
+   max-width: 960px;
+}
+
+h1, h2, h3 {
+   text-align: center;
+}
+
+table, textarea {
+   width: 100%;
+}
+
+button {
+   margin-left: 5px;
+   margin-right: 5px;
+}
+
+div.settings-menu {
+   display: flex;
+   justify-content: space-between;
+   /* align-items: right; */
+   /* background-color: red; */
+}
+
+.odSectionHeading, .odItem, .odSubitem {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
+div.odItem, div.odSubitem {
+   padding-top: 4px;
+   padding-bottom: 4px;
+   width: 100%;
+   border-top: 1px dotted;
+   border-bottom: 1px dotted;
+}
+
+h3.odSectionHeading {
+   text-align: left;
+}
+
+span.odSectionTitle {
+   font-weight: 800;
+   margin-top: 10px;
+   margin-right: -5px;
+}
+
+span.odSubitemContent {
+   margin-left: 15px;
+}
+
+body {
+   background-color: var(--background-color);
+   color: var(--text-color);
+}
+
+input, textarea, select, button {
+   background-color: var(--input-color);
+   color: var(--text-color);
+}
+
+.display-dark {
+   display: var(--display-dark);
+}
+
+.display-light {
+   display: var(--display-light);
+}
+
+a {
+   color: var(--text-color);
+   font-weight: 600;
+}
+
+button {
+   font-size: 16px;
+}
