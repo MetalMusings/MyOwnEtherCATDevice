@@ -13,36 +13,14 @@ typedef struct
 
    /* Inputs */
 
-   struct
-   {
-      int32_t ECount;
-      uint8_t IndexTriggered;
-   } EncoderOut;
-   uint16_t ControlWord;
-   uint8_t OpMode;
-   int32_t TargetPosition;
-   int32_t TargetVelocity;
+   float EncPos;
+   float EncFrequency;
 
    /* Outputs */
 
-   uint16_t StatusWord;
-   uint8_t OpModeDisplay;
-   int32_t ActualPosition;
-   int32_t ActualVelocity;
-   int32_t ActualTorque;
-   struct
-   {
-      uint8_t IndexEnable;
-      uint8_t Reset;
-   } EncoderIn;
+   int32_t EncPosScale;
+   uint32_t EncIndexCEnable;
 
-   /* Parameters */
-
-   struct
-   {
-      uint16_t Period;
-      float Resolution;
-   } StepperData;
 } _Objects;
 
 extern _Objects Obj;

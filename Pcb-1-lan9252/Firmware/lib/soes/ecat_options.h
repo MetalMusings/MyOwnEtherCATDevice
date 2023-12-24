@@ -4,8 +4,8 @@
 #define USE_FOE          0
 #define USE_EOE          0
 
-#define MBXSIZE          128
-#define MBXSIZEBOOT      128
+#define MBXSIZE          512
+#define MBXSIZEBOOT      512
 #define MBXBUFFERS       3
 
 #define MBX0_sma         0x1000
@@ -33,8 +33,8 @@
 #define SM3_smc          0x20
 #define SM3_act          1
 
-#define MAX_MAPPINGS_SM2 7
-#define MAX_MAPPINGS_SM3 6
+#define MAX_MAPPINGS_SM2 2
+#define MAX_MAPPINGS_SM3 2
 
 #define MAX_RXPDO_SIZE   512
 #define MAX_TXPDO_SIZE   512

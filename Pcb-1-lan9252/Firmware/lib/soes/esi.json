@@ -1,32 +1,39 @@
 {
-  "form": {},
+  "form": {
+    "VendorName": "MetalMusings",
+    "VendorID": "0xaaa",
+    "ProductCode": "0xbbbccc",
+    "ProfileNo": "5001",
+    "RevisionNumber": "0x002",
+    "SerialNumber": "0x001",
+    "HWversion": "0.0.1",
+    "SWversion": "0.0.1",
+    "EEPROMsize": "2048",
+    "RxMailboxOffset": "0x1000",
+    "TxMailboxOffset": "0x1200",
+    "MailboxSize": "512",
+    "SM2Offset": "0x1600",
+    "SM3Offset": "0x1A00",
+    "TextGroupType": "MachineControl",
+    "TextGroupName5": "Incremental encoder",
+    "ImageName": "IMGCBY",
+    "TextDeviceType": "EaserCAT2000",
+    "TextDeviceName": "MetalMusings EaserCAT 2000",
+    "Port0Physical": "Y",
+    "Port1Physical": "Y",
+    "Port2Physical": " ",
+    "Port3Physical": " ",
+    "ESC": "LAN9252",
+    "SPImode": "3",
+    "CoeDetailsEnableSDO": "EnableSDO",
+    "CoeDetailsEnableSDOInfo": "EnableSDOInfo",
+    "CoeDetailsEnablePDOAssign": "EnablePDOAssign",
+    "CoeDetailsEnablePDOConfiguration": "EnablePDOConfiguration",
+    "CoeDetailsEnableUploadAtStartup": "EnableUploadAtStartup",
+    "CoeDetailsEnableSDOCompleteAccess": "EnableSDOCompleteAccess"
+  },
   "od": {
     "sdo": {
-      "2000": {
-        "otype": "RECORD",
-        "name": "StepperData",
-        "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "Period",
-            "dtype": "UNSIGNED16",
-            "data": "&Obj.StepperData.Period",
-            "value": "1000",
-            "access": "RO"
-          },
-          {
-            "name": "Resolution",
-            "dtype": "REAL32",
-            "value": "2.5",
-            "access": "RO",
-            "data": "&Obj.StepperData.Resolution"
-          }
-        ],
-        "isSDOitem": true
-      },
       "A": {
         "otype": "RECORD",
         "name": "Error Settings",
@@ -44,148 +51,50 @@
     },
     "txpdo": {
       "6000": {
-        "otype": "RECORD",
-        "name": "EncoderOut",
-        "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "ECount",
-            "dtype": "INTEGER32",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.EncoderOut.ECount"
-          },
-          {
-            "name": "IndexTriggered",
-            "dtype": "UNSIGNED8",
-            "value": "0",
-            "access": "RW",
-            "data": "&Obj.EncoderOut.IndexTriggered"
-          }
-        ],
-        "pdo_mappings": [
-          "txpdo"
-        ]
-      },
-      "6040": {
         "otype": "VAR",
-        "name": "ControlWord",
+        "name": "EncPos",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "UNSIGNED16",
+        "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.ControlWord"
+        "data": "&Obj.EncPos"
       },
-      "6060": {
+      "6001": {
         "otype": "VAR",
-        "name": "OpMode",
+        "name": "EncFrequency",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "UNSIGNED8",
+        "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.OpMode"
-      },
-      "607A": {
-        "otype": "VAR",
-        "name": "TargetPosition",
-        "access": "RO",
-        "pdo_mappings": [
-          "txpdo"
-        ],
-        "dtype": "INTEGER32",
-        "value": "0",
-        "data": "&Obj.TargetPosition"
-      },
-      "60FF": {
-        "otype": "VAR",
-        "name": "TargetVelocity",
-        "access": "RO",
-        "pdo_mappings": [
-          "txpdo"
-        ],
-        "dtype": "INTEGER32",
-        "value": "0",
-        "data": "&Obj.TargetVelocity"
+        "data": "&Obj.EncFrequency"
       }
     },
     "rxpdo": {
-      "6041": {
-        "otype": "VAR",
-        "name": "StatusWord",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "UNSIGNED16",
-        "value": "0",
-        "data": "&Obj.StatusWord"
-      },
-      "6061": {
-        "otype": "VAR",
-        "name": "OpModeDisplay",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "UNSIGNED8",
-        "value": "0",
-        "data": "&Obj.OpModeDisplay"
-      },
-      "6064": {
-        "otype": "VAR",
-        "name": "ActualPosition",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "INTEGER32",
-        "value": "0",
-        "data": "&Obj.ActualPosition"
-      },
-      "6077": {
-        "otype": "VAR",
-        "name": "ActualTorque",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "INTEGER32",
-        "value": "0",
-        "data": "&Obj.ActualTorque"
-      },
       "7000": {
-        "otype": "RECORD",
-        "name": "EncoderIn",
+        "otype": "VAR",
+        "name": "EncPosScale",
         "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "IndexEnable",
-            "dtype": "UNSIGNED8",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.EncoderIn.IndexEnable"
-          },
-          {
-            "name": "Reset",
-            "dtype": "UNSIGNED8",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.EncoderIn.Reset"
-          }
-        ],
         "pdo_mappings": [
           "rxpdo"
-        ]
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.EncPosScale"
+      },
+      "7001": {
+        "otype": "VAR",
+        "name": "EncIndexCEnable",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.EncIndexCEnable"
       },
       "60664": {
         "otype": "VAR",
@@ -196,17 +105,6 @@
         ],
         "dtype": "INTEGER32",
         "value": "0"
-      },
-      "606C": {
-        "otype": "VAR",
-        "name": "ActualVelocity",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "INTEGER32",
-        "value": "0",
-        "data": "&Obj.ActualVelocity"
       }
     }
   },

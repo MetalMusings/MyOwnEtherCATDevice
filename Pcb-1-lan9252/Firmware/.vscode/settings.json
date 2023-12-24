@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "ecat_slv.h": "c",
-        "compare": "cpp"
+        "compare": "cpp",
+        "*.tpp": "cpp"
     }
 }

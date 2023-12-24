@@ -6,44 +6,59 @@ extern "C"
 #include "ecat_slv.h"
 #include "utypes.h"
 };
+#include <CircularBuffer.h>
+#define RINGBUFFERLEN 101
+CircularBuffer<double_t, RINGBUFFERLEN> Pos;
+CircularBuffer<uint32_t, RINGBUFFERLEN> TDelta;
 
 int64_t PreviousEncoderCounterValue = 0;
 int64_t unwrap_encoder(uint16_t in, int64_t *prev);
 #include <Stm32F4_Encoder.h>
 Encoder EncoderInit;
 
-#include "Stepper.h"
+// #include "Stepper.h"
 
 HardwareSerial Serial1(PA10, PA9);
 _Objects Obj;
 
-void StepGen(void);
+void indexPulse(void);
+double PosScaleRes = 1.0;
+uint32_t CurPosScale = 1;
+uint8_t OldIndexCEnable = 0;
 
-volatile uint8_t IndexEnable = 1;
-volatile uint8_t IndexTriggered = 0;
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
-   IndexEnable = Obj.EncoderIn.IndexEnable;
-   if (!IndexEnable)
-      IndexTriggered = 0;
+   if (Obj.EncIndexCEnable && !OldIndexCEnable) // Should only happen first time IndexCEnable is set
+   {
+      attachInterrupt(digitalPinToInterrupt(PA2), indexPulse, RISING); // PA2 = Index pulse
+   }
+   OldIndexCEnable = Obj.EncIndexCEnable;
+
+   if (CurPosScale != Obj.EncPosScale && Obj.EncPosScale != 0)
+   {
+      CurPosScale = Obj.EncPosScale;
+      PosScaleRes = 1.0 / double(CurPosScale);
+   }
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
-   // Obj.EncoderOut.ECount = TIM2->CNT;
-   Obj.EncoderOut.ECount = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
-   Obj.EncoderOut.IndexTriggered = IndexTriggered;
-   uint32_t diffT = ESCvar.Time - ESCvar.PrevTime;
+   int64_t pos = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
+   double CurPos = pos * PosScaleRes;
+   Obj.EncPos = CurPos;
+
+   double diffT = 0;
+   double diffPos = 0;
+   TDelta.push(ESCvar.Time); // Too bad resolution to measure over 1 ms. The length of the circular buffers
+   Pos.push(CurPos);         // tells over how long time the position is measured.
+   if (Pos.size() >= 2)
+   {
+      diffT = 1.0e-9 * (TDelta.last() - TDelta.first()); // Time is in nanoseconds
+      diffPos = fabs(Pos.last() - Pos.first());
+   }
+   Obj.EncFrequency = diffT != 0 ? diffPos / diffT : 0.0; // Revolutions per second
 }
 
-void indexPulse(void)
-{
-   if (IndexEnable && !IndexTriggered)
-   {
-      TIM2->CNT = 0;
-      IndexTriggered = 1;
-   }
-}
 static esc_cfg_t config =
     {
         .user_arg = NULL,
@@ -52,7 +67,7 @@ static esc_cfg_t config =
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
         .post_state_change_hook = NULL,
-        .application_hook = StepGen,
+        .application_hook = NULL, // StepGen,
         .safeoutput_override = NULL,
         .pre_object_download_hook = NULL,
         .post_object_download_hook = NULL,
@@ -71,14 +86,12 @@ void setup(void)
    rcc_config();
 
    // Set starting count value
-   // EncoderInit.SetCount(Tim2, 0);
+   EncoderInit.SetCount(Tim2, 0);
    // EncoderInit.SetCount(Tim3, 0);
    // EncoderInit.SetCount(Tim4, 0);
    // EncoderInit.SetCount(Tim8, 0);
 
-   attachInterrupt(digitalPinToInterrupt(PA2), indexPulse, RISING); // PA2 = Index pulse
-   StepperSetup();
-// delay(5000); // To give serial port monitor time to receive
+   //  delay(5000); // To give serial port monitor time to receive
    Serial1.printf("Before Ecat config\n");
    ecat_slv_init(&config);
 
@@ -110,16 +123,10 @@ int64_t unwrap_encoder(uint16_t in, int64_t *prev)
    return unwrapped + HALF_PERIOD; // remove the shift we applied at the beginning, and return
 }
 
-void StepGen(void)
+void indexPulse(void)
 {
-   uint16_t Period = Obj.StepperData.Period; // Period in microseconds, so 1000 is 1 ms.
-
-   float StepperResolution = Obj.StepperData.Resolution;   // 2.5 pulses/um
-   int32_t TargetPosition = Obj.TargetPosition;            // um
-   int32_t ActualPosition = 0;                             // um
-   int32_t DistanceToGo = TargetPosition - ActualPosition; // um
-   int32_t PulsesToMake = DistanceToGo * StepperResolution;
-   int32_t Frequency = PulsesToMake * 1000000 / Period;
-
-   // Check if timer done.
+   detachInterrupt(digitalPinToInterrupt(PA2)); // PA2 = Index pulse;
+   EncoderInit.SetCount(Tim2, 0);
+   Pos.clear();
+   TDelta.clear();
 }
