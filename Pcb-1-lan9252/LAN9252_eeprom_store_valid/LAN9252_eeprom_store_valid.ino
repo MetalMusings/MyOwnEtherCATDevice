@@ -1,4 +1,12 @@
 // Write a valid eeprom for LAN9252.
+// Uses https://github.com/RobTillaart/I2C_EEPROM
+//
+// Wiring:
+// 4 GND
+// 5 SDA
+// 6 SCL
+// 8 Vcc
+// (1,2,3,7) A0,A1,A2,WP unconnected => write-enabled at address 0x50
 //
 #include <Wire.h>
 #include <I2C_eeprom.h>
@@ -181,6 +189,7 @@ const uint8_t eeprom_data[] = {
 #define EEPROM_MAXBYTES 32 * 1024 / 8
 
 // the address of your EEPROM
+// 0x50 when A0,A1,A2 are left unconnected
 #define DEVICEADDRESS (0x50)
 
 I2C_eeprom eeprom(DEVICEADDRESS, EEPROM_MAXBYTES);
@@ -189,12 +198,13 @@ void setup() {
   Serial.begin(115200);
   while (!Serial)
     ;
+  Serial.println("WAIT FOR IT");
   delay(3000);
   Serial.println("IT IS BEGINNING");
-  Serial.println("WAIT FOR IT");
 
   Wire.begin();
   eeprom.begin();
+#if 0
   Serial.println("----------------------------------------------");
   Serial.printf("Writing %d long data\n", sizeof(eeprom_data));
   uint8_t ok;
@@ -204,8 +214,17 @@ void setup() {
   } else {
     Serial.printf("Failed writeBlockVerify\n");
   }
-
+#endif
   Serial.println("----------------------------------------------");
+  Serial.printf("\n                   VERIFYING\n");
+  for (uint16_t adr = 0; adr < sizeof(eeprom_data); adr++) {
+    uint8_t rB = eeprom.readByte(adr);
+    if (rB != eeprom_data[adr]) {
+      Serial.printf("Not same at addr=%u, read=%u should be %u\n", adr, rB, eeprom_data[adr]);
+    }
+  }
+  Serial.println("----------------------------------------------");
+  Serial.printf("\n                   VERIFYING DONE\n");
 }
 
 
