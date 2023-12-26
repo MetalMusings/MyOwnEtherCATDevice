@@ -15,11 +15,14 @@ typedef struct
 
    float EncPos;
    float EncFrequency;
+   uint32_t DiffT;
+   uint32_t IndexByte;
+   uint32_t IndexStatus;
 
    /* Outputs */
 
    int32_t EncPosScale;
-   uint32_t EncIndexCEnable;
+   uint32_t IndexLatchEnable;
 
 } _Objects;
 

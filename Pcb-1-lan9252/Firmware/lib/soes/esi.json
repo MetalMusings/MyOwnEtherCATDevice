@@ -71,6 +71,39 @@
         "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.EncFrequency"
+      },
+      "6002": {
+        "otype": "VAR",
+        "name": "DiffT",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.DiffT"
+      },
+      "6003": {
+        "otype": "VAR",
+        "name": "IndexByte",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.IndexByte"
+      },
+      "6004": {
+        "otype": "VAR",
+        "name": "IndexStatus",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.IndexStatus"
       }
     },
     "rxpdo": {
@@ -87,14 +120,14 @@
       },
       "7001": {
         "otype": "VAR",
-        "name": "EncIndexCEnable",
+        "name": "IndexLatchEnable",
         "access": "RO",
         "pdo_mappings": [
           "rxpdo"
         ],
         "dtype": "UNSIGNED32",
         "value": "0",
-        "data": "&Obj.EncIndexCEnable"
+        "data": "&Obj.IndexLatchEnable"
       },
       "60664": {
         "otype": "VAR",

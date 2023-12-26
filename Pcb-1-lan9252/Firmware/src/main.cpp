@@ -15,24 +15,28 @@ int64_t PreviousEncoderCounterValue = 0;
 int64_t unwrap_encoder(uint16_t in, int64_t *prev);
 #include <Stm32F4_Encoder.h>
 Encoder EncoderInit;
+Encoder *encP = &EncoderInit;
 
 // #include "Stepper.h"
-
+#define INDEX_PIN PA2
 HardwareSerial Serial1(PA10, PA9);
 _Objects Obj;
 
 void indexPulse(void);
 double PosScaleRes = 1.0;
 uint32_t CurPosScale = 1;
-uint8_t OldIndexCEnable = 0;
+uint8_t OldLatchCEnable = 0;
+volatile uint8_t indexPulseFired = 0;
+uint32_t nFires = 0;
+volatile uint8_t pleaseZeroTheCounter=0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
-   if (Obj.EncIndexCEnable && !OldIndexCEnable) // Should only happen first time IndexCEnable is set
+   if (Obj.IndexLatchEnable && !OldLatchCEnable) // Should only happen first time IndexCEnable is set
    {
-      attachInterrupt(digitalPinToInterrupt(PA2), indexPulse, RISING); // PA2 = Index pulse
+      pleaseZeroTheCounter=1;
    }
-   OldIndexCEnable = Obj.EncIndexCEnable;
+   OldLatchCEnable = Obj.IndexLatchEnable;
 
    if (CurPosScale != Obj.EncPosScale && Obj.EncPosScale != 0)
    {
@@ -43,6 +47,16 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
+   Obj.IndexStatus = 0;
+   if (indexPulseFired)
+   {
+      Obj.IndexStatus = 1;
+      indexPulseFired = 0;
+      nFires++;
+      PreviousEncoderCounterValue = 0;
+   }
+   Obj.DiffT = nFires;
+
    int64_t pos = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
    double CurPos = pos * PosScaleRes;
    Obj.EncPos = CurPos;
@@ -57,6 +71,19 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       diffPos = fabs(Pos.last() - Pos.first());
    }
    Obj.EncFrequency = diffT != 0 ? diffPos / diffT : 0.0; // Revolutions per second
+
+   Obj.IndexStatus = 0;
+   if (indexPulseFired)
+   {
+      Obj.IndexStatus = 1;
+      indexPulseFired = 0;
+      nFires++;
+      PreviousEncoderCounterValue = 0;
+   }
+   Obj.DiffT = nFires;
+   Obj.IndexByte = digitalRead(INDEX_PIN);
+   if (Obj.IndexByte)
+      Serial1.printf("IS 1\n");
 }
 
 static esc_cfg_t config =
@@ -81,7 +108,6 @@ static esc_cfg_t config =
 
 void setup(void)
 {
-   uint64_t ff = F_CPU;
    Serial1.begin(115200);
    rcc_config();
 
@@ -91,11 +117,8 @@ void setup(void)
    // EncoderInit.SetCount(Tim4, 0);
    // EncoderInit.SetCount(Tim8, 0);
 
-   //  delay(5000); // To give serial port monitor time to receive
-   Serial1.printf("Before Ecat config\n");
    ecat_slv_init(&config);
-
-   Serial1.printf("Started\n");
+   attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
 }
 
 void loop(void)
@@ -125,8 +148,12 @@ int64_t unwrap_encoder(uint16_t in, int64_t *prev)
 
 void indexPulse(void)
 {
-   detachInterrupt(digitalPinToInterrupt(PA2)); // PA2 = Index pulse;
-   EncoderInit.SetCount(Tim2, 0);
-   Pos.clear();
-   TDelta.clear();
+   if (pleaseZeroTheCounter)
+   {
+      TIM2->CNT = 0;
+      indexPulseFired = 1;
+      Pos.clear();
+      TDelta.clear();
+      pleaseZeroTheCounter = 0;
+   }
 }

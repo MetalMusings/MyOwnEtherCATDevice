@@ -114,7 +114,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>EncIndexCEnable</Name>
+                  <Name>IndexLatchEnable</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -163,6 +163,78 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>EncFrequency</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1A02</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>DiffT</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1A03</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>IndexByte</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1A04</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>IndexStatus</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -238,15 +310,15 @@
               <DataType>
                 <Name>DT1C13ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>32</BitSize>
+                <BitSize>80</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>2</Elements>
+                  <Elements>5</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C13</Name>
-                <BitSize>48</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -260,7 +332,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C13ARR</Type>
-                  <BitSize>32</BitSize>
+                  <BitSize>80</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -413,7 +485,7 @@
               </Object>
               <Object>
                 <Index>#x1601</Index>
-                <Name>EncIndexCEnable</Name>
+                <Name>IndexLatchEnable</Name>
                 <Type>DT1601</Type>
                 <BitSize>48</BitSize>
                 <Info>
@@ -424,7 +496,7 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>EncIndexCEnable</Name>
+                    <Name>IndexLatchEnable</Name>
                     <Info>
                       <DefaultValue>#x70010020</DefaultValue>
                     </Info>
@@ -473,6 +545,75 @@
                     <Name>EncFrequency</Name>
                     <Info>
                       <DefaultValue>#x60010020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1A02</Index>
+                <Name>DiffT</Name>
+                <Type>DT1A02</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>DiffT</Name>
+                    <Info>
+                      <DefaultValue>#x60020020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1A03</Index>
+                <Name>IndexByte</Name>
+                <Type>DT1A03</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>IndexByte</Name>
+                    <Info>
+                      <DefaultValue>#x60030020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1A04</Index>
+                <Name>IndexStatus</Name>
+                <Type>DT1A04</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>IndexStatus</Name>
+                    <Info>
+                      <DefaultValue>#x60040020</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -554,12 +695,12 @@
                 <Index>#x1C13</Index>
                 <Name>Sync Manager 3 PDO Assignment</Name>
                 <Type>DT1C13</Type>
-                <BitSize>48</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>2</DefaultValue>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -572,6 +713,24 @@
                     <Name>PDO Mapping</Name>
                     <Info>
                       <DefaultValue>#x1A01</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1A02</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1A03</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1A04</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -606,6 +765,45 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x6002</Index>
+                <Name>DiffT</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x6003</Index>
+                <Name>IndexByte</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x6004</Index>
+                <Name>IndexStatus</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x7000</Index>
                 <Name>EncPosScale</Name>
                 <Type>DINT</Type>
@@ -620,7 +818,7 @@
               </Object>
               <Object>
                 <Index>#x7001</Index>
-                <Name>EncIndexCEnable</Name>
+                <Name>IndexLatchEnable</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
                 <Info>
@@ -654,12 +852,12 @@
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
           <Index>#x1601</Index>
-          <Name>EncIndexCEnable</Name>
+          <Name>IndexLatchEnable</Name>
           <Entry>
             <Index>#x7001</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>32</BitLen>
-            <Name>EncIndexCEnable</Name>
+            <Name>IndexLatchEnable</Name>
             <DataType>UDINT</DataType>
           </Entry>
         </RxPdo>
@@ -683,6 +881,39 @@
             <BitLen>32</BitLen>
             <Name>EncFrequency</Name>
             <DataType>REAL</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Mandatory="true" Sm="3">
+          <Index>#x1A02</Index>
+          <Name>DiffT</Name>
+          <Entry>
+            <Index>#x6002</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>DiffT</Name>
+            <DataType>UDINT</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Mandatory="true" Sm="3">
+          <Index>#x1A03</Index>
+          <Name>IndexByte</Name>
+          <Entry>
+            <Index>#x6003</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>IndexByte</Name>
+            <DataType>UDINT</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Mandatory="true" Sm="3">
+          <Index>#x1A04</Index>
+          <Name>IndexStatus</Name>
+          <Entry>
+            <Index>#x6004</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>IndexStatus</Name>
+            <DataType>UDINT</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">
