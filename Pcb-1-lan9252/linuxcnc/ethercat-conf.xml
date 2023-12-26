@@ -1,0 +1,82 @@
+<masters>
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="5">
+#    <slave idx="0" type="EK1100"/>
+#    <slave idx="1" type="EL1008"/>
+#    <slave idx="2" type="EL2008"/>
+#    <slave idx="3" type="EL5101"/>
+    <slave idx="4" type="generic" vid="00000a88" pid="0a880002" configPdos="true">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+      <sdoConfig idx="2000" subIdx="0"><sdoDataRaw data ="b8 0b"/></sdoConfig>  <!-- Max motor current (3.0A) -->
+      <sdoConfig idx="2003" subIdx="0"><sdoDataRaw data ="64 00"/></sdoConfig>  <!-- Standby current percentage (100%) -->
+      <sdoConfig idx="2011" subIdx="0"><sdoDataRaw data ="00 00"/></sdoConfig>  <!-- Open loop -->
+      <syncManager idx="2" dir="out">
+        <pdo idx="1600">
+          <pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="cia-controlword" halType="u32"/>
+          <pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="opmode" halType="s32"/>
+          <pdoEntry idx="607A" subIdx="00" bitLen="32" halPin="target-position" halType="s32"/>
+          <pdoEntry idx="60FF" subIdx="00" bitLen="32" halPin="target-velocity" halType="s32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a00">
+          <pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="cia-statusword" halType="u32"/>
+          <pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="opmode-display" halType="s32"/>
+          <pdoEntry idx="6064" subIdx="00" bitLen="32" halPin="actual-position" halType="s32"/>
+          <pdoEntry idx="606C" subIdx="00" bitLen="32" halPin="actual-velocity" halType="s32"/>
+          <pdoEntry idx="6077" subIdx="00" bitLen="32" halPin="actual-torque" halType="s32"/>
+        </pdo>
+	</syncManager>
+    </slave>
+    <slave idx="5" type="generic" vid="00000a88" pid="0a880002" configPdos="true">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+      <sdoConfig idx="2000" subIdx="0"><sdoDataRaw data ="68 10"/></sdoConfig>  <!-- Max motor current (4.2A) -->
+      <sdoConfig idx="2003" subIdx="0"><sdoDataRaw data ="64 00"/></sdoConfig>  <!-- Standby current percentage (100%) -->
+      <sdoConfig idx="2011" subIdx="0"><sdoDataRaw data ="00 00"/></sdoConfig>  <!-- Open loop -->
+      <syncManager idx="2" dir="out">
+        <pdo idx="1600">
+          <pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="cia-controlword" halType="u32"/>
+          <pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="opmode" halType="s32"/>
+          <pdoEntry idx="607A" subIdx="00" bitLen="32" halPin="target-position" halType="s32"/>
+          <pdoEntry idx="60FF" subIdx="00" bitLen="32" halPin="target-velocity" halType="s32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a00">
+          <pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="cia-statusword" halType="u32"/>
+          <pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="opmode-display" halType="s32"/>
+          <pdoEntry idx="6064" subIdx="00" bitLen="32" halPin="actual-position" halType="s32"/>
+          <pdoEntry idx="606C" subIdx="00" bitLen="32" halPin="actual-velocity" halType="s32"/>
+          <pdoEntry idx="6077" subIdx="00" bitLen="32" halPin="actual-torque" halType="s32"/>
+        </pdo>
+	</syncManager>
+    </slave>
+    <slave idx="6" type="generic" vid="00aaa" pid="000bbbccc" configPdos="true">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1600">
+          <pdoEntry idx="7000" subIdx="00" bitLen="32" halPin="enc-pos-scale" halType="s32"/>
+        </pdo>
+        <pdo idx="1601">
+          <pdoEntry idx="7001" subIdx="00" bitLen="32" halPin="enc-index-latch-enable" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a00">
+          <pdoEntry idx="6000" subIdx="00" bitLen="32" halPin="enc-position" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a01">
+          <pdoEntry idx="6001" subIdx="00" bitLen="32" halPin="enc-frequency" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a02">
+          <pdoEntry idx="6002" subIdx="00" bitLen="32" halPin="DiffT" halType="u32"/>
+        </pdo>
+        <pdo idx="1a03">
+          <pdoEntry idx="6003" subIdx="00" bitLen="32" halPin="index-byte" halType="u32"/>
+        </pdo>
+        <pdo idx="1a04">
+          <pdoEntry idx="6004" subIdx="00" bitLen="32" halPin="index-status" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+  </master>
+</masters>

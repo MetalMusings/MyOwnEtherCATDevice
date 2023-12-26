@@ -1,0 +1,24 @@
+component metalmusings_encoder;
+pin io bit index-c-enable;
+pin in u32 index-status;
+pin out u32 index-latch-enable;
+
+function _;
+license "GPL";
+;;
+
+// general pin set true function
+void set(hal_bit_t *p){
+    *p = 1;
+}
+
+// general pin set false function
+void unset(hal_bit_t *p){
+    *p = 0;
+}
+
+//main function
+FUNCTION(_) {
+    index_latch_enable = index_c_enable;
+    index_c_enable = index_status;
+}
