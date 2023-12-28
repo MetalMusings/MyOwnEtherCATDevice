@@ -97,10 +97,10 @@ net z-drv-target-velo     cia402.1.drv-target-velocity => lcec.0.5.target-veloci
 setp iocontrol.0.emc-enable-in 1
 #net estop iocontrol.0.emc-enable-in lcec.0.1.din-0
 
-#setp lcec.0.3.enc-pos-scale [SPINDLE_9]ENCODER_SCALE
+setp lcec.0.3.enc-pos-scale [SPINDLE_9]ENCODER_SCALE
 setp lcec.0.6.enc-pos-scale [SPINDLE_9]ENCODER_SCALE
 
-#net spindle-revs <= lcec.0.3.enc-pos
+net spindle-revs <= lcec.0.3.enc-pos
 net spindle-revs <= lcec.0.6.enc-position
 loadrt invert 
 loadrt mult2    names=mult2.rps,mult2.rpm
@@ -112,10 +112,10 @@ setp invert.0.in          [SPINDLE_9]ENCODER_SCALE
 setp mult2.rpm.in0        -60.0
 setp mult2.rpm.in0        60.0
 #net  enc-invert-pos-scale mult2.rps.in0  <= invert.0.out
-#net  enc-get-freq-rps     mult2.rps.in1  <= lcec.0.3.enc-frequency
+net  enc-get-freq-rps     mult2.rps.in1  <= lcec.0.3.enc-frequency
 #net  spindle-vel-fb-rps   mult2.rpm.in1  <= mult2.rps.out
 #net  spindle-vel-fb-rpm   mult2.rpm.out
-#net  spindle-index-enable lcec.0.3.enc-index-c-enable
+net  spindle-index-enable lcec.0.3.enc-index-c-enable
 
 net  spindle-vel-fb-rps   mult2.rpm.in1  <= lcec.0.6.enc-frequency
 net  spindle-vel-fb-rpm   mult2.rpm.out

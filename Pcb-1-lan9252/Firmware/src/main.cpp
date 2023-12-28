@@ -28,13 +28,14 @@ uint32_t CurPosScale = 1;
 uint8_t OldLatchCEnable = 0;
 volatile uint8_t indexPulseFired = 0;
 uint32_t nFires = 0;
-volatile uint8_t pleaseZeroTheCounter=0;
+volatile uint8_t pleaseZeroTheCounter = 0;
+uint32_t PrevTime = 0, Prev2Time = 0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
    if (Obj.IndexLatchEnable && !OldLatchCEnable) // Should only happen first time IndexCEnable is set
    {
-      pleaseZeroTheCounter=1;
+      pleaseZeroTheCounter = 1;
    }
    OldLatchCEnable = Obj.IndexLatchEnable;
 
@@ -55,7 +56,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       nFires++;
       PreviousEncoderCounterValue = 0;
    }
-   Obj.DiffT = nFires;
+   uint64_t now = micros();
+   Obj.DiffT = now - Prev2Time;
+   Prev2Time = PrevTime;
+   PrevTime = now;
 
    int64_t pos = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
    double CurPos = pos * PosScaleRes;
@@ -63,8 +67,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 
    double diffT = 0;
    double diffPos = 0;
-   TDelta.push(ESCvar.Time); // Too bad resolution to measure over 1 ms. The length of the circular buffers
-   Pos.push(CurPos);         // tells over how long time the position is measured.
+   TDelta.push(ESCvar.Time); // Running average over the length of the circular buffer
+   Pos.push(CurPos);
    if (Pos.size() >= 2)
    {
       diffT = 1.0e-9 * (TDelta.last() - TDelta.first()); // Time is in nanoseconds
@@ -80,7 +84,6 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       nFires++;
       PreviousEncoderCounterValue = 0;
    }
-   Obj.DiffT = nFires;
    Obj.IndexByte = digitalRead(INDEX_PIN);
    if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
