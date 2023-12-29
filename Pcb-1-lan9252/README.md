@@ -30,6 +30,16 @@ The .ioc file can be opened in CubeMX. The STM32F407 processor has functions tie
 
 I have put [Dig_8IN_8OUT.xml](Dig_8IN_8OUT.xml) here, this is an example ESI file for the LAN9252 IC standalone, no MCU needed. It's sometimes handy to have the simplest possible ESI file at ahnd, here it is. You find the ESI file for the Encoder application [here](Firmware/lib/soes/MetalMusings_EaserCAT_2000_encoder.xml)
 
+##### **linuxcnc** contains modifications to make EaserCAT 2000 work
+
+The configuration files and the hal component I used are placed here.
+
+##### LAN9252_eeprom_store_valid
+
+Arduino sketch to program the AT24C32 eeprom with a valid eeprom content. Hook up the eeprom using I2C and run the program. The verification in the of theprogram must be passed for valid programming.
+
+
+
 ###License
 
 Don't violate the original licenses. No warranties. Use it any way you like.
