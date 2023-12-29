@@ -56,7 +56,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       nFires++;
       PreviousEncoderCounterValue = 0;
    }
-   uint64_t now = micros();
+   uint64_t now = micros(); // Exploring the cycle times
    Obj.DiffT = now - Prev2Time;
    Prev2Time = PrevTime;
    PrevTime = now;
@@ -76,14 +76,6 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    Obj.EncFrequency = diffT != 0 ? diffPos / diffT : 0.0; // Revolutions per second
 
-   Obj.IndexStatus = 0;
-   if (indexPulseFired)
-   {
-      Obj.IndexStatus = 1;
-      indexPulseFired = 0;
-      nFires++;
-      PreviousEncoderCounterValue = 0;
-   }
    Obj.IndexByte = digitalRead(INDEX_PIN);
    if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
