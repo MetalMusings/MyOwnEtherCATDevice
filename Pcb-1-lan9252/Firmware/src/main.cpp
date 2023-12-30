@@ -11,9 +11,9 @@ extern "C"
 CircularBuffer<double_t, RINGBUFFERLEN> Pos;
 CircularBuffer<uint32_t, RINGBUFFERLEN> TDelta;
 
+#include <Stm32F4_Encoder.h>
 int64_t PreviousEncoderCounterValue = 0;
 int64_t unwrap_encoder(uint16_t in, int64_t *prev);
-#include <Stm32F4_Encoder.h>
 Encoder EncoderInit;
 Encoder *encP = &EncoderInit;
 
@@ -22,6 +22,8 @@ Encoder *encP = &EncoderInit;
 HardwareSerial Serial1(PA10, PA9);
 _Objects Obj;
 
+volatile uint32_t sync0s = 0;
+
 void indexPulse(void);
 double PosScaleRes = 1.0;
 uint32_t CurPosScale = 1;
@@ -29,7 +31,6 @@ uint8_t OldLatchCEnable = 0;
 volatile uint8_t indexPulseFired = 0;
 uint32_t nFires = 0;
 volatile uint8_t pleaseZeroTheCounter = 0;
-uint32_t PrevTime = 0, Prev2Time = 0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -56,10 +57,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       nFires++;
       PreviousEncoderCounterValue = 0;
    }
-   uint64_t now = micros(); // Exploring the cycle times
-   Obj.DiffT = now - Prev2Time;
-   Prev2Time = PrevTime;
-   PrevTime = now;
+   Obj.DiffT = sync0s;
 
    int64_t pos = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
    double CurPos = pos * PosScaleRes;
@@ -81,10 +79,14 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       Serial1.printf("IS 1\n");
 }
 
+void ESC_interrupt_enable(uint32_t mask);
+void ESC_interrupt_disable(uint32_t mask);
+uint16_t dc_checker (void);
+
 static esc_cfg_t config =
     {
         .user_arg = NULL,
-        .use_interrupt = 0,
+        .use_interrupt = 1,
         .watchdog_cnt = 150,
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
@@ -95,10 +97,10 @@ static esc_cfg_t config =
         .post_object_download_hook = NULL,
         .rxpdo_override = NULL,
         .txpdo_override = NULL,
-        .esc_hw_interrupt_enable = NULL,
-        .esc_hw_interrupt_disable = NULL,
+        .esc_hw_interrupt_enable = ESC_interrupt_enable,
+        .esc_hw_interrupt_disable = ESC_interrupt_disable,
         .esc_hw_eep_handler = NULL,
-        .esc_check_dc_handler = NULL,
+        .esc_check_dc_handler = dc_checker,
 };
 
 void setup(void)
@@ -151,4 +153,57 @@ void indexPulse(void)
       TDelta.clear();
       pleaseZeroTheCounter = 0;
    }
+}
+
+void countSync0(void)
+{
+   sync0s++;
+}
+
+void ESC_interrupt_enable(uint32_t mask)
+{
+   // Enable interrupt for SYNC0 or SM2 or SM3
+   uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 |
+                            ESCREG_ALEVENT_SM2 |
+                            ESCREG_ALEVENT_SM3;
+   if (mask & user_int_mask)
+   {
+      ESC_ALeventmaskwrite(ESC_ALeventmaskread() | (mask & user_int_mask));
+
+      attachInterrupt(digitalPinToInterrupt(PC3), countSync0, RISING);
+
+      // Set LAN9252 interrupt pin driver as push-pull active high
+      uint32_t bits = 0x00000111;
+      ESC_write(0x54, &bits, 4);
+
+      // Enable LAN9252 interrupt
+      bits = 0x00000001;
+      ESC_write(0x5c, &bits, 4);
+   }
+}
+
+void ESC_interrupt_disable(uint32_t mask)
+{
+   // Enable interrupt for SYNC0 or SM2 or SM3
+   uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 |
+                            ESCREG_ALEVENT_SM2 |
+                            ESCREG_ALEVENT_SM3;
+
+   if (mask & user_int_mask)
+   {
+      // Disable interrupt from SYNC0
+      ESC_ALeventmaskwrite(ESC_ALeventmaskread() & ~(mask & user_int_mask));
+      detachInterrupt(digitalPinToInterrupt(PC3));
+      // Disable LAN9252 interrupt
+      uint32_t bits = 0x00000000;
+      ESC_write(0x5c, &bits, 4);
+   }
+}
+
+// Setup of DC 
+uint16_t dc_checker (void)
+{
+   // Indicate we run DC 
+   ESCvar.dcsync = 1;
+   return 0;
 }
