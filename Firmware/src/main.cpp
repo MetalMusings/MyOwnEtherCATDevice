@@ -86,7 +86,7 @@ uint16_t dc_checker(void);
 static esc_cfg_t config =
     {
         .user_arg = NULL,
-        .use_interrupt = 0,
+        .use_interrupt = 1,
         .watchdog_cnt = 150,
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
@@ -97,13 +97,10 @@ static esc_cfg_t config =
         .post_object_download_hook = NULL,
         .rxpdo_override = NULL,
         .txpdo_override = NULL,
-        //.esc_hw_interrupt_enable = ESC_interrupt_enable,
-        //.esc_hw_interrupt_disable = ESC_interrupt_disable,
-        .esc_hw_interrupt_enable = NULL,
-        .esc_hw_interrupt_disable = NULL,
+        .esc_hw_interrupt_enable = ESC_interrupt_enable,
+        .esc_hw_interrupt_disable = ESC_interrupt_disable,
         .esc_hw_eep_handler = NULL,
-        // .esc_check_dc_handler = dc_checker,
-        .esc_check_dc_handler = NULL,
+        .esc_check_dc_handler = dc_checker,
 };
 
 void setup(void)
