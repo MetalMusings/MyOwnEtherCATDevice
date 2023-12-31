@@ -940,7 +940,7 @@
     )
     (pin "1" (uuid 23f3c69e-afb4-43bf-9acc-6d55efc294d7))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -968,7 +968,7 @@
     )
     (pin "1" (uuid f8855c24-f07a-4a5c-aa93-111c38c54998))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -996,7 +996,7 @@
     )
     (pin "1" (uuid 12cbe4d8-e548-42e4-8ed0-1663c1c72f12))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1010,7 +1010,7 @@
   (symbol (lib_id "Device:R") (at 71.12 92.71 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 10d87c4c-c4d6-4df7-b739-131249afa699)
-    (property "Reference" "R60" (at 71.12 92.71 90)
+    (property "Reference" "R41" (at 71.12 92.71 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 72.39 88.9 0)
@@ -1025,9 +1025,9 @@
     (pin "1" (uuid 47639c9d-1d96-4116-8203-161985cc905d))
     (pin "2" (uuid a52f2ffa-2584-41b0-832b-a1b5cdb8c45a))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R60") (unit 1)
+          (reference "R41") (unit 1)
         )
       )
     )
@@ -1036,7 +1036,7 @@
   (symbol (lib_id "Device:R") (at 63.5 68.58 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 13a82430-c8ee-4250-a3cb-e52cb6a30faa)
-    (property "Reference" "R51" (at 63.5 68.58 90)
+    (property "Reference" "R8" (at 63.5 68.58 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 64.77 64.77 0)
@@ -1051,9 +1051,9 @@
     (pin "1" (uuid 5832c5ba-1250-4b60-950a-508431c4307c))
     (pin "2" (uuid 54632a52-1c29-46a3-8873-d89cd21ad170))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R51") (unit 1)
+          (reference "R8") (unit 1)
         )
       )
     )
@@ -1062,7 +1062,7 @@
   (symbol (lib_id "Connector:Conn_01x05_Pin") (at 81.28 101.6 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 1c84a65c-5122-4a9d-93c5-c95fdce8d967)
-    (property "Reference" "J13" (at 81.9912 100.3879 0)
+    (property "Reference" "J8" (at 81.9912 100.3879 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Encoder 3" (at 81.9912 102.8121 0)
@@ -1080,9 +1080,9 @@
     (pin "4" (uuid 5389b8f8-f6f1-4a81-86fc-36b270e9e779))
     (pin "5" (uuid 0d505531-e434-4969-b3d5-470caf1c249d))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J13") (unit 1)
+          (reference "J8") (unit 1)
         )
       )
     )
@@ -1091,7 +1091,7 @@
   (symbol (lib_id "Device:R") (at 67.31 44.45 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1f6cd783-9186-4110-918c-22956cf2a8ab)
-    (property "Reference" "R54" (at 67.31 44.45 90)
+    (property "Reference" "R2" (at 67.31 44.45 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 68.58 40.64 0)
@@ -1106,9 +1106,9 @@
     (pin "1" (uuid 12c26344-7596-4c8f-af8f-9e9efe4b161a))
     (pin "2" (uuid 844a6691-8752-45a1-8292-2f0d78e136be))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R54") (unit 1)
+          (reference "R2") (unit 1)
         )
       )
     )
@@ -1131,7 +1131,7 @@
     )
     (pin "1" (uuid 75177a4e-e439-4047-942d-4a88b4b2dd4e))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1145,7 +1145,7 @@
   (symbol (lib_id "Device:R") (at 64.77 116.84 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 392ac5db-26e1-4917-a929-e966ccef6bd2)
-    (property "Reference" "R53" (at 64.77 116.84 90)
+    (property "Reference" "R22" (at 64.77 116.84 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 66.04 113.03 0)
@@ -1160,9 +1160,9 @@
     (pin "1" (uuid 71deb045-33bc-45f2-bdde-da80f96b573a))
     (pin "2" (uuid c64dd24f-7c01-4159-909b-3504dfef6bf0))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R53") (unit 1)
+          (reference "R22") (unit 1)
         )
       )
     )
@@ -1185,7 +1185,7 @@
     )
     (pin "1" (uuid 4a20576e-c962-40f8-909a-4a006b523bc7))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1213,7 +1213,7 @@
     )
     (pin "1" (uuid b5a796f8-f145-4f9c-a19d-5ec662ca48fc))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1227,7 +1227,7 @@
   (symbol (lib_id "Device:R") (at 67.31 92.71 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4fb33cd9-ab35-41e8-9f9e-8140f99baa4f)
-    (property "Reference" "R56" (at 67.31 92.71 90)
+    (property "Reference" "R36" (at 67.31 92.71 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 68.58 88.9 0)
@@ -1242,9 +1242,9 @@
     (pin "1" (uuid 80c2d502-1889-473e-ae1e-fe3e4abd8815))
     (pin "2" (uuid f539fb75-f3a5-48aa-aaa8-9947fdfc44d7))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R56") (unit 1)
+          (reference "R36") (unit 1)
         )
       )
     )
@@ -1253,7 +1253,7 @@
   (symbol (lib_id "Connector:Conn_01x03_Pin") (at 76.2 146.05 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5333effc-7687-4ee9-907a-50564ca8d5a9)
-    (property "Reference" "J10" (at 73.66 146.05 0)
+    (property "Reference" "J7" (at 73.66 146.05 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "DAC1" (at 91.44 146.05 0)
@@ -1269,9 +1269,9 @@
     (pin "3" (uuid c1a91b41-d4bb-457e-b0d5-5e5a8a7c21e3))
     (pin "2" (uuid 5bf3ceb0-d975-4ee0-960b-e957ee85ddcf))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J10") (unit 1)
+          (reference "J7") (unit 1)
         )
       )
     )
@@ -1294,7 +1294,7 @@
     )
     (pin "1" (uuid 33623f8b-7963-47a3-81d9-bf347e264dbf))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1308,7 +1308,7 @@
   (symbol (lib_id "Device:R") (at 71.12 44.45 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 60d91c1b-c1ae-4fea-a103-74cf4adc6ef3)
-    (property "Reference" "R58" (at 71.12 44.45 90)
+    (property "Reference" "R3" (at 71.12 44.45 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 72.39 40.64 0)
@@ -1323,9 +1323,9 @@
     (pin "1" (uuid df8f8ed2-da37-464e-b904-951ca39108a8))
     (pin "2" (uuid 7cab4630-1636-418a-b118-bd4231413c30))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R58") (unit 1)
+          (reference "R3") (unit 1)
         )
       )
     )
@@ -1334,7 +1334,7 @@
   (symbol (lib_id "Device:R") (at 63.5 44.45 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6205b81a-3f1e-4c02-9f7e-21413744183e)
-    (property "Reference" "R50" (at 63.5 44.45 90)
+    (property "Reference" "R1" (at 63.5 44.45 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 64.77 40.64 0)
@@ -1349,9 +1349,9 @@
     (pin "1" (uuid b90e7914-bbae-4881-9977-6a7a2dcc9fda))
     (pin "2" (uuid 11ad5fde-617c-4dac-951b-6b24e7292439))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R50") (unit 1)
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -1374,7 +1374,7 @@
     )
     (pin "1" (uuid f8356eea-1205-4923-ae4e-9fa2aa74ecfb))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1402,7 +1402,7 @@
     )
     (pin "1" (uuid 9439d226-2512-4eb7-a25d-a7fbf282d78c))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1430,7 +1430,7 @@
     )
     (pin "1" (uuid a2f3e71f-2960-4e03-bb95-5a5c7eef6aca))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1458,7 +1458,7 @@
     )
     (pin "1" (uuid 7ffd3275-c83d-46f7-8c90-d99e31fbdfb2))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1472,7 +1472,7 @@
   (symbol (lib_id "Device:R") (at 67.31 68.58 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8c98ccb6-e2c4-48b8-9f34-f2506c1d2e3e)
-    (property "Reference" "R55" (at 67.31 68.58 90)
+    (property "Reference" "R9" (at 67.31 68.58 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 68.58 64.77 0)
@@ -1487,9 +1487,9 @@
     (pin "1" (uuid ba3d8ee6-96d3-4e2a-8f11-c483343817ea))
     (pin "2" (uuid 7b04a0ba-1011-4916-a94e-3addca4bb7d4))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R55") (unit 1)
+          (reference "R9") (unit 1)
         )
       )
     )
@@ -1498,7 +1498,7 @@
   (symbol (lib_id "Connector:Conn_01x05_Pin") (at 81.28 77.47 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 961574f6-6377-4800-9f44-d18aac623304)
-    (property "Reference" "J12" (at 81.9912 76.2579 0)
+    (property "Reference" "J4" (at 81.9912 76.2579 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Encoder 2" (at 81.9912 78.6821 0)
@@ -1516,9 +1516,9 @@
     (pin "4" (uuid 990a65af-297a-4f87-8998-6aa41d3cb8d3))
     (pin "5" (uuid 69c0e3e8-a858-4e02-a0c8-1fa828dc8c37))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J12") (unit 1)
+          (reference "J4") (unit 1)
         )
       )
     )
@@ -1541,7 +1541,7 @@
     )
     (pin "1" (uuid 3c923bac-8405-45c7-a74c-6a363eec7d84))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1555,7 +1555,7 @@
   (symbol (lib_id "Connector:Conn_01x05_Pin") (at 82.55 125.73 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid bf40be7c-de17-409c-b5ef-5b18f35948f9)
-    (property "Reference" "J14" (at 83.2612 124.5179 0)
+    (property "Reference" "J6" (at 83.2612 124.5179 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Encoder 4" (at 83.2612 126.9421 0)
@@ -1573,9 +1573,9 @@
     (pin "4" (uuid 7ae77234-5780-4b3b-a75b-3216e6e9a83f))
     (pin "5" (uuid d812103e-792d-4cb0-8951-2bac9a9c9503))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J14") (unit 1)
+          (reference "J6") (unit 1)
         )
       )
     )
@@ -1598,7 +1598,7 @@
     )
     (pin "1" (uuid 6d821f3a-d89c-4799-90f3-9cd615c5d3ee))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1612,7 +1612,7 @@
   (symbol (lib_id "Device:R") (at 72.39 116.84 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid cce125df-b506-49fe-a527-fbc672f08648)
-    (property "Reference" "R61" (at 72.39 116.84 90)
+    (property "Reference" "R29" (at 72.39 116.84 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 73.66 113.03 0)
@@ -1627,9 +1627,9 @@
     (pin "1" (uuid 9db9c4ba-ea66-4649-aa53-c88638ba6331))
     (pin "2" (uuid 540e8541-5769-42ce-b0f6-1cc85f0fe147))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R61") (unit 1)
+          (reference "R29") (unit 1)
         )
       )
     )
@@ -1638,7 +1638,7 @@
   (symbol (lib_id "Connector:Conn_01x05_Pin") (at 81.28 53.34 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid d5941a4c-e7e4-411a-a70c-a9b8e3c1bfce)
-    (property "Reference" "J11" (at 81.9912 52.1279 0)
+    (property "Reference" "J2" (at 81.9912 52.1279 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Encoder 1" (at 81.9912 54.5521 0)
@@ -1656,9 +1656,9 @@
     (pin "4" (uuid 10f66ad1-8425-4d47-9a21-2dabc23be413))
     (pin "5" (uuid 33f07966-a0a1-4252-a420-396366f07c38))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J11") (unit 1)
+          (reference "J2") (unit 1)
         )
       )
     )
@@ -1681,7 +1681,7 @@
     )
     (pin "1" (uuid 39b1a121-7ad5-4a0f-a1f5-c192907c022b))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1695,7 +1695,7 @@
   (symbol (lib_id "Device:R") (at 63.5 92.71 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ed1edc57-26e1-4234-abcd-a22b87379f7e)
-    (property "Reference" "R52" (at 63.5 92.71 90)
+    (property "Reference" "R32" (at 63.5 92.71 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 64.77 88.9 0)
@@ -1710,9 +1710,9 @@
     (pin "1" (uuid 3c8cc804-7e28-4c29-979f-5435fa740934))
     (pin "2" (uuid b8a330b7-96fe-42d1-aa02-687e85f7ab2a))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R52") (unit 1)
+          (reference "R32") (unit 1)
         )
       )
     )
@@ -1721,7 +1721,7 @@
   (symbol (lib_id "Device:R") (at 68.58 116.84 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f6afafec-23d4-4288-b115-63bb96d688f9)
-    (property "Reference" "R57" (at 68.58 116.84 90)
+    (property "Reference" "R27" (at 68.58 116.84 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 69.85 113.03 0)
@@ -1736,9 +1736,9 @@
     (pin "1" (uuid 9e635052-58c2-4b83-8155-27fd32de84a7))
     (pin "2" (uuid 273a33f7-be7b-46dc-814e-cf5a4ed8483a))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R57") (unit 1)
+          (reference "R27") (unit 1)
         )
       )
     )
@@ -1761,7 +1761,7 @@
     )
     (pin "1" (uuid bd4f3ca7-a32d-43b0-97b0-68b5ca21e4a3))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )
@@ -1775,7 +1775,7 @@
   (symbol (lib_id "Connector:Conn_01x04_Pin") (at 71.12 156.21 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f6e9f205-080b-446b-8e6e-d2d2eaa67fb7)
-    (property "Reference" "J9" (at 69.85 156.21 0)
+    (property "Reference" "J14" (at 69.85 156.21 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "I2C bus2" (at 93.98 157.48 0)
@@ -1792,9 +1792,9 @@
     (pin "2" (uuid 96e6cf4c-75b4-47ff-bf47-f499c6b08032))
     (pin "4" (uuid 08ac2130-4308-4802-b146-2e4e12e8ea4f))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J9") (unit 1)
+          (reference "J14") (unit 1)
         )
       )
     )
@@ -1803,7 +1803,7 @@
   (symbol (lib_id "Device:R") (at 71.12 68.58 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid fba92b1b-a107-4bbf-b17c-e1290d74ed15)
-    (property "Reference" "R59" (at 71.12 68.58 90)
+    (property "Reference" "R18" (at 71.12 68.58 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "1k" (at 72.39 64.77 0)
@@ -1818,9 +1818,9 @@
     (pin "1" (uuid 545716f0-994b-46c9-a559-20747da6ba8b))
     (pin "2" (uuid 112446a2-014e-4ec2-bde4-34650f443b1c))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R59") (unit 1)
+          (reference "R18") (unit 1)
         )
       )
     )
@@ -1843,7 +1843,7 @@
     )
     (pin "1" (uuid f560dfa3-2e0f-409f-a64e-b0c197c17347))
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/d564400f-40ba-4aca-9c2a-14ec52a8353b"
           (reference "#PWR?") (unit 1)
         )

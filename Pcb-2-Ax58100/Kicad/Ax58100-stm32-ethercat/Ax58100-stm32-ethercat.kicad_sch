@@ -24,7 +24,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "5"))
       )
     )
@@ -41,7 +41,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "3"))
       )
     )
@@ -58,7 +58,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "2"))
       )
     )
@@ -75,7 +75,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "AX58100-stm32-ethercat"
+      (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "4"))
       )
     )
