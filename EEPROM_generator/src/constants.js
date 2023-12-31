@@ -28,10 +28,13 @@ const DTYPE = {
 	INTEGER8 : 'INTEGER8',
 	INTEGER16 : 'INTEGER16',
 	INTEGER32 : 'INTEGER32',
+	INTEGER32 : 'INTEGER64',
 	UNSIGNED8 : 'UNSIGNED8',
 	UNSIGNED16 : 'UNSIGNED16',
 	UNSIGNED32 : 'UNSIGNED32',
+	UNSIGNED32 : 'UNSIGNED64',
 	REAL32 : 'REAL32',
+	REAL64 : 'REAL64',
 	VISIBLE_STRING : 'VISIBLE_STRING',
 	/* TODO implement missing less common types */
 	// OCTET_STRING : 'OCTET_STRING',
@@ -49,10 +52,13 @@ const dtype_bitsize = {
 	'INTEGER8' : 8,
 	'INTEGER16' : 16,
 	'INTEGER32' : 32,
+	'INTEGER64' : 64,
 	'UNSIGNED8' : 8,
 	'UNSIGNED16' : 16,
 	'UNSIGNED32' : 32,
+	'UNSIGNED64' : 64,
 	'REAL32' : 32,
+	'REAL64' : 64,
 	'VISIBLE_STRING' : 8,
 };
 const booleanPaddingBitsize = 7;
@@ -62,10 +68,13 @@ const ESI_DT = {
 	'INTEGER8': { name: 'SINT', bitsize: 8, ctype: 'int8_t' },
 	'INTEGER16': { name: 'INT', bitsize: 16, ctype: 'int16_t' },
 	'INTEGER32': { name: 'DINT', bitsize: 32, ctype: 'int32_t' },
+	'INTEGER64': { name: 'LINT', bitsize: 64, ctype: 'int64_t' },
 	'UNSIGNED8': { name: 'USINT', bitsize: 8, ctype: 'uint8_t' },
 	'UNSIGNED16': { name: 'UINT', bitsize: 16, ctype: 'uint16_t' },
 	'UNSIGNED32': { name: 'UDINT', bitsize: 32, ctype: 'uint32_t' },
-	'REAL32': { name: 'REAL', bitsize: 32, ctype: 'float' }, // TODO check C type name
+	'UNSIGNED64': { name: 'ULINT', bitsize: 64, ctype: 'uint64_t' },
+	'REAL32': { name: 'REAL', bitsize: 32, ctype: 'float' }, 
+	'REAL64': { name: 'LREAL', bitsize: 64, ctype: 'double' }, 
 	'VISIBLE_STRING': { name: 'STRING', bitsize: 8, ctype: 'char *' }, // TODO check C type name
 };
 
