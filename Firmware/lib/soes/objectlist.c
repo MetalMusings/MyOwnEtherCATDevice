@@ -37,7 +37,7 @@ static const char acName1A03_01[] = "IndexByte";
 static const char acName1A04[] = "IndexStatus";
 static const char acName1A04_00[] = "Max SubIndex";
 static const char acName1A04_01[] = "IndexStatus";
-static const char acName1A05[] = "StepgenOut1";
+static const char acName1A05[] = "StepGenOut1";
 static const char acName1A05_00[] = "Max SubIndex";
 static const char acName1A05_01[] = "ActualPosition";
 static const char acName1C00[] = "Sync Manager Communication Type";
@@ -64,7 +64,7 @@ static const char acName6001[] = "EncFrequency";
 static const char acName6002[] = "DiffT";
 static const char acName6003[] = "IndexByte";
 static const char acName6004[] = "IndexStatus";
-static const char acName6005[] = "StepgenOut1";
+static const char acName6005[] = "StepGenOut1";
 static const char acName6005_00[] = "Max SubIndex";
 static const char acName6005_01[] = "ActualPosition";
 static const char acName7000[] = "EncPosScale";
@@ -75,7 +75,7 @@ static const char acName7002_01[] = "CommandedPosition";
 
 const _objd SDO1000[] =
 {
-  {0x0, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1000, 5001, NULL},
+  {0x0, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1000, 5001, NULL},
 };
 const _objd SDO1008[] =
 {
@@ -92,55 +92,55 @@ const _objd SDO100A[] =
 const _objd SDO1018[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1018_00, 4, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_01, 2730, NULL},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_02, 12303564, NULL},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_03, 2, NULL},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_04, 1, &Obj.serial},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1018_01, 2730, NULL},
+  {0x02, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1018_02, 12303564, NULL},
+  {0x03, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1018_03, 2, NULL},
+  {0x04, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1018_04, 1, &Obj.serial},
 };
 const _objd SDO1600[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1600_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_01, 0x70000020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1600_01, 0x70000020, NULL},
 };
 const _objd SDO1601[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1601_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_01, 0x70010020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1601_01, 0x70010020, NULL},
 };
 const _objd SDO1602[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1602_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_01, 0x70020120, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1602_01, 0x70020120, NULL},
 };
 const _objd SDO1A00[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A00_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A00_01, 0x60000020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A00_01, 0x60000020, NULL},
 };
 const _objd SDO1A01[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A01_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A01_01, 0x60010020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A01_01, 0x60010020, NULL},
 };
 const _objd SDO1A02[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A02_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A02_01, 0x60020020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A02_01, 0x60020020, NULL},
 };
 const _objd SDO1A03[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A03_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A03_01, 0x60030020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A03_01, 0x60030020, NULL},
 };
 const _objd SDO1A04[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A04_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A04_01, 0x60040020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A04_01, 0x60040020, NULL},
 };
 const _objd SDO1A05[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A05_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A05_01, 0x60050120, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A05_01, 0x60050120, NULL},
 };
 const _objd SDO1C00[] =
 {
@@ -190,7 +190,7 @@ const _objd SDO6004[] =
 const _objd SDO6005[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6005_00, 1, NULL},
-  {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName6005_01, 0, &Obj.StepgenOut1.ActualPosition},
+  {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName6005_01, 0, &Obj.StepGenOut1.ActualPosition},
 };
 const _objd SDO7000[] =
 {

@@ -86,7 +86,7 @@ uint16_t dc_checker(void);
 static esc_cfg_t config =
     {
         .user_arg = NULL,
-        .use_interrupt = 1,
+        .use_interrupt = 0,
         .watchdog_cnt = 150,
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
@@ -97,10 +97,13 @@ static esc_cfg_t config =
         .post_object_download_hook = NULL,
         .rxpdo_override = NULL,
         .txpdo_override = NULL,
-        .esc_hw_interrupt_enable = ESC_interrupt_enable,
-        .esc_hw_interrupt_disable = ESC_interrupt_disable,
+        //.esc_hw_interrupt_enable = ESC_interrupt_enable,
+        //.esc_hw_interrupt_disable = ESC_interrupt_disable,
+        .esc_hw_interrupt_enable = NULL,
+        .esc_hw_interrupt_disable = NULL,
         .esc_hw_eep_handler = NULL,
-        .esc_check_dc_handler = dc_checker,
+        // .esc_check_dc_handler = dc_checker,
+        .esc_check_dc_handler = NULL,
 };
 
 void setup(void)
@@ -161,13 +164,13 @@ volatile int32_t requestedPosition;
 volatile uint32_t pulsesToGo = 0;
 volatile byte forwardDirection = 0; // 1 if going forward
 #define STEPPER_DIR PA12
-//#define STEPPER_STEP PA11 // Set in StepperSetup
+// #define STEPPER_STEP PA11 // Set in StepperSetup
 
 void sync0Handler(void)
 {
    // Update the actual position
    actualPosition += pulsesToGo;
-   Obj.StepgenOut1.ActualPosition = actualPosition;
+   Obj.StepGenOut1.ActualPosition = actualPosition;
    // Get new end position
    requestedPosition = Obj.StepGenIn1.CommandedPosition;
    // Get the diff and the direction
@@ -176,7 +179,7 @@ void sync0Handler(void)
    // Set direction pin
    digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
    // Make the pulses using hardware timer
-   makePulses(sync0CycleTime/1000, pulsesToGo);    
+   makePulses(sync0CycleTime / 1000, pulsesToGo);
 }
 
 void ESC_interrupt_enable(uint32_t mask)

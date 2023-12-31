@@ -107,7 +107,7 @@
       },
       "6005": {
         "otype": "RECORD",
-        "name": "StepgenOut1",
+        "name": "StepGenOut1",
         "access": "RO",
         "items": [
           {
@@ -116,7 +116,7 @@
           {
             "name": "ActualPosition",
             "dtype": "INTEGER32",
-            "data": "&Obj.StepgenOut1.ActualPosition",
+            "data": "&Obj.StepGenOut1.ActualPosition",
             "value": "0",
             "access": "RO"
           }

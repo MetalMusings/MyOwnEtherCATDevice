@@ -23,7 +23,7 @@
             <DataTypes>
               <DataType>
                 <Name>DT1018</Name>
-                <BitSize>144</BitSize>
+                <BitSize>272</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -37,8 +37,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>Vendor ID</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -47,9 +47,9 @@
                 <SubItem>
                   <SubIdx>2</SubIdx>
                   <Name>Product Code</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>48</BitOffs>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -57,9 +57,9 @@
                 <SubItem>
                   <SubIdx>3</SubIdx>
                   <Name>Revision Number</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>80</BitOffs>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>144</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -67,9 +67,9 @@
                 <SubItem>
                   <SubIdx>4</SubIdx>
                   <Name>Serial Number</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>112</BitOffs>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>208</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -77,7 +77,7 @@
               </DataType>
               <DataType>
                 <Name>DT1600</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -91,8 +91,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>EncPosScale</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -101,7 +101,7 @@
               </DataType>
               <DataType>
                 <Name>DT1601</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -115,8 +115,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>IndexLatchEnable</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -125,7 +125,7 @@
               </DataType>
               <DataType>
                 <Name>DT1602</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -139,8 +139,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>CommandedPosition</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -149,7 +149,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A00</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -163,8 +163,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>EncPos</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -173,7 +173,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A01</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -187,8 +187,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>EncFrequency</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -197,7 +197,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A02</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -211,8 +211,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>DiffT</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -221,7 +221,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A03</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -235,8 +235,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>IndexByte</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -245,7 +245,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A04</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -259,8 +259,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>IndexStatus</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -269,7 +269,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A05</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -283,8 +283,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>ActualPosition</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -438,8 +438,8 @@
                 </SubItem>
               </DataType>
               <DataType>
-                <Name>UDINT</Name>
-                <BitSize>32</BitSize>
+                <Name>ULINT</Name>
+                <BitSize>64</BitSize>
               </DataType>
               <DataType>
                 <Name>STRING(26)</Name>
@@ -462,6 +462,10 @@
                 <BitSize>32</BitSize>
               </DataType>
               <DataType>
+                <Name>UDINT</Name>
+                <BitSize>32</BitSize>
+              </DataType>
+              <DataType>
                 <Name>DINT</Name>
                 <BitSize>32</BitSize>
               </DataType>
@@ -470,8 +474,8 @@
               <Object>
                 <Index>#x1000</Index>
                 <Name>Device Type</Name>
-                <Type>UDINT</Type>
-                <BitSize>32</BitSize>
+                <Type>ULINT</Type>
+                <BitSize>64</BitSize>
                 <Info>
                   <DefaultValue>5001</DefaultValue>
                 </Info>
@@ -521,7 +525,7 @@
                 <Index>#x1018</Index>
                 <Name>Identity Object</Name>
                 <Type>DT1018</Type>
-                <BitSize>144</BitSize>
+                <BitSize>272</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -562,7 +566,7 @@
                 <Index>#x1600</Index>
                 <Name>EncPosScale</Name>
                 <Type>DT1600</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -585,7 +589,7 @@
                 <Index>#x1601</Index>
                 <Name>IndexLatchEnable</Name>
                 <Type>DT1601</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -608,7 +612,7 @@
                 <Index>#x1602</Index>
                 <Name>StepGenIn1</Name>
                 <Type>DT1602</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -631,7 +635,7 @@
                 <Index>#x1A00</Index>
                 <Name>EncPos</Name>
                 <Type>DT1A00</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -654,7 +658,7 @@
                 <Index>#x1A01</Index>
                 <Name>EncFrequency</Name>
                 <Type>DT1A01</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -677,7 +681,7 @@
                 <Index>#x1A02</Index>
                 <Name>DiffT</Name>
                 <Type>DT1A02</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -700,7 +704,7 @@
                 <Index>#x1A03</Index>
                 <Name>IndexByte</Name>
                 <Type>DT1A03</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -723,7 +727,7 @@
                 <Index>#x1A04</Index>
                 <Name>IndexStatus</Name>
                 <Type>DT1A04</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -744,9 +748,9 @@
               </Object>
               <Object>
                 <Index>#x1A05</Index>
-                <Name>StepgenOut1</Name>
+                <Name>StepGenOut1</Name>
                 <Type>DT1A05</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -961,7 +965,7 @@
               </Object>
               <Object>
                 <Index>#x6005</Index>
-                <Name>StepgenOut1</Name>
+                <Name>StepGenOut1</Name>
                 <Type>DT6005</Type>
                 <BitSize>48</BitSize>
                 <Info>
@@ -1131,7 +1135,7 @@
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A05</Index>
-          <Name>StepgenOut1</Name>
+          <Name>StepGenOut1</Name>
           <Entry>
             <Index>#x6005</Index>
             <SubIndex>#x1</SubIndex>

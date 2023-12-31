@@ -21,7 +21,7 @@ typedef struct
    struct
    {
       int32_t ActualPosition;
-   } StepgenOut1;
+   } StepGenOut1;
 
    /* Outputs */
 
