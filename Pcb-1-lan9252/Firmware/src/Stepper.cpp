@@ -71,7 +71,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim)
     PE9     ------> TIM1_CH1
     PA8     ------< TIM1_CH1
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_8; // 9;
+    GPIO_InitStruct.Pin = GPIO_PIN_11; // 9;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -97,7 +97,7 @@ void StepperSetup(void)
 
   // htim1.Instance->ARR = 1;
   // htim1.Instance->CCR1 = 1;
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
   TIM_TypeDef *TIMM = TIM1;
 
 #define CLOCK_FREQ (168000000-2000000)

@@ -17,12 +17,10 @@ int64_t unwrap_encoder(uint16_t in, int64_t *prev);
 Encoder EncoderInit;
 Encoder *encP = &EncoderInit;
 
-// #include "Stepper.h"
+#include "Stepper.h"
 #define INDEX_PIN PA2
 HardwareSerial Serial1(PA10, PA9);
 _Objects Obj;
-
-volatile uint32_t sync0s = 0;
 
 void indexPulse(void);
 double PosScaleRes = 1.0;
@@ -31,6 +29,8 @@ uint8_t OldLatchCEnable = 0;
 volatile uint8_t indexPulseFired = 0;
 uint32_t nFires = 0;
 volatile uint8_t pleaseZeroTheCounter = 0;
+
+uint32_t sync0CycleTime = 0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -57,7 +57,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       nFires++;
       PreviousEncoderCounterValue = 0;
    }
-   Obj.DiffT = sync0s;
+   Obj.DiffT = sync0CycleTime;
 
    int64_t pos = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
    double CurPos = pos * PosScaleRes;
@@ -81,7 +81,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 
 void ESC_interrupt_enable(uint32_t mask);
 void ESC_interrupt_disable(uint32_t mask);
-uint16_t dc_checker (void);
+uint16_t dc_checker(void);
 
 static esc_cfg_t config =
     {
@@ -108,6 +108,7 @@ void setup(void)
    Serial1.begin(115200);
    rcc_config();
 
+   StepperSetup();
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
    // EncoderInit.SetCount(Tim3, 0);
@@ -155,9 +156,27 @@ void indexPulse(void)
    }
 }
 
-void countSync0(void)
+volatile int32_t actualPosition = 0;
+volatile int32_t requestedPosition;
+volatile uint32_t pulsesToGo = 0;
+volatile byte forwardDirection = 0; // 1 if going forward
+#define STEPPER_DIR PA12
+//#define STEPPER_STEP PA11 // Set in StepperSetup
+
+void sync0Handler(void)
 {
-   sync0s++;
+   // Update the actual position
+   actualPosition += pulsesToGo;
+   Obj.StepgenOut1.ActualPosition = actualPosition;
+   // Get new end position
+   requestedPosition = Obj.StepGenIn1.CommandedPosition;
+   // Get the diff and the direction
+   pulsesToGo = requestedPosition - actualPosition;
+   forwardDirection = pulsesToGo > 0 ? 1 : 0;
+   // Set direction pin
+   digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
+   // Make the pulses using hardware timer
+   makePulses(sync0CycleTime/1000, pulsesToGo);    
 }
 
 void ESC_interrupt_enable(uint32_t mask)
@@ -170,7 +189,7 @@ void ESC_interrupt_enable(uint32_t mask)
    {
       ESC_ALeventmaskwrite(ESC_ALeventmaskread() | (mask & user_int_mask));
 
-      attachInterrupt(digitalPinToInterrupt(PC3), countSync0, RISING);
+      attachInterrupt(digitalPinToInterrupt(PC3), sync0Handler, RISING);
 
       // Set LAN9252 interrupt pin driver as push-pull active high
       uint32_t bits = 0x00000111;
@@ -200,10 +219,12 @@ void ESC_interrupt_disable(uint32_t mask)
    }
 }
 
-// Setup of DC 
-uint16_t dc_checker (void)
+extern "C" uint32_t ESC_SYNC0cycletime(void);
+// Setup of DC
+uint16_t dc_checker(void)
 {
-   // Indicate we run DC 
+   // Indicate we run DC
    ESCvar.dcsync = 1;
+   sync0CycleTime = ESC_SYNC0cycletime();
    return 0;
 }

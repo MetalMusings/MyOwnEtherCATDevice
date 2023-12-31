@@ -18,11 +18,19 @@ typedef struct
    uint32_t DiffT;
    uint32_t IndexByte;
    uint32_t IndexStatus;
+   struct
+   {
+      int32_t ActualPosition;
+   } StepgenOut1;
 
    /* Outputs */
 
    int32_t EncPosScale;
    uint32_t IndexLatchEnable;
+   struct
+   {
+      int32_t CommandedPosition;
+   } StepGenIn1;
 
 } _Objects;
 
