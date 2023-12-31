@@ -1,0 +1,52 @@
+diff --git a/src/lcec_conf.c b/src/lcec_conf.c
+index b0e9ad1..607c6d7 100644
+--- a/src/lcec_conf.c
++++ b/src/lcec_conf.c
+@@ -1267,6 +1267,11 @@ static void parsePdoEntryAttrs(LCEC_CONF_XML_INST_T *inst, int next, const char
+         p->halType = HAL_FLOAT;
+         continue;
+       }
++      if (strcasecmp(val, "float-lreal") == 0) {
++        p->subType = lcecPdoEntTypeFloatLREAL;
++        p->halType = HAL_FLOAT;
++        continue;
++      }
+       fprintf(stderr, "%s: ERROR: Invalid pdoEntry halType %s\n", modname, val);
+       XML_StopParser(inst->parser, 0);
+       return;
+diff --git a/src/lcec_conf.h b/src/lcec_conf.h
+index 5d9943c..2620938 100644
+--- a/src/lcec_conf.h
++++ b/src/lcec_conf.h
+@@ -56,7 +56,8 @@ typedef enum {
+   lcecPdoEntTypeFloatSigned,
+   lcecPdoEntTypeFloatUnsigned,
+   lcecPdoEntTypeComplex,
+-  lcecPdoEntTypeFloatIeee
++  lcecPdoEntTypeFloatIeee,
++  lcecPdoEntTypeFloatLREAL
+ } LCEC_PDOENT_TYPE_T;
+
+ typedef enum {
+diff --git a/src/lcec_generic.c b/src/lcec_generic.c
+index dfddf73..dde7164 100644
+--- a/src/lcec_generic.c
++++ b/src/lcec_generic.c
+@@ -78,7 +78,7 @@ int lcec_generic_init(int comp_id, struct lcec_slave *slave, ec_pdo_entry_reg_t
+
+       case HAL_FLOAT:
+         // check data size
+-        if (hal_data->bitLength > 32) {
++        if (!(hal_data->bitLength == 32 || hal_data->bitLength == 64)) {
+           rtapi_print_msg(RTAPI_MSG_WARN, LCEC_MSG_PFX "unable to export pin %s.%s.%s.%s: invalid process data bitlen!\n", LCEC_MODULE_NAME, master->name, slave->name, hal_data->name);
+           continue;
+         }
+@@ -133,6 +133,8 @@ void lcec_generic_read(struct lcec_slave *slave, long period) {
+           fval = lcec_generic_read_u32(pd, hal_data);
+         } else if(hal_data->subType == lcecPdoEntTypeFloatIeee){
+           fval = EC_READ_REAL(&pd[hal_data->pdo_os]);
++        } else if(hal_data->subType == lcecPdoEntTypeFloatLREAL){
++          fval = EC_READ_LREAL(&pd[hal_data->pdo_os]);
+         } else {
+           fval = lcec_generic_read_s32(pd, hal_data);
+         }
