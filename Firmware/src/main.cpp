@@ -102,7 +102,7 @@ static esc_cfg_t config =
         .esc_hw_eep_handler = NULL,
         .esc_check_dc_handler = dc_checker,
 };
-#define STEPPER_DIR PA12
+#define STEPPER_DIR_PIN PA12
 #define STEPPER_STEP_PIN PA11
 HardwareTimer *MyTim;
 volatile uint32_t stepCount = 0, stepPulses = 0;
@@ -145,7 +145,7 @@ void setup(void)
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50%
    MyTim->attachInterrupt(TimerStep_CB);
    stepCount = 0;
-
+   pinMode(STEPPER_DIR_PIN, OUTPUT);
 #if 1
 
    while (1)
@@ -160,10 +160,10 @@ void setup(void)
       pulsesToGo = requestedPosition - actualPosition;
       syncCounts++;
       forwardDirection = pulsesToGo > 0 ? 1 : 0;
-      forwardDirection = 1;
+      forwardDirection = syncCounts % 2 ? 1 : 0;
       // Set direction pin
       Obj.DiffT = forwardDirection;
-      digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
+      digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
       makePulses(1000, syncCounts % 2 ? 2 : 4);
       // Make the pulses using hardware timer
       //  if (pulsesToGo != 0)
@@ -181,7 +181,7 @@ void setup(void)
 
    ecat_slv_init(&config);
    attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
-   pinMode(STEPPER_DIR, OUTPUT);
+   pinMode(STEPPER_DIR_PIN, OUTPUT);
 }
 
 void loop(void)
@@ -234,7 +234,7 @@ void sync0Handler(void)
    forwardDirection = syncCounts % 2 ? 1 : 0;
    // Set direction pin
    Obj.DiffT = forwardDirection;
-   digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
+   digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
 
    // Make the pulses using hardware timer
    makePulses(sync0CycleTime / 1000, pulsesToGo);
