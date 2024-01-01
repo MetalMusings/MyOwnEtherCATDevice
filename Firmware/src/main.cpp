@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <HardwareTimer.h>
 
 #include <stdio.h>
 extern "C"
@@ -17,7 +18,6 @@ int64_t unwrap_encoder(uint16_t in, int64_t *prev);
 Encoder EncoderInit;
 Encoder *encP = &EncoderInit;
 
-#include "Stepper.h"
 #define INDEX_PIN PA2
 HardwareSerial Serial1(PA10, PA9);
 _Objects Obj;
@@ -103,12 +103,40 @@ static esc_cfg_t config =
         .esc_check_dc_handler = dc_checker,
 };
 #define STEPPER_DIR PA12
+#define STEPPER_STEP_PIN PA11
+HardwareTimer *MyTim;
+volatile uint32_t stepCount = 0;
+
+void TimerStep_CB(void)
+{
+   stepCount++;
+   digitalWrite(STEPPER_STEP_PIN, !digitalRead(STEPPER_STEP_PIN));
+   if (stepCount >= 10)
+   {
+      MyTim->pause();
+   }
+}
+
 void setup(void)
 {
    Serial1.begin(115200);
    rcc_config();
 
-   StepperSetup();
+   TIM_TypeDef *Instance = TIM1;
+   MyTim = new HardwareTimer(Instance);
+
+   MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
+   MyTim->setOverflow(5000, HERTZ_FORMAT);
+   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50%
+   MyTim->attachInterrupt(TimerStep_CB);
+   MyTim->resume();
+   while (1)
+   {
+      HAL_Delay(5);
+      stepCount = 0;
+      MyTim->resume();
+   }
+
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
    // EncoderInit.SetCount(Tim3, 0);
@@ -185,7 +213,7 @@ void sync0Handler(void)
    digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
    Obj.DiffT = forwardDirection;
    // Make the pulses using hardware timer
-   makePulses(sync0CycleTime / 1000, pulsesToGo);
+   // makePulses(sync0CycleTime / 1000, pulsesToGo);
 }
 
 void ESC_interrupt_enable(uint32_t mask)
