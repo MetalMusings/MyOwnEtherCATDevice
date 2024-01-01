@@ -142,7 +142,7 @@ void setup(void)
    TIM_TypeDef *Instance = TIM1;
    MyTim = new HardwareTimer(Instance);
    MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50%
+   MyTim->setCaptureCompare(4, 5, MICROSEC_COMPARE_FORMAT); // 5 usec is needed
    MyTim->attachInterrupt(TimerStep_CB);
    stepCount = 0;
    pinMode(STEPPER_DIR_PIN, OUTPUT);
