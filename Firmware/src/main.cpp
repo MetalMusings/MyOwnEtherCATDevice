@@ -57,7 +57,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       nFires++;
       PreviousEncoderCounterValue = 0;
    }
-   Obj.DiffT = sync0CycleTime;
+   // Obj.DiffT = sync0CycleTime;
 
    int64_t pos = unwrap_encoder(TIM2->CNT, &PreviousEncoderCounterValue);
    double CurPos = pos * PosScaleRes;
@@ -102,7 +102,7 @@ static esc_cfg_t config =
         .esc_hw_eep_handler = NULL,
         .esc_check_dc_handler = dc_checker,
 };
-
+#define STEPPER_DIR PA12
 void setup(void)
 {
    Serial1.begin(115200);
@@ -117,6 +117,7 @@ void setup(void)
 
    ecat_slv_init(&config);
    attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
+   pinMode(STEPPER_DIR, OUTPUT);
 }
 
 void loop(void)
@@ -160,11 +161,12 @@ volatile int32_t actualPosition = 0;
 volatile int32_t requestedPosition;
 volatile uint32_t pulsesToGo = 0;
 volatile byte forwardDirection = 0; // 1 if going forward
-#define STEPPER_DIR PA12
-// #define STEPPER_STEP PA11 // Set in StepperSetup
+
+volatile uint32_t syncCounts = 0;
 
 void sync0Handler(void)
 {
+#if 0
    // Update the actual position
    actualPosition += pulsesToGo;
    Obj.StepGenOut1.ActualPosition = actualPosition;
@@ -172,9 +174,16 @@ void sync0Handler(void)
    requestedPosition = Obj.StepGenIn1.CommandedPosition;
    // Get the diff and the direction
    pulsesToGo = requestedPosition - actualPosition;
-   forwardDirection = pulsesToGo > 0 ? 1 : 0;
+#else
+   syncCounts++;
+   pulsesToGo = syncCounts % 2 ? 4 : 8;
+#endif
+
+   // forwardDirection = pulsesToGo > 0 ? 1 : 0;
+   forwardDirection = syncCounts % 2 ? 1 : 0;
    // Set direction pin
    digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
+   Obj.DiffT = forwardDirection;
    // Make the pulses using hardware timer
    makePulses(sync0CycleTime / 1000, pulsesToGo);
 }
