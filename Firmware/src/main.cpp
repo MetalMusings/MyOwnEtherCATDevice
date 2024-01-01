@@ -105,16 +105,33 @@ static esc_cfg_t config =
 #define STEPPER_DIR PA12
 #define STEPPER_STEP_PIN PA11
 HardwareTimer *MyTim;
-volatile uint32_t stepCount = 0;
+volatile uint32_t stepCount = 0, stepPulses = 0;
+volatile int32_t actualPosition = 0;
+volatile int32_t requestedPosition;
+volatile uint32_t pulsesToGo = 0;
+volatile byte forwardDirection = 0; // 1 if going forward
+
+volatile uint32_t syncCounts = 0;
 
 void TimerStep_CB(void)
 {
-   stepCount++;
-   digitalWrite(STEPPER_STEP_PIN, !digitalRead(STEPPER_STEP_PIN));
-   if (stepCount >= 10)
+   if (forwardDirection)
+      stepCount++;
+   else
+      stepCount--;
+   //digitalWrite(STEPPER_STEP_PIN, !digitalRead(STEPPER_STEP_PIN));
+   if (stepCount == stepPulses)
    {
       MyTim->pause();
    }
+}
+
+void makePulses(uint32_t period /* in usecs */, uint32_t pulses /* nr of pulses to do*/)
+{
+   MyTim->setOverflow(period / pulses, MICROSEC_FORMAT);
+   stepCount = 0;
+   stepPulses = pulses;
+   MyTim->resume();
 }
 
 void setup(void)
@@ -124,18 +141,37 @@ void setup(void)
 
    TIM_TypeDef *Instance = TIM1;
    MyTim = new HardwareTimer(Instance);
-
    MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-   MyTim->setOverflow(5000, HERTZ_FORMAT);
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50%
    MyTim->attachInterrupt(TimerStep_CB);
-   MyTim->resume();
+   stepCount = 0;
+
+#if 1
+
    while (1)
    {
-      HAL_Delay(5);
-      stepCount = 0;
-      MyTim->resume();
+      // Update the actual position
+      actualPosition += pulsesToGo;
+      Obj.StepGenOut1.ActualPosition = actualPosition;
+      // Get new end position
+      // requestedPosition = Obj.StepGenIn1.CommandedPosition;
+      requestedPosition = syncCounts % 2 ? 4 : -4;
+      // Get the diff and the direction
+      pulsesToGo = requestedPosition - actualPosition;
+      syncCounts++;
+      forwardDirection = pulsesToGo > 0 ? 1 : 0;
+      forwardDirection = 1;
+      // Set direction pin
+      Obj.DiffT = forwardDirection;
+      digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
+      makePulses(1000, syncCounts % 2 ? 2 : 4);
+      // Make the pulses using hardware timer
+      //  if (pulsesToGo != 0)
+      //    makePulses(sync0CycleTime / 1000, pulsesToGo);
+      delayMicroseconds(1000);
    }
+
+#endif
 
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
@@ -185,16 +221,8 @@ void indexPulse(void)
    }
 }
 
-volatile int32_t actualPosition = 0;
-volatile int32_t requestedPosition;
-volatile uint32_t pulsesToGo = 0;
-volatile byte forwardDirection = 0; // 1 if going forward
-
-volatile uint32_t syncCounts = 0;
-
 void sync0Handler(void)
 {
-#if 0
    // Update the actual position
    actualPosition += pulsesToGo;
    Obj.StepGenOut1.ActualPosition = actualPosition;
@@ -202,18 +230,14 @@ void sync0Handler(void)
    requestedPosition = Obj.StepGenIn1.CommandedPosition;
    // Get the diff and the direction
    pulsesToGo = requestedPosition - actualPosition;
-#else
    syncCounts++;
-   pulsesToGo = syncCounts % 2 ? 4 : 8;
-#endif
-
-   // forwardDirection = pulsesToGo > 0 ? 1 : 0;
    forwardDirection = syncCounts % 2 ? 1 : 0;
    // Set direction pin
-   digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
    Obj.DiffT = forwardDirection;
+   digitalWrite(STEPPER_DIR, forwardDirection); // I think one should really wait a bit when changed
+
    // Make the pulses using hardware timer
-   // makePulses(sync0CycleTime / 1000, pulsesToGo);
+   makePulses(sync0CycleTime / 1000, pulsesToGo);
 }
 
 void ESC_interrupt_enable(uint32_t mask)
