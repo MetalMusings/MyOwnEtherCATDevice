@@ -111,15 +111,9 @@ volatile double_t requestedPosition;
 volatile uint32_t pulsesToGo = 0;
 volatile byte forwardDirection = 0; // 1 if going forward
 
-volatile uint32_t syncCounts = 0;
-
 void TimerStep_CB(void)
 {
-   if (forwardDirection)
-      stepCount++;
-   else
-      stepCount--;
-   // digitalWrite(STEPPER_STEP_PIN, !digitalRead(STEPPER_STEP_PIN));
+   stepCount++;
    if (stepCount == stepPulses)
    {
       MyTim->pause();
@@ -142,36 +136,9 @@ void setup(void)
    TIM_TypeDef *Instance = TIM1;
    MyTim = new HardwareTimer(Instance);
    MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-   MyTim->setCaptureCompare(4, 5, MICROSEC_COMPARE_FORMAT); // 5 usec is needed
+   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    MyTim->attachInterrupt(TimerStep_CB);
-   stepCount = 0;
    pinMode(STEPPER_DIR_PIN, OUTPUT);
-#if 0
-
-   while (1)
-   {
-      // Update the actual position
-      actualPosition += pulsesToGo;
-      Obj.StepGenOut1.ActualPosition = actualPosition;
-      // Get new end position
-      // requestedPosition = Obj.StepGenIn1.CommandedPosition;
-      requestedPosition = syncCounts % 2 ? 4 : -4;
-      // Get the diff and the direction
-      pulsesToGo = requestedPosition - actualPosition;
-      syncCounts++;
-      forwardDirection = pulsesToGo > 0 ? 1 : 0;
-      forwardDirection = syncCounts % 2 ? 1 : 0;
-      // Set direction pin
-      Obj.DiffT = forwardDirection;
-      digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
-      makePulses(1000, syncCounts % 2 ? 2 : 4);
-      // Make the pulses using hardware timer
-      //  if (pulsesToGo != 0)
-      //    makePulses(sync0CycleTime / 1000, pulsesToGo);
-      delayMicroseconds(1000);
-   }
-
-#endif
 
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
@@ -181,7 +148,6 @@ void setup(void)
 
    ecat_slv_init(&config);
    attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
-   pinMode(STEPPER_DIR_PIN, OUTPUT);
 }
 
 void loop(void)
@@ -223,19 +189,20 @@ void indexPulse(void)
 
 void sync0Handler(void)
 {
-   const int32_t stepsPerMM = 100;
+   const int32_t stepsPerMM = 1;
    // Update the actual position
-   pulsesToGo = stepsPerMM * (Obj.StepGenIn1.CommandedPosition - Obj.StepGenOut1.ActualPosition);
-   Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition; // Cheat
+   pulsesToGo = stepsPerMM * Obj.StepGenIn1.CommandedPosition; // Wrong, but test
+   Obj.StepGenOut1.ActualPosition = actualPosition; 
    // Get new end position
-   syncCounts++;
    forwardDirection = pulsesToGo > 1 ? 1 : 0;
    // Set direction pin
    Obj.DiffT = forwardDirection;
    digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
 
    // Make the pulses using hardware timer
-   makePulses(sync0CycleTime / 1000, abs((int)pulsesToGo));
+   if (pulsesToGo != 0)
+      makePulses(sync0CycleTime / 1000, abs((int)pulsesToGo));
+   actualPosition = Obj.StepGenIn1.CommandedPosition;
 }
 
 void ESC_interrupt_enable(uint32_t mask)
