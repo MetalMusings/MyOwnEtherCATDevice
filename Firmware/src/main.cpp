@@ -122,7 +122,7 @@ void TimerStep_CB(void)
 
 void makePulses(uint32_t period /* in usecs */, uint32_t pulses /* nr of pulses to do*/)
 {
-   MyTim->setOverflow(period / pulses, MICROSEC_FORMAT);
+   MyTim->setOverflow(pulses*1000000/period, HERTZ_FORMAT);
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    stepCount = 0;
    stepPulses = pulses;
