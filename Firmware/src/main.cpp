@@ -123,11 +123,13 @@ void TimerStep_CB(void)
 void makePulses(uint32_t period /* in usecs */, uint32_t pulses /* nr of pulses to do*/)
 {
    MyTim->setOverflow(period / pulses, MICROSEC_FORMAT);
+   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    stepCount = 0;
    stepPulses = pulses;
    MyTim->resume();
 }
 
+void sync0Handler(void);
 void setup(void)
 {
    Serial1.begin(115200);
@@ -139,6 +141,15 @@ void setup(void)
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    MyTim->attachInterrupt(TimerStep_CB);
    pinMode(STEPPER_DIR_PIN, OUTPUT);
+
+   uint32_t i = 2;
+   while (1)
+   {
+      Obj.StepGenIn1.CommandedPosition = i;
+      sync0Handler();
+      HAL_Delay(1000);
+      i++;
+   }
 
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
@@ -192,7 +203,7 @@ void sync0Handler(void)
    const int32_t stepsPerMM = 1;
    // Update the actual position
    pulsesToGo = stepsPerMM * Obj.StepGenIn1.CommandedPosition; // Wrong, but test
-   Obj.StepGenOut1.ActualPosition = actualPosition; 
+   Obj.StepGenOut1.ActualPosition = actualPosition;
    // Get new end position
    forwardDirection = pulsesToGo > 1 ? 1 : 0;
    // Set direction pin
@@ -201,7 +212,7 @@ void sync0Handler(void)
 
    // Make the pulses using hardware timer
    if (pulsesToGo != 0)
-      makePulses(sync0CycleTime / 1000, abs((int)pulsesToGo));
+      makePulses(1000 /*sync0CycleTime / 1000*/, abs((int)pulsesToGo));
    actualPosition = Obj.StepGenIn1.CommandedPosition;
 }
 
