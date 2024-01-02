@@ -110,17 +110,17 @@ const _objd SDO1601[] =
 const _objd SDO1602[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1602_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1602_01, 0x70020120, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1602_01, 0x70020140, NULL},
 };
 const _objd SDO1A00[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A00_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A00_01, 0x60000020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A00_01, 0x60000040, NULL},
 };
 const _objd SDO1A01[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A01_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A01_01, 0x60010020, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A01_01, 0x60010040, NULL},
 };
 const _objd SDO1A02[] =
 {
@@ -140,7 +140,7 @@ const _objd SDO1A04[] =
 const _objd SDO1A05[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A05_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A05_01, 0x60050120, NULL},
+  {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1A05_01, 0x60050140, NULL},
 };
 const _objd SDO1C00[] =
 {
@@ -169,11 +169,11 @@ const _objd SDO1C13[] =
 };
 const _objd SDO6000[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6000, 0x00000000, &Obj.EncPos},
+  {0x0, DTYPE_REAL64, 64, ATYPE_RO | ATYPE_TXPDO, acName6000, 0, &Obj.EncPos},
 };
 const _objd SDO6001[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6001, 0x00000000, &Obj.EncFrequency},
+  {0x0, DTYPE_REAL64, 64, ATYPE_RO | ATYPE_TXPDO, acName6001, 0, &Obj.EncFrequency},
 };
 const _objd SDO6002[] =
 {
@@ -190,7 +190,7 @@ const _objd SDO6004[] =
 const _objd SDO6005[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6005_00, 1, NULL},
-  {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName6005_01, 0, &Obj.StepGenOut1.ActualPosition},
+  {0x01, DTYPE_REAL64, 64, ATYPE_RO, acName6005_01, 0, &Obj.StepGenOut1.ActualPosition},
 };
 const _objd SDO7000[] =
 {
@@ -203,7 +203,7 @@ const _objd SDO7001[] =
 const _objd SDO7002[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7002_00, 1, NULL},
-  {0x01, DTYPE_INTEGER32, 32, ATYPE_RO, acName7002_01, 0, &Obj.StepGenIn1.CommandedPosition},
+  {0x01, DTYPE_REAL64, 64, ATYPE_RO, acName7002_01, 0, &Obj.StepGenIn1.CommandedPosition},
 };
 
 const _objectlist SDOobjects[] =

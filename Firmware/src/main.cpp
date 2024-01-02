@@ -106,8 +106,8 @@ static esc_cfg_t config =
 #define STEPPER_STEP_PIN PA11
 HardwareTimer *MyTim;
 volatile uint32_t stepCount = 0, stepPulses = 0;
-volatile int32_t actualPosition = 0;
-volatile int32_t requestedPosition;
+volatile double_t actualPosition = 0;
+volatile double_t requestedPosition;
 volatile uint32_t pulsesToGo = 0;
 volatile byte forwardDirection = 0; // 1 if going forward
 
@@ -119,7 +119,7 @@ void TimerStep_CB(void)
       stepCount++;
    else
       stepCount--;
-   //digitalWrite(STEPPER_STEP_PIN, !digitalRead(STEPPER_STEP_PIN));
+   // digitalWrite(STEPPER_STEP_PIN, !digitalRead(STEPPER_STEP_PIN));
    if (stepCount == stepPulses)
    {
       MyTim->pause();
@@ -146,7 +146,7 @@ void setup(void)
    MyTim->attachInterrupt(TimerStep_CB);
    stepCount = 0;
    pinMode(STEPPER_DIR_PIN, OUTPUT);
-#if 1
+#if 0
 
    while (1)
    {
@@ -223,21 +223,19 @@ void indexPulse(void)
 
 void sync0Handler(void)
 {
+   const int32_t stepsPerMM = 100;
    // Update the actual position
-   actualPosition += pulsesToGo;
-   Obj.StepGenOut1.ActualPosition = actualPosition;
+   pulsesToGo = stepsPerMM * (Obj.StepGenIn1.CommandedPosition - Obj.StepGenOut1.ActualPosition);
+   Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition; // Cheat
    // Get new end position
-   requestedPosition = Obj.StepGenIn1.CommandedPosition;
-   // Get the diff and the direction
-   pulsesToGo = requestedPosition - actualPosition;
    syncCounts++;
-   forwardDirection = syncCounts % 2 ? 1 : 0;
+   forwardDirection = pulsesToGo > 1 ? 1 : 0;
    // Set direction pin
    Obj.DiffT = forwardDirection;
    digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
 
    // Make the pulses using hardware timer
-   makePulses(sync0CycleTime / 1000, pulsesToGo);
+   makePulses(sync0CycleTime / 1000, abs((int)pulsesToGo));
 }
 
 void ESC_interrupt_enable(uint32_t mask)

@@ -57,7 +57,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "REAL32",
+        "dtype": "REAL64",
         "value": "0",
         "data": "&Obj.EncPos"
       },
@@ -68,7 +68,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "REAL32",
+        "dtype": "REAL64",
         "value": "0",
         "data": "&Obj.EncFrequency"
       },
@@ -115,7 +115,7 @@
           },
           {
             "name": "ActualPosition",
-            "dtype": "INTEGER32",
+            "dtype": "REAL64",
             "data": "&Obj.StepGenOut1.ActualPosition",
             "value": "0",
             "access": "RO"
@@ -159,7 +159,7 @@
           },
           {
             "name": "CommandedPosition",
-            "dtype": "INTEGER32",
+            "dtype": "REAL64",
             "data": "&Obj.StepGenIn1.CommandedPosition",
             "value": "0",
             "access": "RO"

@@ -1,52 +1,102 @@
 diff --git a/src/lcec_conf.c b/src/lcec_conf.c
-index b0e9ad1..607c6d7 100644
+index b0e9ad1..6cc7f8a 100644
 --- a/src/lcec_conf.c
 +++ b/src/lcec_conf.c
 @@ -1267,6 +1267,11 @@ static void parsePdoEntryAttrs(LCEC_CONF_XML_INST_T *inst, int next, const char
          p->halType = HAL_FLOAT;
          continue;
        }
-+      if (strcasecmp(val, "float-lreal") == 0) {
-+        p->subType = lcecPdoEntTypeFloatLREAL;
++      if (strcasecmp(val, "float-double") == 0) {
++        p->subType = lcecPdoEntTypeFloatDouble;
 +        p->halType = HAL_FLOAT;
 +        continue;
 +      }
        fprintf(stderr, "%s: ERROR: Invalid pdoEntry halType %s\n", modname, val);
        XML_StopParser(inst->parser, 0);
        return;
+@@ -1410,6 +1415,11 @@ static void parseComplexEntryAttrs(LCEC_CONF_XML_INST_T *inst, int next, const c
+         p->halType = HAL_FLOAT;
+         continue;
+       }
++      if (strcasecmp(val, "float-double") == 0) {
++        p->subType = lcecPdoEntTypeFloatDouble;
++        p->halType = HAL_FLOAT;
++        continue;
++      }
+       fprintf(stderr, "%s: ERROR: Invalid complexEntry halType %s\n", modname, val);
+       XML_StopParser(inst->parser, 0);
+       return;
 diff --git a/src/lcec_conf.h b/src/lcec_conf.h
-index 5d9943c..2620938 100644
+index 5d9943c..261c965 100644
 --- a/src/lcec_conf.h
 +++ b/src/lcec_conf.h
-@@ -56,7 +56,8 @@ typedef enum {
+@@ -55,6 +55,7 @@ typedef enum {
+   lcecPdoEntTypeSimple,
    lcecPdoEntTypeFloatSigned,
    lcecPdoEntTypeFloatUnsigned,
++  lcecPdoEntTypeFloatDouble,
    lcecPdoEntTypeComplex,
--  lcecPdoEntTypeFloatIeee
-+  lcecPdoEntTypeFloatIeee,
-+  lcecPdoEntTypeFloatLREAL
+   lcecPdoEntTypeFloatIeee
  } LCEC_PDOENT_TYPE_T;
-
- typedef enum {
 diff --git a/src/lcec_generic.c b/src/lcec_generic.c
-index dfddf73..dde7164 100644
+index dfddf73..2f58fde 100644
 --- a/src/lcec_generic.c
 +++ b/src/lcec_generic.c
-@@ -78,7 +78,7 @@ int lcec_generic_init(int comp_id, struct lcec_slave *slave, ec_pdo_entry_reg_t
-
+@@ -26,6 +26,7 @@ hal_s32_t lcec_generic_read_s32(uint8_t *pd, lcec_generic_pin_t *hal_data);
+ hal_u32_t lcec_generic_read_u32(uint8_t *pd, lcec_generic_pin_t *hal_data);
+ void lcec_generic_write_s32(uint8_t *pd, lcec_generic_pin_t *hal_data, hal_s32_t sval);
+ void lcec_generic_write_u32(uint8_t *pd, lcec_generic_pin_t *hal_data, hal_u32_t uval);
++void lcec_generic_write_f64(uint8_t *pd, lcec_generic_pin_t *hal_data, hal_float_t fval);
+ 
+ int lcec_generic_init(int comp_id, struct lcec_slave *slave, ec_pdo_entry_reg_t *pdo_entry_regs) {
+   lcec_master_t *master = slave->master;
+@@ -78,7 +79,7 @@ int lcec_generic_init(int comp_id, struct lcec_slave *slave, ec_pdo_entry_reg_t
+ 
        case HAL_FLOAT:
          // check data size
 -        if (hal_data->bitLength > 32) {
-+        if (!(hal_data->bitLength == 32 || hal_data->bitLength == 64)) {
++        if (hal_data->bitLength > 64) {
            rtapi_print_msg(RTAPI_MSG_WARN, LCEC_MSG_PFX "unable to export pin %s.%s.%s.%s: invalid process data bitlen!\n", LCEC_MODULE_NAME, master->name, slave->name, hal_data->name);
            continue;
          }
-@@ -133,6 +133,8 @@ void lcec_generic_read(struct lcec_slave *slave, long period) {
+@@ -133,6 +134,8 @@ void lcec_generic_read(struct lcec_slave *slave, long period) {
            fval = lcec_generic_read_u32(pd, hal_data);
          } else if(hal_data->subType == lcecPdoEntTypeFloatIeee){
            fval = EC_READ_REAL(&pd[hal_data->pdo_os]);
-+        } else if(hal_data->subType == lcecPdoEntTypeFloatLREAL){
++        } else if(hal_data->subType == lcecPdoEntTypeFloatDouble){
 +          fval = EC_READ_LREAL(&pd[hal_data->pdo_os]);
          } else {
            fval = lcec_generic_read_s32(pd, hal_data);
          }
+@@ -185,6 +188,8 @@ void lcec_generic_write(struct lcec_slave *slave, long period) {
+ 
+         if (hal_data->subType == lcecPdoEntTypeFloatUnsigned) {
+           lcec_generic_write_u32(pd, hal_data, (hal_u32_t) fval);
++	} else if (hal_data->subType == lcecPdoEntTypeFloatDouble) {
++          lcec_generic_write_f64(pd, hal_data, fval);
+         } else {
+           lcec_generic_write_s32(pd, hal_data, (hal_s32_t) fval);
+         }
+@@ -300,3 +305,22 @@ void lcec_generic_write_u32(uint8_t *pd, lcec_generic_pin_t *hal_data, hal_u32_t
+   }
+ }
+ 
++void lcec_generic_write_f64(uint8_t *pd, lcec_generic_pin_t *hal_data, hal_float_t fval) {
++  int i, offset;
++
++  if (hal_data->pdo_bp == 0 && hal_data->bitOffset == 0) {
++    EC_WRITE_LREAL(&pd[hal_data->pdo_os], fval);
++  }
++  union {
++    double d;
++    uin64_t u;
++  } v;
++  v.d = fval;
++  offset = ((hal_data->pdo_os << 3) | (hal_data->pdo_bp & 0x07)) + hal_data->bitOffset;
++  for (i=0; i < hal_data->bitLength; i++, offset++) {
++    EC_WRITE_BIT(&pd[offset >> 3], offset & 0x07,v.u & 1);
++    v.u >>= 1;
++  }
++#endif
++}
++

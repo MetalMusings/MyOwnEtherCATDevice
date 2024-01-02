@@ -389,7 +389,7 @@
               </DataType>
               <DataType>
                 <Name>DT6005</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -403,8 +403,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>ActualPosition</Name>
-                  <Type>DINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>LREAL</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">ro</Access>
@@ -414,7 +414,7 @@
               </DataType>
               <DataType>
                 <Name>DT7002</Name>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -428,8 +428,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>CommandedPosition</Name>
-                  <Type>DINT</Type>
-                  <BitSize>32</BitSize>
+                  <Type>LREAL</Type>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">ro</Access>
@@ -458,8 +458,8 @@
                 <BitSize>16</BitSize>
               </DataType>
               <DataType>
-                <Name>REAL</Name>
-                <BitSize>32</BitSize>
+                <Name>LREAL</Name>
+                <BitSize>64</BitSize>
               </DataType>
               <DataType>
                 <Name>UDINT</Name>
@@ -623,7 +623,7 @@
                   <SubItem>
                     <Name>CommandedPosition</Name>
                     <Info>
-                      <DefaultValue>#x70020120</DefaultValue>
+                      <DefaultValue>#x70020140</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -646,7 +646,7 @@
                   <SubItem>
                     <Name>EncPos</Name>
                     <Info>
-                      <DefaultValue>#x60000020</DefaultValue>
+                      <DefaultValue>#x60000040</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -669,7 +669,7 @@
                   <SubItem>
                     <Name>EncFrequency</Name>
                     <Info>
-                      <DefaultValue>#x60010020</DefaultValue>
+                      <DefaultValue>#x60010040</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -761,7 +761,7 @@
                   <SubItem>
                     <Name>ActualPosition</Name>
                     <Info>
-                      <DefaultValue>#x60050120</DefaultValue>
+                      <DefaultValue>#x60050140</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -901,8 +901,8 @@
               <Object>
                 <Index>#x6000</Index>
                 <Name>EncPos</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
+                <Type>LREAL</Type>
+                <BitSize>64</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -914,8 +914,8 @@
               <Object>
                 <Index>#x6001</Index>
                 <Name>EncFrequency</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
+                <Type>LREAL</Type>
+                <BitSize>64</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -967,7 +967,7 @@
                 <Index>#x6005</Index>
                 <Name>StepGenOut1</Name>
                 <Type>DT6005</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1016,7 +1016,7 @@
                 <Index>#x7002</Index>
                 <Name>StepGenIn1</Name>
                 <Type>DT7002</Type>
-                <BitSize>48</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1073,9 +1073,9 @@
           <Entry>
             <Index>#x7002</Index>
             <SubIndex>#x1</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>64</BitLen>
             <Name>CommandedPosition</Name>
-            <DataType>DINT</DataType>
+            <DataType>LREAL</DataType>
           </Entry>
         </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1084,9 +1084,9 @@
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>64</BitLen>
             <Name>EncPos</Name>
-            <DataType>REAL</DataType>
+            <DataType>LREAL</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1095,9 +1095,9 @@
           <Entry>
             <Index>#x6001</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>64</BitLen>
             <Name>EncFrequency</Name>
-            <DataType>REAL</DataType>
+            <DataType>LREAL</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1139,9 +1139,9 @@
           <Entry>
             <Index>#x6005</Index>
             <SubIndex>#x1</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>64</BitLen>
             <Name>ActualPosition</Name>
-            <DataType>DINT</DataType>
+            <DataType>LREAL</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">

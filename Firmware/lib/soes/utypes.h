@@ -13,14 +13,14 @@ typedef struct
 
    /* Inputs */
 
-   float EncPos;
-   float EncFrequency;
+   double EncPos;
+   double EncFrequency;
    uint32_t DiffT;
    uint32_t IndexByte;
    uint32_t IndexStatus;
    struct
    {
-      int32_t ActualPosition;
+      double ActualPosition;
    } StepGenOut1;
 
    /* Outputs */
@@ -29,7 +29,7 @@ typedef struct
    uint32_t IndexLatchEnable;
    struct
    {
-      int32_t CommandedPosition;
+      double CommandedPosition;
    } StepGenIn1;
 
 } _Objects;
