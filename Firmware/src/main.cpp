@@ -142,15 +142,6 @@ void setup(void)
    MyTim->attachInterrupt(TimerStep_CB);
    pinMode(STEPPER_DIR_PIN, OUTPUT);
 
-   uint32_t i = 2;
-   while (1)
-   {
-      Obj.StepGenIn1.CommandedPosition = i;
-      sync0Handler();
-      HAL_Delay(1000);
-      i++;
-   }
-
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
    // EncoderInit.SetCount(Tim3, 0);
