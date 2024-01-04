@@ -39,7 +39,7 @@ index 5d9943c..261c965 100644
    lcecPdoEntTypeFloatIeee
  } LCEC_PDOENT_TYPE_T;
 diff --git a/src/lcec_generic.c b/src/lcec_generic.c
-index dfddf73..2f58fde 100644
+index dfddf73..41a13a9 100644
 --- a/src/lcec_generic.c
 +++ b/src/lcec_generic.c
 @@ -26,6 +26,7 @@ hal_s32_t lcec_generic_read_s32(uint8_t *pd, lcec_generic_pin_t *hal_data);
@@ -86,17 +86,17 @@ index dfddf73..2f58fde 100644
 +
 +  if (hal_data->pdo_bp == 0 && hal_data->bitOffset == 0) {
 +    EC_WRITE_LREAL(&pd[hal_data->pdo_os], fval);
++    return;
 +  }
 +  union {
 +    double d;
-+    uin64_t u;
++    uint64_t u;
 +  } v;
-+  v.d = fval;
++  v.d = fval; // Make an equivalent long int for bit operations (don't work on doubles)
 +  offset = ((hal_data->pdo_os << 3) | (hal_data->pdo_bp & 0x07)) + hal_data->bitOffset;
 +  for (i=0; i < hal_data->bitLength; i++, offset++) {
 +    EC_WRITE_BIT(&pd[offset >> 3], offset & 0x07,v.u & 1);
 +    v.u >>= 1;
 +  }
-+#endif
 +}
 +

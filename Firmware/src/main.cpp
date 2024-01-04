@@ -108,7 +108,7 @@ HardwareTimer *MyTim;
 volatile uint32_t stepCount = 0, stepPulses = 0;
 volatile double_t actualPosition = 0;
 volatile double_t requestedPosition;
-volatile uint32_t pulsesToGo = 0;
+volatile int32_t pulsesToGo = 0;
 volatile byte forwardDirection = 0; // 1 if going forward
 
 void TimerStep_CB(void)
@@ -122,7 +122,7 @@ void TimerStep_CB(void)
 
 void makePulses(uint32_t period /* in usecs */, uint32_t pulses /* nr of pulses to do*/)
 {
-   MyTim->setOverflow(pulses*1000000/period, HERTZ_FORMAT);
+   MyTim->setOverflow(pulses * 1000000 / period, HERTZ_FORMAT);
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    stepCount = 0;
    stepPulses = pulses;
@@ -189,22 +189,27 @@ void indexPulse(void)
    }
 }
 
+uint64_t now = 0, back_then = 0;
+uint32_t deltaT;
 void sync0Handler(void)
 {
-   const int32_t stepsPerMM = 1;
+   now = micros();
+   const int32_t stepsPerMM = 1000;
    // Update the actual position
-   pulsesToGo = stepsPerMM * Obj.StepGenIn1.CommandedPosition; // Wrong, but test
+   pulsesToGo = stepsPerMM * (Obj.StepGenIn1.CommandedPosition - actualPosition);
    Obj.StepGenOut1.ActualPosition = actualPosition;
    // Get new end position
    forwardDirection = pulsesToGo > 1 ? 1 : 0;
    // Set direction pin
-   Obj.DiffT = forwardDirection;
-   digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
-
-   // Make the pulses using hardware timer
+   deltaT = now - back_then;
+   Obj.DiffT = deltaT;
    if (pulsesToGo != 0)
-      makePulses(1000 /*sync0CycleTime / 1000*/, abs((int)pulsesToGo));
+   {
+      digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
+      makePulses(deltaT-20, abs((int)pulsesToGo));        // Make the pulses using hardware timer
+   }
    actualPosition = Obj.StepGenIn1.CommandedPosition;
+   back_then = now;
 }
 
 void ESC_interrupt_enable(uint32_t mask)
