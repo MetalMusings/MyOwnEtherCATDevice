@@ -32,6 +32,8 @@ volatile uint8_t pleaseZeroTheCounter = 0;
 
 uint32_t sync0CycleTime = 0;
 
+void handleStepper(void);
+
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
    if (Obj.IndexLatchEnable && !OldLatchCEnable) // Should only happen first time IndexCEnable is set
@@ -91,7 +93,7 @@ static esc_cfg_t config =
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
         .post_state_change_hook = NULL,
-        .application_hook = NULL, // StepGen,
+        .application_hook = handleStepper, // StepGen,
         .safeoutput_override = NULL,
         .pre_object_download_hook = NULL,
         .post_object_download_hook = NULL,
@@ -138,24 +140,23 @@ void setup(void)
    TIM_TypeDef *Instance = TIM1;
    MyTim = new HardwareTimer(Instance);
    MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    MyTim->attachInterrupt(TimerStep_CB);
    pinMode(STEPPER_DIR_PIN, OUTPUT);
 
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
+   attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
    // EncoderInit.SetCount(Tim3, 0);
    // EncoderInit.SetCount(Tim4, 0);
    // EncoderInit.SetCount(Tim8, 0);
 
    ecat_slv_init(&config);
-   attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
 }
 
 void loop(void)
 {
    ESCvar.PrevTime = ESCvar.Time;
-   ecat_slv();
+   ecat_slv_poll();
 }
 
 #define ONE_PERIOD 65536
@@ -193,6 +194,11 @@ uint64_t now = 0, back_then = 0;
 uint32_t deltaT;
 void sync0Handler(void)
 {
+   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+               DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+}
+void handleStepper(void)
+{
    now = micros();
    const int32_t stepsPerMM = 1000;
    // Update the actual position
@@ -206,7 +212,7 @@ void sync0Handler(void)
    if (pulsesToGo != 0)
    {
       digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
-      makePulses(deltaT-20, abs((int)pulsesToGo));        // Make the pulses using hardware timer
+      makePulses(1000, abs((int)pulsesToGo));  // Make the pulses using hardware timer
    }
    actualPosition = Obj.StepGenIn1.CommandedPosition;
    back_then = now;
@@ -221,7 +227,6 @@ void ESC_interrupt_enable(uint32_t mask)
    if (mask & user_int_mask)
    {
       ESC_ALeventmaskwrite(ESC_ALeventmaskread() | (mask & user_int_mask));
-
       attachInterrupt(digitalPinToInterrupt(PC3), sync0Handler, RISING);
 
       // Set LAN9252 interrupt pin driver as push-pull active high
