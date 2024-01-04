@@ -47,6 +47,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
       CurPosScale = Obj.EncPosScale;
       PosScaleRes = 1.0 / double(CurPosScale);
    }
+   Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -199,7 +200,12 @@ void sync0Handler(void)
 }
 void handleStepper(void)
 {
+
    now = micros();
+   deltaT = now - back_then;
+   Obj.DiffT = deltaT;
+   back_then = now;
+#if 0
    const int32_t stepsPerMM = 1000;
    // Update the actual position
    pulsesToGo = stepsPerMM * (Obj.StepGenIn1.CommandedPosition - actualPosition);
@@ -207,15 +213,15 @@ void handleStepper(void)
    // Get new end position
    forwardDirection = pulsesToGo > 1 ? 1 : 0;
    // Set direction pin
-   deltaT = now - back_then;
-   Obj.DiffT = deltaT;
+
    if (pulsesToGo != 0)
    {
       digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
-      makePulses(1000, abs((int)pulsesToGo));  // Make the pulses using hardware timer
+      makePulses(900, abs((int)pulsesToGo));          // Make the pulses using hardware timer
    }
    actualPosition = Obj.StepGenIn1.CommandedPosition;
-   back_then = now;
+   Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition;
+#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask)
