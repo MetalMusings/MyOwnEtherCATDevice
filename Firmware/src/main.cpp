@@ -50,6 +50,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition;
 }
 
+uint32_t posD2 = 0, posD3 = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = 0;
@@ -80,6 +81,12 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.IndexByte = digitalRead(INDEX_PIN);
    if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
+
+   Obj.IndexByte = posD2;
+   Obj.IndexStatus = posD3;
+
+   posD3 = posD2;
+   posD2 = 1000*Obj.StepGenIn1.CommandedPosition;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -205,11 +212,9 @@ void handleStepper(void)
    deltaT = now - back_then;
    Obj.DiffT = deltaT;
    back_then = now;
-#if 0
    const int32_t stepsPerMM = 1000;
    // Update the actual position
    pulsesToGo = stepsPerMM * (Obj.StepGenIn1.CommandedPosition - actualPosition);
-   Obj.StepGenOut1.ActualPosition = actualPosition;
    // Get new end position
    forwardDirection = pulsesToGo > 1 ? 1 : 0;
    // Set direction pin
@@ -217,11 +222,10 @@ void handleStepper(void)
    if (pulsesToGo != 0)
    {
       digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
-      makePulses(900, abs((int)pulsesToGo));          // Make the pulses using hardware timer
+      makePulses(700, abs((int)pulsesToGo));          // Make the pulses using hardware timer
    }
    actualPosition = Obj.StepGenIn1.CommandedPosition;
    Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition;
-#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask)
