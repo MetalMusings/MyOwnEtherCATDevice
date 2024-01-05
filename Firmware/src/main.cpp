@@ -30,9 +30,17 @@ volatile uint8_t indexPulseFired = 0;
 uint32_t nFires = 0;
 volatile uint8_t pleaseZeroTheCounter = 0;
 
+#define STEPPER_DIR_PIN PA12
+#define STEPPER_STEP_PIN PA11
+HardwareTimer *MyTim;
+volatile uint32_t stepCount = 0, stepPulses = 0;
+volatile double_t actualPosition = 0;
+volatile double_t requestedPosition;
+
 uint32_t sync0CycleTime = 0;
 
 void handleStepper(void);
+void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/);
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -47,10 +55,18 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
       CurPosScale = Obj.EncPosScale;
       PosScaleRes = 1.0 / double(CurPosScale);
    }
-   Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition;
+   requestedPosition = Obj.StepGenIn1.CommandedPosition;
+
+   byte forwardDirection = 0; // 1 if going forward
+   int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
+   if (pulsesToGo != 0)
+      makePulses(500, 1); // Make the pulses using hardware timer
+
+   // digitalWrite(STEPPER_DIR_PIN, HIGH); // I think one should really wait a bit when changed
+
+   actualPosition = requestedPosition;
 }
 
-uint32_t posD2 = 0, posD3 = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = 0;
@@ -82,11 +98,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
 
-   Obj.IndexByte = posD2;
-   Obj.IndexStatus = posD3;
-
-   posD3 = posD2;
-   posD2 = 1000*Obj.StepGenIn1.CommandedPosition;
+   Obj.StepGenOut1.ActualPosition = actualPosition;
+   Obj.DiffT = 10000 * requestedPosition; // deltaT;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -112,14 +125,6 @@ static esc_cfg_t config =
         .esc_hw_eep_handler = NULL,
         .esc_check_dc_handler = dc_checker,
 };
-#define STEPPER_DIR_PIN PA12
-#define STEPPER_STEP_PIN PA11
-HardwareTimer *MyTim;
-volatile uint32_t stepCount = 0, stepPulses = 0;
-volatile double_t actualPosition = 0;
-volatile double_t requestedPosition;
-volatile int32_t pulsesToGo = 0;
-volatile byte forwardDirection = 0; // 1 if going forward
 
 void TimerStep_CB(void)
 {
@@ -130,12 +135,13 @@ void TimerStep_CB(void)
    }
 }
 
-void makePulses(uint32_t period /* in usecs */, uint32_t pulses /* nr of pulses to do*/)
+void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/)
 {
-   MyTim->setOverflow(pulses * 1000000 / period, HERTZ_FORMAT);
+   uint32_t puls = abs(pulses);
+   MyTim->setOverflow(puls * 1000000 / period, HERTZ_FORMAT);
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    stepCount = 0;
-   stepPulses = pulses;
+   stepPulses = puls;
    MyTim->resume();
 }
 
@@ -198,34 +204,24 @@ void indexPulse(void)
    }
 }
 
-uint64_t now = 0, back_then = 0;
-uint32_t deltaT;
 void sync0Handler(void)
 {
    DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
                DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
 }
+
 void handleStepper(void)
 {
-
-   now = micros();
-   deltaT = now - back_then;
-   Obj.DiffT = deltaT;
-   back_then = now;
-   const int32_t stepsPerMM = 1000;
-   // Update the actual position
-   pulsesToGo = stepsPerMM * (Obj.StepGenIn1.CommandedPosition - actualPosition);
-   // Get new end position
-   forwardDirection = pulsesToGo > 1 ? 1 : 0;
-   // Set direction pin
-
+#if 0
+   byte forwardDirection = 0; // 1 if going forward
+   int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
    if (pulsesToGo != 0)
-   {
-      digitalWrite(STEPPER_DIR_PIN, forwardDirection); // I think one should really wait a bit when changed
-      makePulses(700, abs((int)pulsesToGo));          // Make the pulses using hardware timer
-   }
-   actualPosition = Obj.StepGenIn1.CommandedPosition;
-   Obj.StepGenOut1.ActualPosition = Obj.StepGenIn1.CommandedPosition;
+      makePulses(500, 1); // Make the pulses using hardware timer
+
+   // digitalWrite(STEPPER_DIR_PIN, HIGH); // I think one should really wait a bit when changed
+
+   actualPosition = requestedPosition;
+#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask)
