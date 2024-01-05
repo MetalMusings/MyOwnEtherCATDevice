@@ -60,7 +60,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    byte forwardDirection = 0; // 1 if going forward
    int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
    if (pulsesToGo != 0)
-      makePulses(500, 1); // Make the pulses using hardware timer
+      makePulses(900, abs(pulsesToGo)); // Make the pulses using hardware timer
 
    // digitalWrite(STEPPER_DIR_PIN, HIGH); // I think one should really wait a bit when changed
 
@@ -166,10 +166,16 @@ void setup(void)
 
    ecat_slv_init(&config);
 }
-
+volatile byte serveIRQ=0;
 void loop(void)
 {
    ESCvar.PrevTime = ESCvar.Time;
+   if (serveIRQ)
+   {
+      DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+      serveIRQ = 0;
+   }
    ecat_slv_poll();
 }
 
@@ -206,8 +212,7 @@ void indexPulse(void)
 
 void sync0Handler(void)
 {
-   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
-               DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+   serveIRQ=1;
 }
 
 void handleStepper(void)
