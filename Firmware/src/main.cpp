@@ -60,9 +60,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    byte forwardDirection = 0; // 1 if going forward
    int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
    if (pulsesToGo != 0)
-      makePulses(900, abs(pulsesToGo)); // Make the pulses using hardware timer
-
-   // digitalWrite(STEPPER_DIR_PIN, HIGH); // I think one should really wait a bit when changed
+      makePulses(900, pulsesToGo); // Make the pulses using hardware timer
 
    actualPosition = requestedPosition;
 }
@@ -114,7 +112,7 @@ static esc_cfg_t config =
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
         .post_state_change_hook = NULL,
-        .application_hook = handleStepper, // StepGen,
+        .application_hook = NULL, // StepGen,
         .safeoutput_override = NULL,
         .pre_object_download_hook = NULL,
         .post_object_download_hook = NULL,
@@ -137,11 +135,13 @@ void TimerStep_CB(void)
 
 void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/)
 {
+   byte sgn = pulses > 0 ? HIGH : LOW;
+   digitalWrite(STEPPER_DIR_PIN, sgn); // I think one should really wait a bit when changed
    uint32_t puls = abs(pulses);
-   MyTim->setOverflow(puls * 1000000 / period, HERTZ_FORMAT);
+   MyTim->setOverflow(abs(pulses) * 1000000 / period, HERTZ_FORMAT);
    MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
    stepCount = 0;
-   stepPulses = puls;
+   stepPulses = abs(pulses);
    MyTim->resume();
 }
 
@@ -166,7 +166,7 @@ void setup(void)
 
    ecat_slv_init(&config);
 }
-volatile byte serveIRQ=0;
+volatile byte serveIRQ = 0;
 void loop(void)
 {
    ESCvar.PrevTime = ESCvar.Time;
@@ -212,21 +212,7 @@ void indexPulse(void)
 
 void sync0Handler(void)
 {
-   serveIRQ=1;
-}
-
-void handleStepper(void)
-{
-#if 0
-   byte forwardDirection = 0; // 1 if going forward
-   int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
-   if (pulsesToGo != 0)
-      makePulses(500, 1); // Make the pulses using hardware timer
-
-   // digitalWrite(STEPPER_DIR_PIN, HIGH); // I think one should really wait a bit when changed
-
-   actualPosition = requestedPosition;
-#endif
+   serveIRQ = 1;
 }
 
 void ESC_interrupt_enable(uint32_t mask)
@@ -273,7 +259,7 @@ extern "C" uint32_t ESC_SYNC0cycletime(void);
 uint16_t dc_checker(void)
 {
    // Indicate we run DC
-   ESCvar.dcsync = 1;
+   ESCvar.dcsync = 0;
    sync0CycleTime = ESC_SYNC0cycletime();
    return 0;
 }
