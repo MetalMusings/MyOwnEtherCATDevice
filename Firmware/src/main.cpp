@@ -56,13 +56,6 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
       PosScaleRes = 1.0 / double(CurPosScale);
    }
    requestedPosition = Obj.StepGenIn1.CommandedPosition;
-
-   byte forwardDirection = 0; // 1 if going forward
-   int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
-   if (pulsesToGo != 0)
-      makePulses(900, pulsesToGo); // Make the pulses using hardware timer
-
-   actualPosition = requestedPosition;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -112,7 +105,7 @@ static esc_cfg_t config =
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
         .post_state_change_hook = NULL,
-        .application_hook = NULL, // StepGen,
+        .application_hook = handleStepper, // StepGen,
         .safeoutput_override = NULL,
         .pre_object_download_hook = NULL,
         .post_object_download_hook = NULL,
@@ -215,6 +208,15 @@ void sync0Handler(void)
    serveIRQ = 1;
 }
 
+void handleStepper(void)
+{
+   byte forwardDirection = 0; // 1 if going forward
+   int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
+   if (pulsesToGo != 0)
+      makePulses(900, pulsesToGo); // Make the pulses using hardware timer
+
+   actualPosition = requestedPosition;
+}
 void ESC_interrupt_enable(uint32_t mask)
 {
    // Enable interrupt for SYNC0 or SM2 or SM3
