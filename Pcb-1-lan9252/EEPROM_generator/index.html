@@ -1,0 +1,415 @@
+<head>
+   <meta charset="UTF-8">
+   <title>🔁 EEPROM Generator | ESI, EEPORM, SOES C code configuration tool</title>
+<!--
+ * SOES EEPROM generator
+ * This tool serves as:
+- EtherCAT Slave Information XML + EEPROM binary generator
+- SOES code generator
+
+ * Victor Sluiter 2013-2018
+ * Kuba Buda 2020-2021
+ -->
+   <script src="lib/jszip.min.js"></script>
+
+   <script src="src/constants.js"></script>
+   <script src="src/od.js"></script>
+   <script src="src/file_io.js"></script>
+   <script src="src/backup.js"></script>
+   
+   <script src="src/generators/ecat_options.js"></script>
+   <script src="src/generators/EEPROM.js"></script>
+   <script src="src/generators/esi_xml.js"></script>
+   <script src="src/generators/objectlist.js"></script>
+   <script src="src/generators/utypes.js"></script>   
+   
+   <script src="src/ui.js"></script>
+   
+   <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<body>
+   <!-- Modal dialog to edit OD objects  -->
+   <div id="editObjectModal" class="modal">
+   <!-- Modal content -->
+      <div class="modal-content">
+         <span class="close" onClick="odModalClose()">&times;</span>
+         <h3 id="editObjectTitle">Edit object</h3>
+         <form name="EditObjectForm" id="EditObjectForm" action="" onsubmit="onEditObjectSubmit(this); return false;">
+            <table border="0">
+               <tr id="dialogRowIndex">
+                  <td>Index:</td>
+                  <td><input type = "text" name="Index" value="0x6000" title="Enter OD index for the new object" id="modalInputIndex"></td>
+               </tr>
+               <tr>
+                  <td>Name of Object:</td>
+                  <td><input type = "text" name="ObjectName" value="" title="Enter name for the new object" id="modalInputObjectName"></td>
+               </tr>
+               <tr id="dialogRowDtype">
+                  <td>Data Type</td>
+                  <td><select type = "text" name="DTYPE" title="Enter data type of new object">
+                     <option value="BOOLEAN">BOOLEAN</option>
+                     <option value="INTEGER8">INTEGER8</option>
+                     <option value="INTEGER16">INTEGER16</option>
+                     <option value="INTEGER32">INTEGER32</option>
+                     <option value="UNSIGNED8">UNSIGNED8</option>
+                     <option value="UNSIGNED16">UNSIGNED16</option>
+                     <option value="UNSIGNED32">UNSIGNED32</option>
+                     <option value="REAL32">REAL32</option>
+                     <option value="VISIBLE_STRING">VISIBLE STRING</option>
+                  </select></td>
+               </tr>
+               <tr id="dialogRowValue">
+                  <td>Value:</td>
+                  <td><input type = "text" name="InitalValue" value="0" title="Enter initial value for the new object"></td>
+               </tr>
+               <tr id="dialogRowAccess">
+                  <td>Access:</td>
+                  <td><select type = "text" name="Access" title="Enter access mode of new object">
+                     <option value="RO">RO</option>
+                     <option value="RW">RW</option>
+                     <option value="WO">WO</option>
+                     <option value="RWpre">RWpre</option>
+                  </select></td>
+               </tr>
+               <tr>
+                  <td align="center">
+                     <button name="Cancel" onClick='odModalClose();'>✖️ &nbsp; Cancel &nbsp;</button>
+                  </td><td>
+                     <input type="submit" name="SaveChanges" value="✔️&nbsp; Save changes &nbsp;">
+                  </td>
+               </tr>
+            </table>
+         </form>
+      </div>
+   </div>
+
+   <!-- Modal dialog to edit synchronization modes  -->
+   <div id="syncModal" class="modal">
+      <!-- Modal content -->
+         <div class="modal-content">
+            <span class="close" onClick="syncModalClose()">&times;</span>
+            <h3 id="editObjectTitle">Edit synchronization mode</h3>
+
+            <form name="syncModalForm" id="syncModalForm" action="" onsubmit="onSyncSubmit(this); return false;">
+               <table border="0">
+                  <tr>
+                     <td>Name:</td>
+                     <td><input type = "text" name="Name" value="New sync modee" title="Enter Name for new sync mode" id="syncModalName"></td>
+                  </tr>
+                  <tr>
+                     <td>Description:</td>
+                     <td><input type = "text" name="Description" value="New sync mode description" title="Enter Description for new sync mode" id="syncModalDescription"></td>
+                  </tr>
+                  <tr>
+                     <td>Assign Activate:</td>
+                     <td><input type = "text" name="AssignActivate" value="0x0" title="Enter Assign Activate value for new sync mode" id="syncModalAssignActivate"></td>
+                  </tr>
+               </table>
+               <table border="0">
+                  <tr>
+                     <td>S0 cycle</td>
+                     <td><input type = "text" name="Sync0cycleTime" value="0" title="Enter Sync0 cycle time" id="syncModalSync0cycleTime"></td>
+                     <td>S0 shift</td>
+                     <td><input type = "text" name="Sync0shiftTime" value="0" title="Enter Sync0 shift time" id="syncModalSync0shiftTime"></td>
+                  </tr>
+                  <tr>
+                     <td>S1 cycle</td>
+                     <td><input type = "text" name="Sync1cycleTime" value="0" title="Enter Sync1 cycle time" id="syncModalSync1cycleTime"></td>
+                     <td>S1 shift</td>
+                     <td><input type = "text" name="Sync1shiftTime" value="0" title="Enter Sync1 shift time" id="syncModalSync1shiftTime"></td>
+                  </tr>
+               </table>
+               <table border="0" style="padding-top: 20px;">
+                  <tr>
+                     <td align="center">
+                        <button name="Cancel" onClick='syncModalClose();'>✖️ &nbsp; Cancel &nbsp;</button>
+                     </td><td>
+                        <input type="submit" name="SaveChanges" value="✔️&nbsp; Save changes &nbsp;">
+                     </td>
+                  </tr>
+               </table>
+            </form>
+         </div>
+   </div>
+      
+   <div class="settings-menu">
+      <span></span>
+      <h1> 🔁 EEPROM generator</h1>
+      <div>
+         <div class="dropdown">
+            <button class="dropbtn">⚙️ Settings</button>
+            <div class="dropdown-content">
+               <a href="#">
+                  <button name="DarkMode" onClick='toggleDarkMode();' title="Toggle dark mode">
+                     <span class="display-dark">🌞 Light mode</span>
+                     <span class="display-light">🌜 Dark mode</span>
+                  </button>
+               </a>
+               <a href="./tests.html">
+                  <button name="tests" title="Run unit tests">
+                     🔴🟢 Tests &nbsp;
+                  </button>
+               </a>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+   <div class="main-wrapper">
+      <div id="pageHeading">
+         <h2> EtherCAT EEPROM + SOES OD configuration tool</h2>
+         <p>
+            This page serves as a tool to generate consistent data across your code, ESI file and EEPROM data.
+            Hover over the fields to get additional info about the items you can change. <br>
+            For more detail on how these values translate to the corresponding files, and where you can find more info in the ETG documentation, 
+            look into javascript source that generates these files</a>.<br>
+         </p><p>
+            C source code is generated for SOES: Simple Open source EtherCAT Slave stack. 
+            Its source code with example applications <a href="https://github.com/OpenEtherCATsociety/SOES">is available on Github</a>. 
+            Docs with basic tutorial <a href="https://rt-labs.com/docs/soes/tutorial.html">can be found on rt-labs page</a> 
+         </p>
+      </div>
+      <br>
+         
+      <form name="SlaveForm" id="SlaveForm" action="" onsubmit="return false;">
+         <table border="0">
+            <tr>
+               <td><strong>Item:</strong></td><td><strong>Value</strong></td><td width="12%"><strong>ESI</strong></td><td width="12%"><strong>EEPROM</strong></td><td width="12%"><strong>objectlist.c</strong></td><td width="12%"><strong>ecat_options.h</strong></td>
+            </tr>
+            <tr>
+               <td>Name of Vendor:</td><td><input type = "text" name="VendorName" value="ACME EtherCAT Devices" title="Enter the name as how you are known in the EtherCAT Technology Group members list"></td><td>x</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>VendorID:</td><td><input type = "text" name="VendorID" value="0x000" title="You need to be member of the ETG to get a VendorID!&#013; Enter in hex (0x...) or decimal."></td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>ProductCode:</td><td><input type = "text" name="ProductCode" value="0x00ab123" title="The code of your Product...&#013;Each different product should have its own code.&#013;Enter in hex (0x...) or decimal."></td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Profile No:</td><td><input type = "text" name="ProfileNo" value="5001" title="Profile number of your Product...&#013;Used to identify device type.&#013;Enter in hex (0x...) or decimal."></td><td>x</td><td></td><td></td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>RevisionNumber:</td><td><input type = "text" name="RevisionNumber" value="0x002" title="Revision of Product&#013; Enter in hex (0x...) or decimal."></td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>SerialNumber:</td><td><input type = "text" name="SerialNumber" value="0x001" title="Serial number; may be used in production.&#013; Enter in hex (0x...) or decimal."></td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Hardware version:</td><td><input type = "text" name="HWversion" value="0.0.1" title="Enter HW version as string"><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Software version:</td><td><input type = "text" name="SWversion" value="0.0.1" title="Enter SW version as string"></td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr><td colspan="6"><hr></td</tr>
+            <tr>
+               <td>Number of <strong>bytes</strong> in EEPROM:</td><td><input type = "text" name="EEPROMsize" value="2048" title="Number of bytes in EEPROM; 2048&#013;2048*8=16kilobit&#013;Enter in hex (0x...) or decimal."></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>RxMailbox Offset:</td><td><input type = "text" name="RxMailboxOffset" value="0x1000" title="Offset in memory. Do not change unless you are really sure what you're doing"></td><td>x</td><td>x</td><td>&nbsp;</td><td>x</td>
+            </tr>
+            <tr>
+               <td>TxMailbox Offset:</td><td><input type = "text" name="TxMailboxOffset" value="0x1200" title="Offset in memory. Do not change unless you are really sure what you're doing"></td><td>x</td><td>x</td><td>&nbsp;</td><td>x</td>
+            </tr>
+            <tr>
+               <td>Tx AND Rx Mailbox Size:</td><td><input type = "text" name="MailboxSize" value="512" title="Size of mailbox in bytes.&#013;Do not change unless you are really sure what you're doing."></td><td>x</td><td>x</td><td>&nbsp;</td><td>x</td>
+            </tr>
+            <tr>
+               <td>SyncManager 2 offset:</td><td><input type = "text" name="SM2Offset" value="0x1600" title="Offset in memory. Do not change unless you are really sure what you're doing"></td><td>x</td><td>x</td><td>&nbsp;</td><td>x</td>
+            </tr>
+            <tr>
+               <td>SyncManager 3 offset:</td><td><input type = "text" name="SM3Offset" value="0x1A00" title="Offset in memory. Do not change unless you are really sure what you're doing"></td><td>x</td><td>x</td><td>&nbsp;</td><td>x</td>
+            </tr>
+            <tr><td colspan="6"><hr></td</tr>
+            <tr>
+               <td>Group Type:</td><td><input type = "text" name="TextGroupType" value="DigIn" title="Group Type, like DigIn, DigOut, Measurement, ...&#013;See ETG2000, this is used for grouping in the ESI file"></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Group Name:</td><td><input type = "text" name="TextGroupName5" value="Digital input" title="Description of Group&#013;See ETG2000, this is used for grouping in the ESI file"></td><td>x</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Image Name:</td><td><input type = "text" name="ImageName" value="IMGCBY" title="Name of image used in EtherCAT Configurator"></td><td>&nbsp;</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Device Type:</td><td><input type = "text" name="TextDeviceType" value="DigIn2000" title="Name or order code of product"></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Device Name:</td><td><input type = "text" name="TextDeviceName" value="2-channel Hypergalactic input superimpermanator" title="Description of your device"></td><td>x</td><td>x</td><td>x</td><td>&nbsp;</td>
+            </tr>
+            <tr><td colspan="6"><hr></td</tr>
+            <tr>
+               <td>Port 0 Physical interface:</td><td><select name="Port0Physical" title="Select which physical connection is used on each physical port of your Beckhoff ASIC (ET1100, ET1200)">
+                  <option value="Y" selected>MII</option>
+                  <option value="H">MII-Fast Hot Connect</option>
+                  <option value="K">EBUS</option>
+                  <option value=" ">Not Used</option>
+               </select></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Port 1 Physical interface:</td><td><select name="Port1Physical" title="Select which physical connection is used on each physical port of your Beckhoff ASIC (ET1100, ET1200)">
+                  <option value="Y" selected>MII</option>
+                  <option value="H">MII-Fast Hot Connect</option>
+                  <option value="K">EBUS</option>
+                  <option value=" ">Not Used</option>
+               </select></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Port 2 Physical interface:</td><td><select name="Port2Physical" title="Select which physical connection is used on each physical port of your Beckhoff ASIC (ET1100, ET1200)">
+                  <option value="Y">MII</option>
+                  <option value="H">MII-Fast Hot Connect</option>
+                  <option value="K">EBUS</option>
+                  <option value=" " selected>Not Used</option>
+               </select></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>
+               <td>Port 3 Physical interface:</td><td><select name="Port3Physical" title="Select which physical connection is used on each physical port of your Beckhoff ASIC (ET1100, ET1200)">
+                  <option value="Y">MII</option>
+                  <option value="H">MII-Fast Hot Connect</option>
+                  <option value="K">EBUS</option>
+                  <option value=" " selected>Not Used</option>
+               </select></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr><td colspan="6"><hr></td</tr>
+            <tr>
+               <td>ESC (EtherCAT Slave Chip):</td><td><select name="ESC" title="Select which ESC (EtherCAT Slave Chip) is used">
+                  <option value="AX58100">AX58100</option>
+                  <option value="ET1100">ET1100</option>
+                  <option value="LAN9252">LAN9252</option>
+                  <option value="LAN9253 Beckhoff">LAN9253 Beckhoff</option>
+               </select></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr>      
+               <td>SPI mode:</td><td><select name="SPImode" title="Select which SPI mode is used">
+                  <option value="3">3 (CPOL=1 CPHA=1) </option>
+                  <option value="2">2 (CPOL=1 CPHA=0) </option>
+                  <option value="1">1 (CPOL=0 CPHA=1) </option>
+                  <option value="0">0 (CPOL=0 CPHA=0) </option>
+               </select></td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>   
+            <tr><td colspan="6"><hr></td</tr>
+            <tr><td>
+               <input type="checkbox" name="CoeDetailsEnableSDO" value="EnableSDO" checked>Enable SDO<br>
+               <input type="checkbox" name="CoeDetailsEnableSDOInfo" value="EnableSDOInfo" checked>Enable SDO Info<br>
+               <input type="checkbox" name="CoeDetailsEnablePDOAssign" value="EnablePDOAssign">Enable PDO Assign<br>
+               <input type="checkbox" name="CoeDetailsEnablePDOConfiguration" value="EnablePDOConfiguration">Enable PDO Configuration<br>
+               <input type="checkbox" name="CoeDetailsEnableUploadAtStartup" value="EnableUploadAtStartup" checked>Enable Upload at startup<br>
+               <input type="checkbox" name="CoeDetailsEnableSDOCompleteAccess" value="EnableSDOCompleteAccess">Enable SDO complete access <br>
+               </td><td>&nbsp;</td><td>x</td><td>x</td><td>&nbsp;</td><td>&nbsp;</td>
+            </tr>
+            <tr><td colspan="6"><hr></td</tr>
+            <tr><td colspan="6">
+               <h3 class="odSectionHeading">
+                  <span class="odSectionTitle"> SDO </span>
+                  <span>
+                     <button onClick="editVAR_Click(sdo)">➕ Add variable</button>
+                     <button onClick="editARRAY_Click(sdo)">➕ Add Array</button>
+                     <button onClick="editRECORD_Click(sdo)">➕ Add Record</button>
+                  </span>
+                  </h3>
+               <div id="tr_sdo"></div>
+            </td></tr>
+            
+            <tr><td colspan="6"><hr></td</tr>
+            <tr><td colspan="6">
+               <h3 class="odSectionHeading">
+                  <span title="We are assuming single, fixed TxPDO" class="odSectionTitle"> TXPDO  (slv to master) </span>
+                  <span>
+                     <button onClick="editVAR_Click(txpdo)">➕ Add variable</button>
+                     <button onClick="editARRAY_Click(txpdo)">➕ Add Array</button>
+                     <button onClick="editRECORD_Click(txpdo)">➕ Add Record</button>
+                  </span>
+               </h3>
+               <div id="tr_txpdo"></div>
+            </td></tr>
+            
+            <tr><td colspan="6"><hr></td</tr>
+            <tr><td colspan="6">
+               <h3 class="odSectionHeading">
+                  <span title="We are assuming single, fixed RxPDO" class="odSectionTitle"> RXPDO  (master to slv) </span>
+                  <span>
+                     <button onClick="editVAR_Click(rxpdo)">➕ Add variable</button>
+                     <button onClick="editARRAY_Click(rxpdo)">➕ Add Array</button>
+                     <button onClick="editRECORD_Click(rxpdo)">➕ Add Record</button>
+                  </span>
+               </h3>
+               <div id="tr_rxpdo"></div>
+            </td></tr>
+
+            <tr><td colspan="6"><hr></td</tr>
+               <h3 class="odSectionHeading">
+                  <span title="Distributed Clocks configuration" class="odSectionTitle"> Synchronization </span>
+                  <span>
+                     <button onClick="addSyncClick()">➕ Add DC settings</button>
+                  </span>
+               </h3>
+               <div id="dcSyncModes"></div>
+            
+            <tr><td colspan="6"><hr></td</tr>
+
+            <tr><td colspan="6" align="center">
+               <button name="GenerateDownload" onclick="onGenerateDownloadClick()" title="Generate all files and download at once">
+                  ⏬ &nbsp; Download all files &nbsp;
+               </button>
+               <button id='GenerateFilesButton' name="Generate" onClick="onGenerateClick();" title="Generate all files">
+                  &nbsp; Generate files &nbsp;
+               </button>
+               <button name="Save" onClick='onSaveClick();' title="Download current settings and Object Dictionary state as JSON file">
+                  ⤵️ &nbsp; Save project &nbsp;
+               </button>
+               <button name="Restore" onClick='onRestoreClick();' title="Load settings and Object Dictionary state from previously saved JSON file">
+                  ⤴️ &nbsp; Restore project &nbsp;
+               </button>
+               <button name="Reset" onClick='onResetClick();' title="Reset settings to default values and remove all Object Dictionary entries">
+                  ‼️ &nbsp; Reset project &nbsp;
+               </button>
+            </td></tr>
+         </table>
+      </form>
+
+      <br><br>
+      <form name="outCodeForm" id="outCodeForm" spellcheck="false" action="" onsubmit="return false;">
+         ESI file:
+         <button name="DownloadESI" onClick="onDownloadEsiXmlClick()">
+            🔽 &nbsp; Download &nbsp;
+         </button>   
+         <br>
+         <textarea cols = "150" rows = "12" name="ESI">ESI File</textarea><br><br>
+         EEPROM HEX file:
+         <button name="Download_HEX" 
+            onClick="downloadFile(getOutputForm().HEX.value, fileName = 'eeprom.hex', contentType = 'application/octet-stream');">
+            🔽 &nbsp; Download &nbsp;
+         </button>
+         <button name="Download_BIN" onClick="onDownloadBinClick();">
+            🔽 &nbsp; Download .bin &nbsp;
+         </button>
+         <br>
+         To flash slave device with generated EEPROM content, you can <a href="https://github.com/OpenEtherCATsociety/SOEM/">install SOEM</a> 
+         and run command (for Intel Hex):
+         <br><br><i title="For binary, use flag -w instead of -wi" id="hexInstallCmd">sudo ./eepromtool 1 eth0 -wi eeprom.hex</i><br><br>
+      
+         <textarea cols = "150" rows = "12" name="HEX">Hex File</textarea><br><br>
+         ecat_options.h: 
+         <button name="Download_ecat_options" 
+            onClick="downloadFile(getOutputForm().ecat_options.value, fileName = 'ecat_options.h', contentType = 'text/plain');">
+            🔽 &nbsp; Download &nbsp;
+         </button>
+         <br>
+         <textarea cols = "150" rows = "12" name="ecat_options">ecat_options.h</textarea><br><br>
+         objectlist.c: 
+         <button name="Download_objectlist" 
+            onClick="downloadFile(getOutputForm().objectlist.value, fileName = 'objectlist.c', contentType = 'text/plain');">
+            🔽 &nbsp; Download &nbsp;
+         </button>
+         <br>
+         <textarea cols = "150" rows = "12" name="objectlist">objectlist.c</textarea><br><br>
+         utypes.h: 
+         <button name="Download_utypes"
+            onClick="downloadFile(getOutputForm().utypes.value, fileName = 'utypes.h', contentType = 'text/plain');">
+            🔽 &nbsp; Download &nbsp;
+         </button>
+         <br>
+         <textarea cols = "150" rows = "12" name="utypes">utypes.h</textarea><br><br>
+         <input id="restoreFileInput" type='file' accept=".json" style="visibility:hidden;" onchange="readFile(event)" />
+      </form>
+   </div>
+</body>
