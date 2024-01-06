@@ -6,14 +6,20 @@ that I used during the creation of my own EtherCAT device.
 This job is documented in a series of Youtube videos, from my first attempts to understand
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
-## Make my own EtherCat device 5. The lathe is alive
+## Make my own EtherCAT device 6. Stepper motor driver
+
+The stepper driver generator shows up and makes some stepper motor sounds. The two big things
+this time have been setup of the timer for the stepper pulses and synchronizing the EtherCAT
+cycle with the linuxcnc servo-thread cycle. Thankfully I don't show much of that.
+
+## Make my own EtherCAT device 5. The lathe is alive
 
 I hook up the EaserCAT 2000 board to my mini-lathe and make it work.
 Documentation is available here, please select the *Video5* branch.
 
 [![Watch the video](https://img.youtube.com/vi/wOtMrlHCCic/default.jpg)](https://youtu.be/wOtMrlHCCic)0
 
-## Make my own EtherCat device 4. The PCB is here
+## Make my own EtherCAT device 4. The PCB is here
 
 In this video it starts to be interesting. I have got the pcb and I try to make it work.
 Now I finally make documentation available, see [this folder](Pcb-1-lan9252).
