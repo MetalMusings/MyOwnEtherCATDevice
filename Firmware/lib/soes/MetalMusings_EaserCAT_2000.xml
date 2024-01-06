@@ -125,7 +125,7 @@
               </DataType>
               <DataType>
                 <Name>DT1602</Name>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -142,6 +142,16 @@
                   <Type>ULINT</Type>
                   <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>CommandedVelocity</Name>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -414,7 +424,7 @@
               </DataType>
               <DataType>
                 <Name>DT7002</Name>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -431,6 +441,17 @@
                   <Type>LREAL</Type>
                   <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>CommandedVelocity</Name>
+                  <Type>LREAL</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">ro</Access>
                   <PdoMapping>R</PdoMapping>
@@ -612,18 +633,24 @@
                 <Index>#x1602</Index>
                 <Name>StepGenIn1</Name>
                 <Type>DT1602</Type>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>2</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>CommandedPosition</Name>
                     <Info>
                       <DefaultValue>#x70020140</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>CommandedVelocity</Name>
+                    <Info>
+                      <DefaultValue>#x70020240</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1016,16 +1043,22 @@
                 <Index>#x7002</Index>
                 <Name>StepGenIn1</Name>
                 <Type>DT7002</Type>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>2</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>CommandedPosition</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>CommandedVelocity</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
                     </Info>
@@ -1075,6 +1108,13 @@
             <SubIndex>#x1</SubIndex>
             <BitLen>64</BitLen>
             <Name>CommandedPosition</Name>
+            <DataType>LREAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x7002</Index>
+            <SubIndex>#x2</SubIndex>
+            <BitLen>64</BitLen>
+            <Name>CommandedVelocity</Name>
             <DataType>LREAL</DataType>
           </Entry>
         </RxPdo>

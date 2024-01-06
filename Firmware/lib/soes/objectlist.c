@@ -22,6 +22,7 @@ static const char acName1601_01[] = "IndexLatchEnable";
 static const char acName1602[] = "StepGenIn1";
 static const char acName1602_00[] = "Max SubIndex";
 static const char acName1602_01[] = "CommandedPosition";
+static const char acName1602_02[] = "CommandedVelocity";
 static const char acName1A00[] = "EncPos";
 static const char acName1A00_00[] = "Max SubIndex";
 static const char acName1A00_01[] = "EncPos";
@@ -72,6 +73,7 @@ static const char acName7001[] = "IndexLatchEnable";
 static const char acName7002[] = "StepGenIn1";
 static const char acName7002_00[] = "Max SubIndex";
 static const char acName7002_01[] = "CommandedPosition";
+static const char acName7002_02[] = "CommandedVelocity";
 
 const _objd SDO1000[] =
 {
@@ -109,8 +111,9 @@ const _objd SDO1601[] =
 };
 const _objd SDO1602[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1602_00, 1, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1602_00, 2, NULL},
   {0x01, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1602_01, 0x70020140, NULL},
+  {0x02, DTYPE_UNSIGNED64, 64, ATYPE_RO, acName1602_02, 0x70020240, NULL},
 };
 const _objd SDO1A00[] =
 {
@@ -202,8 +205,9 @@ const _objd SDO7001[] =
 };
 const _objd SDO7002[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7002_00, 1, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7002_00, 2, NULL},
   {0x01, DTYPE_REAL64, 64, ATYPE_RO, acName7002_01, 0, &Obj.StepGenIn1.CommandedPosition},
+  {0x02, DTYPE_REAL64, 64, ATYPE_RO, acName7002_02, 0, &Obj.StepGenIn1.CommandedVelocity},
 };
 
 const _objectlist SDOobjects[] =
@@ -215,7 +219,7 @@ const _objectlist SDOobjects[] =
   {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
   {0x1600, OTYPE_RECORD, 1, 0, acName1600, SDO1600},
   {0x1601, OTYPE_RECORD, 1, 0, acName1601, SDO1601},
-  {0x1602, OTYPE_RECORD, 1, 0, acName1602, SDO1602},
+  {0x1602, OTYPE_RECORD, 2, 0, acName1602, SDO1602},
   {0x1A00, OTYPE_RECORD, 1, 0, acName1A00, SDO1A00},
   {0x1A01, OTYPE_RECORD, 1, 0, acName1A01, SDO1A01},
   {0x1A02, OTYPE_RECORD, 1, 0, acName1A02, SDO1A02},
@@ -233,6 +237,6 @@ const _objectlist SDOobjects[] =
   {0x6005, OTYPE_RECORD, 1, 0, acName6005, SDO6005},
   {0x7000, OTYPE_VAR, 0, 0, acName7000, SDO7000},
   {0x7001, OTYPE_VAR, 0, 0, acName7001, SDO7001},
-  {0x7002, OTYPE_RECORD, 1, 0, acName7002, SDO7002},
+  {0x7002, OTYPE_RECORD, 2, 0, acName7002, SDO7002},
   {0xffff, 0xff, 0xff, 0xff, NULL, NULL}
 };

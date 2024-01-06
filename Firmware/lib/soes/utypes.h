@@ -30,6 +30,7 @@ typedef struct
    struct
    {
       double CommandedPosition;
+      double CommandedVelocity;
    } StepGenIn1;
 
 } _Objects;

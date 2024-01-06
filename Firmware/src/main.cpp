@@ -35,7 +35,7 @@ volatile uint8_t pleaseZeroTheCounter = 0;
 HardwareTimer *MyTim;
 volatile uint32_t stepCount = 0, stepPulses = 0;
 volatile double_t actualPosition = 0;
-volatile double_t requestedPosition;
+volatile double_t requestedPosition, requestedVelocity;
 
 uint32_t sync0CycleTime = 0;
 
@@ -56,6 +56,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
       PosScaleRes = 1.0 / double(CurPosScale);
    }
    requestedPosition = Obj.StepGenIn1.CommandedPosition;
+   requestedVelocity = Obj.StepGenIn1.CommandedVelocity;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -211,7 +212,7 @@ void sync0Handler(void)
 void handleStepper(void)
 {
    byte forwardDirection = 0; // 1 if going forward
-   int32_t pulsesToGo = 1000 * (requestedPosition - actualPosition);
+   int32_t pulsesToGo = 100 * (requestedPosition - actualPosition);
    if (pulsesToGo != 0)
       makePulses(900, pulsesToGo); // Make the pulses using hardware timer
 

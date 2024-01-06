@@ -163,6 +163,13 @@
             "data": "&Obj.StepGenIn1.CommandedPosition",
             "value": "0",
             "access": "RO"
+          },
+          {
+            "name": "CommandedVelocity",
+            "dtype": "REAL64",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.StepGenIn1.CommandedVelocity"
           }
         ],
         "pdo_mappings": [
