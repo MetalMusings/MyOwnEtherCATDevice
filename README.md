@@ -12,12 +12,14 @@ The stepper driver generator shows up and makes some stepper motor sounds. The t
 this time have been setup of the timer for the stepper pulses and synchronizing the EtherCAT
 cycle with the linuxcnc servo-thread cycle. Thankfully I don't show much of that.
 
+[![Watch the video](https://img.youtube.com/vi/QNNEA0wO4Mw/default.jpg)](https://youtu.be/QNNEA0wO4Mw)
+
 ## Make my own EtherCAT device 5. The lathe is alive
 
 I hook up the EaserCAT 2000 board to my mini-lathe and make it work.
 Documentation is available here, please select the *Video5* branch.
 
-[![Watch the video](https://img.youtube.com/vi/wOtMrlHCCic/default.jpg)](https://youtu.be/wOtMrlHCCic)0
+[![Watch the video](https://img.youtube.com/vi/wOtMrlHCCic/default.jpg)](https://youtu.be/wOtMrlHCCic)
 
 ## Make my own EtherCAT device 4. The PCB is here
 
