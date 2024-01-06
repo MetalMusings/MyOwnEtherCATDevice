@@ -1,6 +1,0 @@
-#!/bin/bash
-R=2.1334
-MAXRPM=4260
-halcmd setp scale.0.gain $R
-halcmd setp scale.1.gain $(echo "scale=5;1.0 / $R"| bc -q)
-exit 0

@@ -1,3 +1,0 @@
-# These files are loaded post GUI, in the order they appear
-
-source custom_postgui.hal

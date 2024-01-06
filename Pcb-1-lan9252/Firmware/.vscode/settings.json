@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "ecat_slv.h": "c",
+        "compare": "cpp",
+        "*.tpp": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "system_error": "cpp"
+    }
+}

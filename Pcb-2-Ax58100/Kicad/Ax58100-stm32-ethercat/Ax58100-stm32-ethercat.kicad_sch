@@ -1,0 +1,87 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid 5597aedc-b607-407f-bbfd-31b3b298ecb1)
+
+  (paper "A3")
+
+  (lib_symbols
+  )
+
+
+  (text "Huvudsida" (at 162.56 85.09 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid adf2be63-7ec7-44be-837f-901ddbc80717)
+  )
+
+  (sheet (at 144.78 224.79) (size 71.12 16.51) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 0a376a6c-0f15-42f8-81f6-3a55619be267)
+    (property "Sheetname" "Peripherals" (at 144.78 224.0784 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "peripherals.kicad_sch" (at 144.78 241.8846 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "AX58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "5"))
+      )
+    )
+  )
+
+  (sheet (at 234.95 198.12) (size 102.87 34.29) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 5bf93325-f5d9-4344-9bf3-f5fc91bc1622)
+    (property "Sheetname" "AX58100 phys etc" (at 234.95 197.4084 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "AX58100_phy_etc.kicad_sch" (at 234.95 232.9946 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "AX58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "3"))
+      )
+    )
+  )
+
+  (sheet (at 233.68 123.19) (size 93.98 60.96) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 9f485422-734f-43d3-94ea-443cbc453d2e)
+    (property "Sheetname" "AX58100" (at 233.68 122.4784 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "AX48100.kicad_sch" (at 233.68 184.7346 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "AX58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "2"))
+      )
+    )
+  )
+
+  (sheet (at 142.24 200.66) (size 74.93 17.78) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid d564400f-40ba-4aca-9c2a-14ec52a8353b)
+    (property "Sheetname" "STM32F4" (at 142.24 199.9484 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "STM32F4.kicad_sch" (at 142.24 219.0246 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "AX58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "4"))
+      )
+    )
+  )
+
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+)
