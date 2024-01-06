@@ -1,0 +1,74 @@
+# Include your custom_postgui HAL commands here
+# This file will not be overwritten when you run PNCconf again
+
+loadrt or2 count=2
+loadrt mux4 count=1
+loadrt and2 count=4
+loadrt oneshot count=1
+
+addf or2.0     servo-thread
+addf or2.1     servo-thread
+addf mux4.0    servo-thread
+addf and2.0    servo-thread
+addf and2.1    servo-thread
+addf and2.2    servo-thread
+addf and2.3    servo-thread
+addf oneshot.0 servo-thread
+
+setp mux4.0.in0 0
+setp mux4.0.in1 25
+setp mux4.0.in2 50
+setp mux4.0.in3 1000
+
+net remote-speed-slow or2.0.in0    <= input.0.btn-x
+net remote-speed-medium or2.1.in0  <= input.0.btn-a
+net remote-speed-fast or2.0.in1    <= input.0.btn-b
+net remote-speed-fast or2.1.in1    <= input.0.btn-b
+
+net joy-speed-1 mux4.0.sel0 <= or2.0.out
+net joy-speed-2 mux4.0.sel1 <= or2.1.out
+net jog-speed               <= mux4.0.out
+
+net jog-x-analog <= input.0.abs-y-position
+net jog-z-analog <= input.0.abs-x-position
+
+# Spindle start+manual and stop
+
+net manual-mode-spindle-lock and2.3.in0 halui.mode.manual <= input.0.btn-mode
+net spindle-safe-start       and2.3.in1                   <= input.0.btn-tr
+net spindle-manual-cw                                     <= and2.3.out
+net spindle-manual-stop                                   <= input.0.btn-tl
+
+#  E-stop
+
+net estop halui.estop.activate    <= input.0.btn-y
+
+# net manual-mode halui.mode.manual <= input.0.btn-mode
+
+# Start/pause/resume stop
+
+setp oneshot.0.width 0.0011
+setp oneshot.0.retriggerable 0
+setp oneshot.0.rising  1
+setp oneshot.0.falling 0
+
+net program-is-idle    halui.program.is-idle    => and2.0.in0
+net program-is-running halui.program.is-running => and2.1.in0
+net program-is-paused  halui.program.is-paused  => and2.2.in0
+net button-edge-trig   input.0.btn-start        => oneshot.0.in
+net button-start       oneshot.0.out            => and2.0.in1 and2.1.in1 and2.2.in1
+
+net program-start      and2.0.out         => halui.program.run halui.mode.auto
+net program-pause      and2.1.out         => halui.program.pause
+net program-resume     and2.2.out         => halui.program.resume
+net program-stop       input.0.btn-select => halui.program.stop
+
+net spindle-at-speed      gmoccapy.spindle_at_speed_led
+net spindle-vel-fb-rpm    => gmoccapy.spindle_feedback_bar
+
+net tool-change        gmoccapy.toolchange-change  <= iocontrol.0.tool-change
+net tool-changed       gmoccapy.toolchange-changed <= iocontrol.0.tool-changed
+net tool-prep-number   gmoccapy.toolchange-number  <= iocontrol.0.tool-prep-number
+net tool-prep-loop     iocontrol.0.tool-prepare    <= iocontrol.0.tool-prepared
+net tooloffset-x       gmoccapy.tooloffset-x       <= motion.tooloffset.x
+net tooloffset-z       gmoccapy.tooloffset-z       <= motion.tooloffset.z
