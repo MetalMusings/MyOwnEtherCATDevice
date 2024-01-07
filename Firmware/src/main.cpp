@@ -27,7 +27,6 @@ double PosScaleRes = 1.0;
 uint32_t CurPosScale = 1;
 uint8_t OldLatchCEnable = 0;
 volatile uint8_t indexPulseFired = 0;
-uint32_t nFires = 0;
 volatile uint8_t pleaseZeroTheCounter = 0;
 
 #define STEPPER_DIR_PIN PA12
@@ -66,7 +65,6 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    {
       Obj.IndexStatus = 1;
       indexPulseFired = 0;
-      nFires++;
       PreviousEncoderCounterValue = 0;
    }
    // Obj.DiffT = sync0CycleTime;
@@ -97,6 +95,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 void ESC_interrupt_enable(uint32_t mask);
 void ESC_interrupt_disable(uint32_t mask);
 uint16_t dc_checker(void);
+void TimerStep_CB(void);
+void sync0Handler(void);
+void handleStepper(void);
+void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/);
 
 static esc_cfg_t config =
     {
@@ -106,7 +108,7 @@ static esc_cfg_t config =
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
         .post_state_change_hook = NULL,
-        .application_hook = handleStepper, // StepGen,
+        .application_hook = handleStepper, 
         .safeoutput_override = NULL,
         .pre_object_download_hook = NULL,
         .post_object_download_hook = NULL,
@@ -118,28 +120,9 @@ static esc_cfg_t config =
         .esc_check_dc_handler = dc_checker,
 };
 
-void TimerStep_CB(void)
-{
-   stepCount++;
-   if (stepCount == stepPulses)
-   {
-      MyTim->pause();
-   }
-}
-
-void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/)
-{
-   byte sgn = pulses > 0 ? HIGH : LOW;
-   digitalWrite(STEPPER_DIR_PIN, sgn); // I think one should really wait a bit when changed
-   uint32_t puls = abs(pulses);
-   MyTim->setOverflow(abs(pulses) * 1000000 / period, HERTZ_FORMAT);
-   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
-   stepCount = 0;
-   stepPulses = abs(pulses);
-   MyTim->resume();
-}
-
 void sync0Handler(void);
+volatile byte serveIRQ = 0;
+
 void setup(void)
 {
    Serial1.begin(115200);
@@ -153,14 +136,14 @@ void setup(void)
 
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
-   attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // Always when Index triggered
+   attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // When Index triggered
    // EncoderInit.SetCount(Tim3, 0);
    // EncoderInit.SetCount(Tim4, 0);
    // EncoderInit.SetCount(Tim8, 0);
 
    ecat_slv_init(&config);
 }
-volatile byte serveIRQ = 0;
+
 void loop(void)
 {
    ESCvar.PrevTime = ESCvar.Time;
@@ -171,25 +154,6 @@ void loop(void)
       serveIRQ = 0;
    }
    ecat_slv_poll();
-}
-
-#define ONE_PERIOD 65536
-#define HALF_PERIOD 32768
-
-int64_t unwrap_encoder(uint16_t in, int64_t *prev)
-{
-   int64_t c64 = (int32_t)in - HALF_PERIOD; // remove half period to determine (+/-) sign of the wrap
-   int64_t dif = (c64 - *prev);             // core concept: prev + (current - prev) = current
-
-   // wrap difference from -HALF_PERIOD to HALF_PERIOD. modulo prevents differences after the wrap from having an incorrect result
-   int64_t mod_dif = ((dif + HALF_PERIOD) % ONE_PERIOD) - HALF_PERIOD;
-   if (dif < -HALF_PERIOD)
-      mod_dif += ONE_PERIOD; // account for mod of negative number behavior in C
-
-   int64_t unwrapped = *prev + mod_dif;
-   *prev = unwrapped; // load previous value
-
-   return unwrapped + HALF_PERIOD; // remove the shift we applied at the beginning, and return
 }
 
 void indexPulse(void)
@@ -211,13 +175,34 @@ void sync0Handler(void)
 
 void handleStepper(void)
 {
-   byte forwardDirection = 0; // 1 if going forward
-   int32_t pulsesToGo = 100 * (requestedPosition - actualPosition);
+   int32_t pulsesToGo = 5000 * (requestedPosition - actualPosition); // From Turner.hal X:5000 Z:2000 ps/mm
    if (pulsesToGo != 0)
-      makePulses(900, pulsesToGo); // Make the pulses using hardware timer
+      makePulses(sync0CycleTime, pulsesToGo); // Make the pulses using hardware timer
 
    actualPosition = requestedPosition;
 }
+
+void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/)
+{
+   byte sgn = pulses > 0 ? HIGH : LOW;
+   digitalWrite(STEPPER_DIR_PIN, sgn); // I think one should really wait a bit when changed
+   uint32_t puls = abs(pulses);
+   MyTim->setOverflow(abs(pulses) * 1000000 / period, HERTZ_FORMAT);
+   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
+   stepCount = 0;
+   stepPulses = abs(pulses);
+   MyTim->resume();
+}
+
+void TimerStep_CB(void)
+{
+   stepCount++;
+   if (stepCount == stepPulses)
+   {
+      MyTim->pause();
+   }
+}
+
 void ESC_interrupt_enable(uint32_t mask)
 {
    // Enable interrupt for SYNC0 or SM2 or SM3
@@ -265,4 +250,22 @@ uint16_t dc_checker(void)
    ESCvar.dcsync = 0;
    sync0CycleTime = ESC_SYNC0cycletime();
    return 0;
+}
+#define ONE_PERIOD 65536
+#define HALF_PERIOD 32768
+
+int64_t unwrap_encoder(uint16_t in, int64_t *prev)
+{
+   int64_t c64 = (int32_t)in - HALF_PERIOD; // remove half period to determine (+/-) sign of the wrap
+   int64_t dif = (c64 - *prev);             // core concept: prev + (current - prev) = current
+
+   // wrap difference from -HALF_PERIOD to HALF_PERIOD. modulo prevents differences after the wrap from having an incorrect result
+   int64_t mod_dif = ((dif + HALF_PERIOD) % ONE_PERIOD) - HALF_PERIOD;
+   if (dif < -HALF_PERIOD)
+      mod_dif += ONE_PERIOD; // account for mod of negative number behavior in C
+
+   int64_t unwrapped = *prev + mod_dif;
+   *prev = unwrapped; // load previous value
+
+   return unwrapped + HALF_PERIOD; // remove the shift we applied at the beginning, and return
 }
