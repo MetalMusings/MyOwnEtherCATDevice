@@ -36,10 +36,7 @@ volatile uint32_t stepCount = 0, stepPulses = 0;
 volatile double_t actualPosition = 0;
 volatile double_t requestedPosition, requestedVelocity;
 
-uint32_t sync0CycleTime = 0;
-
-void handleStepper(void);
-void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/);
+uint32_t sync0CycleTime = 0; // nanoseconds
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -98,7 +95,7 @@ uint16_t dc_checker(void);
 void TimerStep_CB(void);
 void sync0Handler(void);
 void handleStepper(void);
-void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/);
+void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* nr of pulses to do*/);
 
 static esc_cfg_t config =
     {
@@ -108,7 +105,7 @@ static esc_cfg_t config =
         .set_defaults_hook = NULL,
         .pre_state_change_hook = NULL,
         .post_state_change_hook = NULL,
-        .application_hook = handleStepper, 
+        .application_hook = handleStepper,
         .safeoutput_override = NULL,
         .pre_object_download_hook = NULL,
         .post_object_download_hook = NULL,
@@ -173,32 +170,54 @@ void sync0Handler(void)
    serveIRQ = 1;
 }
 
+volatile uint8_t timerIsRunning = 0;
+volatile uint8_t reloadStepperTimer = 0;
+volatile int32_t currentPosition = 0;
+volatile int32_t direction = 1;
+volatile int32_t timerStepPosition = 0;
+volatile int32_t timerStepDirection = 0;
+volatile int32_t timerStepPositionAtEnd = 0;
+
 void handleStepper(void)
 {
-   int32_t pulsesToGo = 5000 * (requestedPosition - actualPosition); // From Turner.hal X:5000 Z:2000 ps/mm
-   if (pulsesToGo != 0)
-      makePulses(sync0CycleTime, pulsesToGo); // Make the pulses using hardware timer
-
+   int32_t pulsesAtEndOfCycle = 1000 * requestedPosition;  // From Turner.hal X:5000 Z:2000 ps/mm
+   makePulses(/*sync0CycleTime / 1000*/ 700, pulsesAtEndOfCycle); // Make the pulses using hardware timer
    actualPosition = requestedPosition;
 }
 
-void makePulses(uint32_t period /* in usecs */, int32_t pulses /* nr of pulses to do*/)
+void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/)
 {
-   byte sgn = pulses > 0 ? HIGH : LOW;
-   digitalWrite(STEPPER_DIR_PIN, sgn); // I think one should really wait a bit when changed
-   uint32_t puls = abs(pulses);
-   MyTim->setOverflow(abs(pulses) * 1000000 / period, HERTZ_FORMAT);
-   MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
-   stepCount = 0;
-   stepPulses = abs(pulses);
-   MyTim->resume();
+   //  if (!stepperTimerIsRunning)
+   {
+      int32_t steps = pulsesAtEnd - timerStepPositionAtEnd; // Pulses to go + or -
+      if (abs(steps) * 1000000 / cycleTime > 100000)        // 100 kHz is too much for driver, reduce
+      {
+         int32_t stepsMax = 100000 * cycleTime / 1000000;
+         steps = stepsMax*(steps > 0 ? 1 : -1);
+         pulsesAtEnd = timerStepPositionAtEnd + stepsMax;
+      }
+      if (steps != 0)
+      {
+         byte sgn = steps > 0 ? HIGH : LOW;
+         digitalWrite(STEPPER_DIR_PIN, sgn);
+         uint64_t period = cycleTime; // usecs
+         uint32_t freq = abs(steps) * 1000000 / period;
+         MyTim->setOverflow(freq, HERTZ_FORMAT);
+         MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
+         timerStepDirection = steps > 0 ? 1 : -1;
+         timerStepPositionAtEnd = pulsesAtEnd; // Current Position
+         timerIsRunning = 1;
+         MyTim->resume();
+      }
+   }
 }
 
 void TimerStep_CB(void)
 {
-   stepCount++;
-   if (stepCount == stepPulses)
+   timerStepPosition += timerStepDirection;
+   if (timerStepPosition == timerStepPositionAtEnd)
    {
+      timerIsRunning = 0;
       MyTim->pause();
    }
 }
