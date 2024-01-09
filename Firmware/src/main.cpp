@@ -36,7 +36,7 @@ volatile uint32_t stepCount = 0, stepPulses = 0;
 volatile double_t actualPosition = 0;
 volatile double_t requestedPosition, requestedVelocity;
 
-uint32_t sync0CycleTime = 0; // nanoseconds
+uint32_t sync0CycleTime = 0; // microseconds
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -180,72 +180,82 @@ volatile int32_t timerStepPositionAtEnd = 0;
 
 void handleStepper(void)
 {
-   int32_t pulsesAtEndOfCycle = 100 * requestedPosition;           // From Turner.hal X:5000 Z:2000 ps/mm
-   makePulses(/*sync0CycleTime / 1000*/ 1200, pulsesAtEndOfCycle); // Make the pulses using hardware timer
-   actualPosition = requestedPosition;
+   const uint32_t steps_per_mm = 1000;
+   actualPosition = timerStepPosition / double(steps_per_mm);
+   double diffPosition = requestedPosition - actualPosition;
+   if (abs(diffPosition) * steps_per_mm > 10000)
+   {
+      requestedPosition = actualPosition + 10.0 * (diffPosition > 0 ? 1 : -1);
+   }
+   int32_t pulsesAtEndOfCycle = steps_per_mm * requestedPosition; // From Turner.hal X:5000 Z:2000 ps/mm
+   makePulses(sync0CycleTime, pulsesAtEndOfCycle);          // Make the pulses using hardware timer
 }
 
 volatile int32_t timerNewEndStepPosition = 0;
-volatile uint64_t timerNewEndTime = 0;
+volatile uint32_t timerNewCycleTime = 0;
 
 void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/)
 {
-   if (1 /*!timerIsRunning*/)
+   uint32_t now = micros();
+   if (timerIsRunning)
+   {
+      // Set variables, they will be picked up by the timer_CB and the timer is reloaded.
+      timerNewEndStepPosition = pulsesAtEnd;
+      timerNewCycleTime = cycleTime;
+   }
+   if (!timerIsRunning)
    {
       // Start the timer
       int32_t steps = pulsesAtEnd - timerStepPositionAtEnd; // Pulses to go + or -
       if (steps != 0)
       {
-         if (abs(steps) * 1000000 / cycleTime > 100000) // 100 kHz is too much for driver, reduce
-         {
-            int32_t stepsMax = 100000 * cycleTime / 1000000;
-            steps = stepsMax * (steps > 0 ? 1 : -1);
-            pulsesAtEnd = timerStepPositionAtEnd + steps;
-         }
          byte sgn = steps > 0 ? HIGH : LOW;
          digitalWrite(STEPPER_DIR_PIN, sgn);
-         uint32_t freq = 1.4 * abs(steps) * 1000000 / cycleTime;
-         MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
+         double_t freqf = (abs(steps) * 1000000.0) / double(cycleTime);
+         uint32_t freq = uint32_t(freqf);
+         // freq=1428;
          MyTim->setOverflow(freq, HERTZ_FORMAT);
          MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
          timerStepDirection = steps > 0 ? 1 : -1;
          timerStepPositionAtEnd = pulsesAtEnd; // Current Position
          timerIsRunning = 1;
+         MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
          MyTim->resume();
       }
-   }
-   else // Timer is running, reload
-   {
-      // Set variables, they will be picked up by the timer_CB and the timer is reloaded.
-
-      timerNewEndStepPosition = pulsesAtEnd;
-      timerNewEndTime = micros() + cycleTime;
    }
 }
 
 void TimerStep_CB(void)
 {
    timerStepPosition += timerStepDirection; // The step that was just completed
-   if (timerNewEndTime != 0)                // Are we going to reload?
+   if (timerNewCycleTime != 0)                // Are we going to reload?
    {
       // Input for reload is timerNewEndStepPosition and timerNewEndTime
       // The timer has current position and current time and from this
       // can set new frequency and new endtarget for steps
       MyTim->pause();
       int32_t steps = timerNewEndStepPosition - timerStepPosition;
-      uint64_t cycleTime = timerNewEndTime - micros();
-      byte sgn = steps > 0 ? HIGH : LOW;
-      digitalWrite(STEPPER_DIR_PIN, sgn);
-      uint32_t freq = abs(steps) * 1000000 / cycleTime;
-      MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-      MyTim->setOverflow(freq, HERTZ_FORMAT);
-      MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
-      timerStepDirection = steps > 0 ? 1 : -1;
-      timerStepPositionAtEnd = timerNewEndStepPosition;
-      timerNewEndStepPosition = 0; // Set to zero to not reload next time
-      timerNewEndTime = 0;
-      timerIsRunning = 1;
-      MyTim->resume();
+      if (steps != 0)
+      {
+         byte sgn = steps > 0 ? HIGH : LOW;
+         digitalWrite(STEPPER_DIR_PIN, sgn);
+         double_t freqf = (abs(steps) * 1000000.0) / double(timerNewCycleTime);
+         uint32_t freq = uint32_t(freqf);
+         // freq=1428;
+         if (freq != 0)
+         {
+            MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
+            // freq=1428;
+            MyTim->setOverflow(freq, HERTZ_FORMAT);
+            MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
+            timerStepDirection = steps > 0 ? 1 : -1;
+            timerStepPositionAtEnd = timerNewEndStepPosition;
+            timerNewEndStepPosition = 0; // Set to zero to not reload next time
+            timerNewCycleTime = 0;
+            MyTim->resume();
+            timerIsRunning = 1;
+         }
+      }
    }
    if (timerStepPosition == timerStepPositionAtEnd) // Are we finished?
    {
@@ -299,7 +309,7 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 0;
-   sync0CycleTime = ESC_SYNC0cycletime();
+   sync0CycleTime = ESC_SYNC0cycletime() / 1000; // nsec to usec
    return 0;
 }
 #define ONE_PERIOD 65536
