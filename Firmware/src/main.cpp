@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <HardwareTimer.h>
 
 #include <stdio.h>
 extern "C"
@@ -32,9 +31,14 @@ volatile uint8_t pleaseZeroTheCounter = 0;
 #define STEPPER_DIR_PIN PA12
 #define STEPPER_STEP_PIN PA11
 HardwareTimer *MyTim;
-volatile uint32_t stepCount = 0, stepPulses = 0;
-volatile double_t actualPosition = 0;
-volatile double_t requestedPosition, requestedVelocity;
+
+#include "StepGen.h"
+void timerCallbackStep1(void);
+StepGen Step1(TIM1, 4, PA11, PA12, timerCallbackStep1);
+void timerCallbackStep1(void)
+{
+   Step1.timerCB();
+}
 
 uint32_t sync0CycleTime = 0; // microseconds
 
@@ -51,8 +55,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
       CurPosScale = Obj.EncPosScale;
       PosScaleRes = 1.0 / double(CurPosScale);
    }
-   requestedPosition = Obj.StepGenIn1.CommandedPosition;
-   requestedVelocity = Obj.StepGenIn1.CommandedVelocity;
+   Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -85,14 +88,13 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
 
-   Obj.StepGenOut1.ActualPosition = actualPosition;
-   Obj.DiffT = 10000 * requestedPosition; // deltaT;
+   Obj.StepGenOut1.ActualPosition = Step1.actPos();
+   Obj.DiffT = 10000 * Step1.reqPos(); // deltaT;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
 void ESC_interrupt_disable(uint32_t mask);
 uint16_t dc_checker(void);
-void TimerStep_CB(void);
 void sync0Handler(void);
 void handleStepper(void);
 void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* nr of pulses to do*/);
@@ -117,20 +119,19 @@ static esc_cfg_t config =
         .esc_check_dc_handler = dc_checker,
 };
 
-void sync0Handler(void);
 volatile byte serveIRQ = 0;
 
 void setup(void)
 {
    Serial1.begin(115200);
    rcc_config();
-
+#if 0
    TIM_TypeDef *Instance = TIM1;
    MyTim = new HardwareTimer(Instance);
    MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
    MyTim->attachInterrupt(TimerStep_CB);
    pinMode(STEPPER_DIR_PIN, OUTPUT);
-
+#endif
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
    attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // When Index triggered
@@ -170,16 +171,11 @@ void sync0Handler(void)
    serveIRQ = 1;
 }
 
-volatile uint8_t timerIsRunning = 0;
-volatile uint8_t reloadStepperTimer = 0;
-volatile int32_t currentPosition = 0;
-volatile int32_t direction = 1;
-volatile int32_t timerStepPosition = 0;
-volatile int32_t timerStepDirection = 0;
-volatile int32_t timerStepPositionAtEnd = 0;
-
 void handleStepper(void)
 {
+   Step1.handleStepper();
+#if 0
+
    const uint32_t steps_per_mm = 1000;
    actualPosition = timerStepPosition / double(steps_per_mm);
    double diffPosition = requestedPosition - actualPosition;
@@ -188,80 +184,8 @@ void handleStepper(void)
       requestedPosition = actualPosition + 10.0 * (diffPosition > 0 ? 1 : -1);
    }
    int32_t pulsesAtEndOfCycle = steps_per_mm * requestedPosition; // From Turner.hal X:5000 Z:2000 ps/mm
-   makePulses(sync0CycleTime, pulsesAtEndOfCycle);          // Make the pulses using hardware timer
-}
-
-volatile int32_t timerNewEndStepPosition = 0;
-volatile uint32_t timerNewCycleTime = 0;
-
-void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/)
-{
-   uint32_t now = micros();
-   if (timerIsRunning)
-   {
-      // Set variables, they will be picked up by the timer_CB and the timer is reloaded.
-      timerNewEndStepPosition = pulsesAtEnd;
-      timerNewCycleTime = cycleTime;
-   }
-   if (!timerIsRunning)
-   {
-      // Start the timer
-      int32_t steps = pulsesAtEnd - timerStepPositionAtEnd; // Pulses to go + or -
-      if (steps != 0)
-      {
-         byte sgn = steps > 0 ? HIGH : LOW;
-         digitalWrite(STEPPER_DIR_PIN, sgn);
-         double_t freqf = (abs(steps) * 1000000.0) / double(cycleTime);
-         uint32_t freq = uint32_t(freqf);
-         // freq=1428;
-         MyTim->setOverflow(freq, HERTZ_FORMAT);
-         MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
-         timerStepDirection = steps > 0 ? 1 : -1;
-         timerStepPositionAtEnd = pulsesAtEnd; // Current Position
-         timerIsRunning = 1;
-         MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-         MyTim->resume();
-      }
-   }
-}
-
-void TimerStep_CB(void)
-{
-   timerStepPosition += timerStepDirection; // The step that was just completed
-   if (timerNewCycleTime != 0)                // Are we going to reload?
-   {
-      // Input for reload is timerNewEndStepPosition and timerNewEndTime
-      // The timer has current position and current time and from this
-      // can set new frequency and new endtarget for steps
-      MyTim->pause();
-      int32_t steps = timerNewEndStepPosition - timerStepPosition;
-      if (steps != 0)
-      {
-         byte sgn = steps > 0 ? HIGH : LOW;
-         digitalWrite(STEPPER_DIR_PIN, sgn);
-         double_t freqf = (abs(steps) * 1000000.0) / double(timerNewCycleTime);
-         uint32_t freq = uint32_t(freqf);
-         // freq=1428;
-         if (freq != 0)
-         {
-            MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-            // freq=1428;
-            MyTim->setOverflow(freq, HERTZ_FORMAT);
-            MyTim->setCaptureCompare(4, 50, PERCENT_COMPARE_FORMAT); // 50 %
-            timerStepDirection = steps > 0 ? 1 : -1;
-            timerStepPositionAtEnd = timerNewEndStepPosition;
-            timerNewEndStepPosition = 0; // Set to zero to not reload next time
-            timerNewCycleTime = 0;
-            MyTim->resume();
-            timerIsRunning = 1;
-         }
-      }
-   }
-   if (timerStepPosition == timerStepPositionAtEnd) // Are we finished?
-   {
-      timerIsRunning = 0;
-      MyTim->pause();
-   }
+   makePulses(sync0CycleTime, pulsesAtEndOfCycle);                // Make the pulses using hardware timer
+#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask)
@@ -309,7 +233,7 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 0;
-   sync0CycleTime = ESC_SYNC0cycletime() / 1000; // nsec to usec
+   Step1.setCycleTime(ESC_SYNC0cycletime() / 1000); // nsec to usec
    return 0;
 }
 #define ONE_PERIOD 65536
