@@ -126,7 +126,7 @@ void setup(void)
    Serial1.begin(115200);
    rcc_config();
 
-   Step1.setScale(100);
+   Step1.setScale(500);
 
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
