@@ -125,13 +125,9 @@ void setup(void)
 {
    Serial1.begin(115200);
    rcc_config();
-#if 0
-   TIM_TypeDef *Instance = TIM1;
-   MyTim = new HardwareTimer(Instance);
-   MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-   MyTim->attachInterrupt(TimerStep_CB);
-   pinMode(STEPPER_DIR_PIN, OUTPUT);
-#endif
+
+   Step1.setScale(100);
+
    // Set starting count value
    EncoderInit.SetCount(Tim2, 0);
    attachInterrupt(digitalPinToInterrupt(INDEX_PIN), indexPulse, RISING); // When Index triggered
@@ -174,18 +170,6 @@ void sync0Handler(void)
 void handleStepper(void)
 {
    Step1.handleStepper();
-#if 0
-
-   const uint32_t steps_per_mm = 1000;
-   actualPosition = timerStepPosition / double(steps_per_mm);
-   double diffPosition = requestedPosition - actualPosition;
-   if (abs(diffPosition) * steps_per_mm > 10000)
-   {
-      requestedPosition = actualPosition + 10.0 * (diffPosition > 0 ? 1 : -1);
-   }
-   int32_t pulsesAtEndOfCycle = steps_per_mm * requestedPosition; // From Turner.hal X:5000 Z:2000 ps/mm
-   makePulses(sync0CycleTime, pulsesAtEndOfCycle);                // Make the pulses using hardware timer
-#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask)

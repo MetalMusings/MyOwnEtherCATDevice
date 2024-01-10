@@ -12,6 +12,7 @@ StepGen::StepGen(TIM_TypeDef *Timer, uint8_t _timerChannel, uint8_t _stepPin, ui
     timerNewCycleTime = 0;
     actualPosition = 0;
     requestedPosition = 0;
+    stepsPerMM = 0;
 
     dirPin = _dirPin;
     stepPin = _stepPin;
@@ -46,9 +47,12 @@ void StepGen::handleStepper(void)
 {
     actualPosition = timerStepPosition / double(stepsPerMM);
     double diffPosition = requestedPosition - actualPosition;
-    if (abs(diffPosition) * stepsPerMM > 10000)
+
+    uint64_t fre = abs(diffPosition) * stepsPerMM * 1000000 / double(sync0CycleTime); // Frequency needed
+    if (fre > maxFreq)                                                                // Only do maxFre
     {
-        requestedPosition = actualPosition + 10.0 * (diffPosition > 0 ? 1 : -1);
+        double maxDist = maxFreq/stepsPerMM * sync0CycleTime / 1000000.0 * (diffPosition > 0 ? 1 : -1);
+        requestedPosition = actualPosition + maxDist;
     }
     int32_t pulsesAtEndOfCycle = stepsPerMM * requestedPosition; // From Turner.hal X:5000 Z:2000 ps/mm
     makePulses(sync0CycleTime, pulsesAtEndOfCycle);              // Make the pulses using hardware timer
@@ -60,7 +64,6 @@ void StepGen::setCycleTime(uint32_t cycleTime)
 
 void StepGen::makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/)
 {
-    uint32_t now = micros();
     if (timerIsRunning)
     {
         // Set variables, they will be picked up by the timer_CB and the timer is reloaded.
@@ -125,4 +128,9 @@ void StepGen::timerCB()
         timerIsRunning = 0;
         MyTim->pause();
     }
+}
+
+void StepGen::setScale(int32_t spm)
+{
+    stepsPerMM = spm;
 }

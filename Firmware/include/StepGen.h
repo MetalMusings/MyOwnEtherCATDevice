@@ -15,11 +15,12 @@ public:
     volatile double_t actualPosition;
     volatile double_t requestedPosition;
     HardwareTimer *MyTim;
-    const uint32_t stepsPerMM = 1000;
+    uint32_t stepsPerMM;
     uint32_t sync0CycleTime;
     uint8_t dirPin;
     uint8_t stepPin;
     uint8_t timerChan;
+    const uint32_t maxFreq = 100000;
 
     StepGen(TIM_TypeDef *Timer, uint8_t timerChannel, uint8_t stepPin, uint8_t dirPin, void irq(void));
     void cmdPos(double_t pos);
@@ -29,6 +30,7 @@ public:
     void setCycleTime(uint32_t cycleTime);
     void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/);
     void timerCB();
+    void setScale(int32_t spm);
 };
 
 #endif
