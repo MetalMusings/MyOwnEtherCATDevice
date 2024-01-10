@@ -1,15 +1,13 @@
 #include <Arduino.h>
-
 #include <stdio.h>
 extern "C"
 {
 #include "ecat_slv.h"
 #include "utypes.h"
 };
-
+_Objects Obj;
 
 HardwareSerial Serial1(PA10, PA9);
-_Objects Obj;
 
 #include "MyEncoder.h"
 #define INDEX_PIN PA2
@@ -30,27 +28,18 @@ void timerCallbackStep1(void)
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
-   if (Obj.IndexLatchEnable && !Encoder1.OldLatchCEnable) // Should only happen first time IndexCEnable is set
-   {
-      Encoder1.pleaseZeroTheCounter = 1;
-   }
-   Encoder1.OldLatchCEnable = Obj.IndexLatchEnable;
-
-   if (Encoder1.CurPosScale != Obj.EncPosScale && Obj.EncPosScale != 0)
-   {
-      Encoder1.CurPosScale = Obj.EncPosScale;
-      Encoder1.PosScaleRes = 1.0 / double(Encoder1.CurPosScale);
-   }
+   Encoder1.setLatch(Obj.IndexLatchEnable);
+   Encoder1.setScale(Obj.EncPosScale);
    Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = Encoder1.indexHappened();
-   Obj.EncPos = Encoder1.currentPos();
+   Obj.EncPos = Encoder1.currentPos(TIM2->CNT);
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
-    if (Obj.IndexByte)
+   if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
    Obj.DiffT = 10000 * Step1.reqPos();
@@ -61,7 +50,6 @@ void ESC_interrupt_disable(uint32_t mask);
 uint16_t dc_checker(void);
 void sync0Handler(void);
 void handleStepper(void);
-void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* nr of pulses to do*/);
 
 static esc_cfg_t config =
     {
@@ -91,8 +79,7 @@ void setup(void)
    rcc_config();
 
    Step1.setScale(500);
-   Encoder1.init(Tim2);
-
+   Encoder1.init(Tim2, TIM2);
 
    ecat_slv_init(&config);
 }

@@ -36,8 +36,9 @@ void MyEncoder::indexPulse(void)
         pleaseZeroTheCounter = 0;
     }
 }
-void MyEncoder::init(enum EncTimer timer)
+void MyEncoder::init(enum EncTimer timer, TIM_TypeDef *_tim_base)
 {
+    tim_base = _tim_base;
     // Set starting count value
     EncoderInit.SetCount(timer, 0);
     // EncoderInit.SetCount(Tim3, 0);
@@ -56,9 +57,9 @@ uint8_t MyEncoder::indexHappened()
     return 0;
 }
 
-double MyEncoder::currentPos()
+double MyEncoder::currentPos(volatile uint32_t cnt)
 {
-    curPos = unwrapEncoder(TIM2->CNT) * PosScaleRes;
+    curPos = unwrapEncoder(tim_base->CNT) * PosScaleRes;
     return curPos;
 }
 
@@ -79,4 +80,22 @@ double MyEncoder::frequency(uint64_t time)
 uint8_t MyEncoder::getIndexState()
 {
     return digitalRead(indexPin);
+}
+
+void MyEncoder::setScale(double scale)
+{
+    if (CurPosScale != scale && scale != 0)
+    {
+        CurPosScale = scale;
+        PosScaleRes = 1.0 / double(scale);
+    }
+}
+
+void MyEncoder::setLatch(uint8_t latchEnable)
+{
+    if (latchEnable && !oldLatchCEnable) // Should only happen first time IndexCEnable is set
+    {
+        pleaseZeroTheCounter = 1;
+    }
+    oldLatchCEnable = latchEnable;
 }
