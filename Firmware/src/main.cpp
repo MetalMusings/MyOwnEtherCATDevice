@@ -33,6 +33,11 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
 }
 
+void handleStepper(void)
+{
+   Step1.handleStepper();
+}
+
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = Encoder1.indexHappened();
@@ -49,7 +54,6 @@ void ESC_interrupt_enable(uint32_t mask);
 void ESC_interrupt_disable(uint32_t mask);
 uint16_t dc_checker(void);
 void sync0Handler(void);
-void handleStepper(void);
 
 static esc_cfg_t config =
     {
@@ -99,11 +103,6 @@ void loop(void)
 void sync0Handler(void)
 {
    serveIRQ = 1;
-}
-
-void handleStepper(void)
-{
-   Step1.handleStepper();
 }
 
 void ESC_interrupt_enable(uint32_t mask)
