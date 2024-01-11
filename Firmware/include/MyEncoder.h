@@ -7,12 +7,12 @@
 class MyEncoder
 {
 public:
-    MyEncoder(uint8_t _indexPin, void irq(void));
+    MyEncoder(TIM_TypeDef *_tim_base, uint8_t _indexPin, void irq(void));
     int32_t unwrapEncoder(uint16_t in);
     void indexPulse(void);
-    void init(TIM_TypeDef *_tim_base);
+    void init();
     uint8_t indexHappened();
-    double currentPos(volatile uint32_t cnt);
+    double currentPos();
     double frequency(uint64_t time);
     uint8_t getIndexState();
     void setScale(double scale);

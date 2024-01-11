@@ -12,7 +12,7 @@ HardwareSerial Serial1(PA10, PA9);
 #include "MyEncoder.h"
 #define INDEX_PIN PA2
 void indexPulseEncoderCB1(void);
-MyEncoder Encoder1(INDEX_PIN, indexPulseEncoderCB1);
+MyEncoder Encoder1(TIM2, INDEX_PIN, indexPulseEncoderCB1);
 void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
@@ -30,6 +30,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 {
    Encoder1.setLatch(Obj.IndexLatchEnable);
    Encoder1.setScale(Obj.EncPosScale);
+   
    Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
 }
 
@@ -41,11 +42,12 @@ void handleStepper(void)
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = Encoder1.indexHappened();
-   Obj.EncPos = Encoder1.currentPos(TIM2->CNT);
+   Obj.EncPos = Encoder1.currentPos();
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
    if (Obj.IndexByte)
       Serial1.printf("IS 1\n");
+
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
    Obj.DiffT = 10000 * Step1.reqPos();
 }
@@ -83,7 +85,7 @@ void setup(void)
    rcc_config();
 
    Step1.setScale(500);
-   Encoder1.init(TIM2);
+   Encoder1.init();
 
    ecat_slv_init(&config);
 }

@@ -1,7 +1,8 @@
 #include "MyENcoder.h"
 
-MyEncoder::MyEncoder(uint8_t _indexPin, void irq(void))
+MyEncoder::MyEncoder(TIM_TypeDef *_tim_base, uint8_t _indexPin, void irq(void))
 {
+    tim_base = _tim_base;
     indexPin = _indexPin;
     attachInterrupt(digitalPinToInterrupt(indexPin), irq, RISING); // When Index triggered
 }
@@ -29,21 +30,17 @@ void MyEncoder::indexPulse(void)
 {
     if (pleaseZeroTheCounter)
     {
-        TIM2->CNT = 0;
+        tim_base->CNT = 0;
         indexPulseFired = 1;
         Pos.clear();
         TDelta.clear();
         pleaseZeroTheCounter = 0;
     }
 }
-void MyEncoder::init(TIM_TypeDef *_tim_base)
+void MyEncoder::init()
 {
-    EncoderInit.tim_base = _tim_base;
     // Set starting count value
     EncoderInit.SetCount(0);
-    // EncoderInit.SetCount(Tim3, 0);
-    // EncoderInit.SetCount(Tim4, 0);
-    // EncoderInit.SetCount(Tim8, 0);
 }
 
 uint8_t MyEncoder::indexHappened()
@@ -57,7 +54,7 @@ uint8_t MyEncoder::indexHappened()
     return 0;
 }
 
-double MyEncoder::currentPos(volatile uint32_t cnt)
+double MyEncoder::currentPos()
 {
     curPos = unwrapEncoder(tim_base->CNT) * PosScaleRes;
     return curPos;
