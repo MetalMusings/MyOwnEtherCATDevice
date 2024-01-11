@@ -99,3 +99,4 @@ void MyEncoder::setLatch(uint8_t latchEnable)
     }
     oldLatchCEnable = latchEnable;
 }
+

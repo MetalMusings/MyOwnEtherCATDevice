@@ -57,10 +57,6 @@ void StepGen::handleStepper(void)
     int32_t pulsesAtEndOfCycle = stepsPerMM * requestedPosition; // From Turner.hal X:5000 Z:2000 ps/mm
     makePulses(sync0CycleTime, pulsesAtEndOfCycle);              // Make the pulses using hardware timer
 }
-void StepGen::setCycleTime(uint32_t cycleTime)
-{
-    sync0CycleTime = cycleTime;
-}
 
 void StepGen::makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/)
 {
@@ -134,3 +130,5 @@ void StepGen::setScale(int32_t spm)
 {
     stepsPerMM = spm;
 }
+
+uint32_t StepGen::sync0CycleTime = 0;

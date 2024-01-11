@@ -150,6 +150,7 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 0;
-   Step1.setCycleTime(ESC_SYNC0cycletime() / 1000); // nsec to usec
+   //Step1.setCycleTime(ESC_SYNC0cycletime() / 1000); // nsec to usec
+   StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000;
    return 0;
 }

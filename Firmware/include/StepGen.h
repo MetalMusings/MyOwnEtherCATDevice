@@ -16,7 +16,7 @@ public:
     volatile double_t requestedPosition;
     HardwareTimer *MyTim;
     uint32_t stepsPerMM;
-    uint32_t sync0CycleTime;
+    static uint32_t sync0CycleTime;
     uint8_t dirPin;
     uint8_t stepPin;
     uint8_t timerChan;
@@ -27,7 +27,6 @@ public:
     double actPos();
     double reqPos();
     void handleStepper(void);
-    void setCycleTime(uint32_t cycleTime);
     void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/);
     void timerCB();
     void setScale(int32_t spm);
