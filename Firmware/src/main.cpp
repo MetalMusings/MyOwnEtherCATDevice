@@ -83,7 +83,7 @@ void setup(void)
    rcc_config();
 
    Step1.setScale(500);
-   Encoder1.init(Tim2, TIM2);
+   Encoder1.init(TIM2);
 
    ecat_slv_init(&config);
 }

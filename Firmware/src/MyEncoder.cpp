@@ -36,11 +36,11 @@ void MyEncoder::indexPulse(void)
         pleaseZeroTheCounter = 0;
     }
 }
-void MyEncoder::init(enum EncTimer timer, TIM_TypeDef *_tim_base)
+void MyEncoder::init(TIM_TypeDef *_tim_base)
 {
-    tim_base = _tim_base;
+    EncoderInit.tim_base = _tim_base;
     // Set starting count value
-    EncoderInit.SetCount(timer, 0);
+    EncoderInit.SetCount(0);
     // EncoderInit.SetCount(Tim3, 0);
     // EncoderInit.SetCount(Tim4, 0);
     // EncoderInit.SetCount(Tim8, 0);

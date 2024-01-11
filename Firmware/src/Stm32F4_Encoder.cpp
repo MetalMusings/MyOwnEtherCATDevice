@@ -5,45 +5,21 @@
     Created on: Nov 20, 2020
         Author: GoktugH.
 */
-
+// TIM2, TIM3, TIM4, TIM8
 Encoder::Encoder()
 {
     int unit;
 }
 
-void Encoder::eattach(int enco)
+// void Encoder::SetCount(enum EncTimer enc, int64_t Counter)
+void Encoder::SetCount(int64_t Counter)
 {
+    tim_base->CNT = Counter;
 }
-
-void Encoder::attachh(int encoNumber)
+// uint16_t Encoder::GetCount(enum EncTimer enc)
+uint16_t Encoder::GetCount()
 {
-    eattach(encoNumber);
-}
-
-void Encoder::SetCount(enum EncTimer enc, int64_t Counter)
-{
-
-    if (enc == Tim2)
-        TIM2->CNT = Counter;
-    else if (enc == Tim3)
-        TIM3->CNT = Counter;
-    else if (enc == Tim4)
-        TIM4->CNT = Counter;
-    else if (enc == Tim8)
-        TIM8->CNT = Counter;
-}
-uint16_t Encoder::GetCount(enum EncTimer enc)
-{
-
-    if (enc == Tim2)
-        c = (TIM2->CNT);
-    else if (enc == Tim3)
-        c = (TIM3->CNT);
-    else if (enc == Tim4)
-        c = (TIM4->CNT);
-    else if (enc == Tim8)
-        c = (TIM8->CNT);
-    return c;
+    return tim_base->CNT;
 }
 
 void GpioConfigPortA(GPIO_TypeDef *GPIOx)
