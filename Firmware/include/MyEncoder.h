@@ -8,9 +8,8 @@ class MyEncoder
 {
 public:
     MyEncoder(TIM_TypeDef *_tim_base, uint8_t _indexPin, void irq(void));
-    int32_t unwrapEncoder(uint16_t in);
+    int64_t unwrapEncoder(uint16_t in);
     void indexPulse(void);
-    void init();
     uint8_t indexHappened();
     double currentPos();
     double frequency(uint64_t time);
@@ -19,7 +18,7 @@ public:
     void setLatch(uint8_t latchEnable);
 
 private:
-    int32_t previousEncoderCounterValue = 0;
+    int64_t previousEncoderCounterValue = 0;
     double PosScaleRes = 1.0;
     uint32_t CurPosScale = 1;
     uint8_t oldLatchCEnable = 0;

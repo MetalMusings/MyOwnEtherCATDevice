@@ -10,13 +10,20 @@ _Objects Obj;
 HardwareSerial Serial1(PA10, PA9);
 
 #include "MyEncoder.h"
-#define INDEX_PIN PA2
 void indexPulseEncoderCB1(void);
-MyEncoder Encoder1(TIM2, INDEX_PIN, indexPulseEncoderCB1);
+MyEncoder Encoder1(TIM2, PA2, indexPulseEncoderCB1);
 void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
+#if 1
+void indexPulseEncoderCB2(void);
+MyEncoder Encoder2(TIM3, PB6, indexPulseEncoderCB2);
+void indexPulseEncoderCB2(void)
+{
+   Encoder2.indexPulse();
+}
+#endif
 
 #include "StepGen.h"
 void timerCallbackStep1(void);
@@ -25,12 +32,20 @@ void timerCallbackStep1(void)
 {
    Step1.timerCB();
 }
+#if 1
+void timerCallbackStep2(void);
+StepGen Step2(TIM8, 4, PC9, PC10, timerCallbackStep2);
+void timerCallbackStep2(void)
+{
+   Step2.timerCB();
+}
+#endif
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
    Encoder1.setLatch(Obj.IndexLatchEnable);
    Encoder1.setScale(Obj.EncPosScale);
-   
+
    Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
 }
 
@@ -85,7 +100,6 @@ void setup(void)
    rcc_config();
 
    Step1.setScale(500);
-   Encoder1.init();
 
    ecat_slv_init(&config);
 }

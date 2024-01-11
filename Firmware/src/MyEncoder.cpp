@@ -5,12 +5,13 @@ MyEncoder::MyEncoder(TIM_TypeDef *_tim_base, uint8_t _indexPin, void irq(void))
     tim_base = _tim_base;
     indexPin = _indexPin;
     attachInterrupt(digitalPinToInterrupt(indexPin), irq, RISING); // When Index triggered
+    EncoderInit.SetCount(0);
 }
 
 #define ONE_PERIOD 65536
 #define HALF_PERIOD 32768
 
-int32_t MyEncoder::unwrapEncoder(uint16_t in)
+int64_t MyEncoder::unwrapEncoder(uint16_t in)
 {
     int32_t c32 = (int32_t)in - HALF_PERIOD;           // remove half period to determine (+/-) sign of the wrap
     int32_t dif = (c32 - previousEncoderCounterValue); // core concept: prev + (current - prev) = current
@@ -20,7 +21,7 @@ int32_t MyEncoder::unwrapEncoder(uint16_t in)
     if (dif < -HALF_PERIOD)
         mod_dif += ONE_PERIOD; // account for mod of negative number behavior in C
 
-    int32_t unwrapped = previousEncoderCounterValue + mod_dif;
+    int64_t unwrapped = previousEncoderCounterValue + mod_dif;
     previousEncoderCounterValue = unwrapped; // load previous value
 
     return unwrapped + HALF_PERIOD; // remove the shift we applied at the beginning, and return
@@ -36,11 +37,6 @@ void MyEncoder::indexPulse(void)
         TDelta.clear();
         pleaseZeroTheCounter = 0;
     }
-}
-void MyEncoder::init()
-{
-    // Set starting count value
-    EncoderInit.SetCount(0);
 }
 
 uint8_t MyEncoder::indexHappened()
@@ -96,4 +92,3 @@ void MyEncoder::setLatch(uint8_t latchEnable)
     }
     oldLatchCEnable = latchEnable;
 }
-
