@@ -16,7 +16,7 @@ void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
-#if 1
+#if 0
 void indexPulseEncoderCB2(void);
 MyEncoder Encoder2(TIM3, PB6, indexPulseEncoderCB2);
 void indexPulseEncoderCB2(void)
@@ -32,7 +32,7 @@ void timerCallbackStep1(void)
 {
    Step1.timerCB();
 }
-#if 1
+#if 0
 void timerCallbackStep2(void);
 StepGen Step2(TIM8, 4, PC9, PC10, timerCallbackStep2);
 void timerCallbackStep2(void)
@@ -60,11 +60,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncPos = Encoder1.currentPos();
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
-   if (Obj.IndexByte)
-      Serial1.printf("IS 1\n");
 
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
-   Obj.DiffT = 10000 * Step1.reqPos();
+   Obj.DiffT = 10000 * Step1.reqPos(); // Debug
 }
 
 void ESC_interrupt_enable(uint32_t mask);
