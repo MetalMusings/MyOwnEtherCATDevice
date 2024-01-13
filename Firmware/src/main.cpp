@@ -32,14 +32,12 @@ void timerCallbackStep1(void)
 {
    Step1.timerCB();
 }
-#if 0
 void timerCallbackStep2(void);
 StepGen Step2(TIM8, 4, PC9, PC10, timerCallbackStep2);
 void timerCallbackStep2(void)
 {
    Step2.timerCB();
 }
-#endif
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -47,11 +45,13 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Encoder1.setScale(Obj.EncPosScale);
 
    Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
+   Step2.cmdPos(Obj.StepGenIn2.CommandedPosition);
 }
 
 void handleStepper(void)
 {
    Step1.handleStepper();
+   Step2.handleStepper();
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -62,6 +62,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.IndexByte = Encoder1.getIndexState();
 
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
+   Obj.StepGenOut2.ActualPosition = Step2.actPos();
    Obj.DiffT = 10000 * Step1.reqPos(); // Debug
 }
 
@@ -97,7 +98,8 @@ void setup(void)
    Serial1.begin(115200);
    rcc_config();
 
-   Step1.setScale(500);
+   Step1.setScale(1250); // 2000 /rev 4 mm/rev x 2.5 gear => 1250 /mm
+   Step2.setScale(500);  // 2000 /rev 4 mm/rev => 500 /mm
 
    ecat_slv_init(&config);
 }
@@ -164,7 +166,6 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 0;
-   //Step1.setCycleTime(ESC_SYNC0cycletime() / 1000); // nsec to usec
    StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000;
    return 0;
 }

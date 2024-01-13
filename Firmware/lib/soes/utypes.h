@@ -22,6 +22,10 @@ typedef struct
    {
       double ActualPosition;
    } StepGenOut1;
+   struct
+   {
+      double ActualPosition;
+   } StepGenOut2;
 
    /* Outputs */
 
@@ -30,8 +34,11 @@ typedef struct
    struct
    {
       double CommandedPosition;
-      double CommandedVelocity;
    } StepGenIn1;
+   struct
+   {
+      double CommandedPosition;
+   } StepGenIn2;
 
 } _Objects;
 

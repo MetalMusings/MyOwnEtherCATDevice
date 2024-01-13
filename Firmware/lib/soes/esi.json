@@ -124,6 +124,26 @@
         "pdo_mappings": [
           "txpdo"
         ]
+      },
+      "6006": {
+        "otype": "RECORD",
+        "name": "StepGenOut2",
+        "access": "RO",
+        "items": [
+          {
+            "name": "Max SubIndex"
+          },
+          {
+            "name": "ActualPosition",
+            "dtype": "REAL64",
+            "data": "&Obj.StepGenOut2.ActualPosition",
+            "value": "0",
+            "access": "RO"
+          }
+        ],
+        "pdo_mappings": [
+          "txpdo"
+        ]
       }
     },
     "rxpdo": {
@@ -163,13 +183,26 @@
             "data": "&Obj.StepGenIn1.CommandedPosition",
             "value": "0",
             "access": "RO"
+          }
+        ],
+        "pdo_mappings": [
+          "rxpdo"
+        ]
+      },
+      "7003": {
+        "otype": "RECORD",
+        "name": "StepGenIn2",
+        "access": "RO",
+        "items": [
+          {
+            "name": "Max SubIndex"
           },
           {
-            "name": "CommandedVelocity",
+            "name": "CommandedPosition",
             "dtype": "REAL64",
+            "data": "&Obj.StepGenIn2.CommandedPosition",
             "value": "0",
-            "access": "RO",
-            "data": "&Obj.StepGenIn1.CommandedVelocity"
+            "access": "RO"
           }
         ],
         "pdo_mappings": [
