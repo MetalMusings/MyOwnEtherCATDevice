@@ -291,7 +291,7 @@ void rcc_config()
 
     GPIO_PinAF(GPIOA, GPIO_PinSource0, GPIO_AF_TIM2);
     GPIO_PinAF(GPIOA, GPIO_PinSource1, GPIO_AF_TIM2);
-
+#if 0 // Skipping since I use TIM8 as stepper generator
     TIM_EncoderInterConfig(TIM8, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
     TIMER_InitStructure.TIM_Period = 65535;
     TIMER_InitStructure.TIM_CounterMode = TIM_CounterMode_Up | TIM_CounterMode_Down;
@@ -299,7 +299,7 @@ void rcc_config()
     TIM_TimeBaseStructInit(&TIMER_InitStructure);
     TIM_Cmd(TIM8, ENABLE);
     TIM8->CNT = 0;
-
+#endif
     TIM_EncoderInterConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
     TIMER_InitStructureE.TIM_Period = 65535;
     TIMER_InitStructureE.TIM_CounterMode = TIM_CounterMode_Up | TIM_CounterMode_Down;

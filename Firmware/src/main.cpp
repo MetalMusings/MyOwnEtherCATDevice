@@ -44,8 +44,8 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Encoder1.setLatch(Obj.IndexLatchEnable);
    Encoder1.setScale(Obj.EncPosScale);
 
-   Step1.cmdPos(Obj.StepGenIn1.CommandedPosition);
-   Step2.cmdPos(Obj.StepGenIn2.CommandedPosition);
+   Step1.reqPos(Obj.StepGenIn1.CommandedPosition);
+   Step2.reqPos(Obj.StepGenIn2.CommandedPosition);
 }
 
 void handleStepper(void)
@@ -96,7 +96,7 @@ volatile byte serveIRQ = 0;
 void setup(void)
 {
    Serial1.begin(115200);
-   rcc_config();
+   rcc_config(); // probably breaks some timers.
 
    Step1.setScale(1250); // 2000 /rev 4 mm/rev x 2.5 gear => 1250 /mm
    Step2.setScale(500);  // 2000 /rev 4 mm/rev => 500 /mm

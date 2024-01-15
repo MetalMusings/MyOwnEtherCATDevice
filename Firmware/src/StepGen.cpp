@@ -30,57 +30,59 @@ StepGen::StepGen(TIM_TypeDef *Timer, uint8_t _timerChannel, uint8_t _stepPin, ui
             pinMode(STEPPER_DIR_PIN, OUTPUT);
       */
 }
-void StepGen::cmdPos(double_t pos)
+void StepGen::reqPos(double_t pos)
 {
     requestedPosition = pos;
-}
-
-double StepGen::actPos()
-{
-    return actualPosition;
 }
 double StepGen::reqPos()
 {
     return requestedPosition;
 }
+void StepGen::actPos(double pos)
+{
+    actualPosition = pos;
+}
+double StepGen::actPos()
+{
+    return actualPosition;
+}
+
 void StepGen::handleStepper(void)
 {
-    actualPosition = timerStepPosition / double(stepsPerMM);
-    double diffPosition = requestedPosition - actualPosition;
+    actPos(timerStepPosition / double(stepsPerMM));
+    double diffPosition = reqPos() - actPos();
 
     uint64_t fre = abs(diffPosition) * stepsPerMM * 1000000 / double(sync0CycleTime); // Frequency needed
     if (fre > maxFreq)                                                                // Only do maxFre
     {
-        double maxDist = maxFreq/stepsPerMM * sync0CycleTime / 1000000.0 * (diffPosition > 0 ? 1 : -1);
-        requestedPosition = actualPosition + maxDist;
+        double maxDist = maxFreq / stepsPerMM * sync0CycleTime / 1000000.0 * (diffPosition > 0 ? 1 : -1);
+        reqPos(actualPosition + maxDist);
     }
-    int32_t pulsesAtEndOfCycle = stepsPerMM * requestedPosition; // From Turner.hal X:5000 Z:2000 ps/mm
-    makePulses(sync0CycleTime, pulsesAtEndOfCycle);              // Make the pulses using hardware timer
-}
+    int32_t pulsesAtEndOfCycle = stepsPerMM * reqPos(); // From Turner.hal X:5000 Z:2000 ps/mm
 
-void StepGen::makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/)
-{
+    sync0CycleTime = 800;
+
     if (timerIsRunning)
     {
         // Set variables, they will be picked up by the timer_CB and the timer is reloaded.
-        timerNewEndStepPosition = pulsesAtEnd;
-        timerNewCycleTime = cycleTime;
+        timerNewEndStepPosition = pulsesAtEndOfCycle;
+        timerNewCycleTime = sync0CycleTime;
     }
     if (!timerIsRunning)
     {
         // Start the timer
-        int32_t steps = pulsesAtEnd - timerStepPositionAtEnd; // Pulses to go + or -
+        int32_t steps = pulsesAtEndOfCycle - timerStepPositionAtEnd; // Pulses to go + or -
         if (steps != 0)
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
             digitalWrite(dirPin, sgn);
-            double_t freqf = (abs(steps) * 1000000.0) / double(cycleTime);
+            double_t freqf = (abs(steps) * 1000000.0) / double(sync0CycleTime);
             uint32_t freq = uint32_t(freqf);
             // freq=1428;
             MyTim->setOverflow(freq, HERTZ_FORMAT);
             MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
             timerStepDirection = steps > 0 ? 1 : -1;
-            timerStepPositionAtEnd = pulsesAtEnd; // Current Position
+            timerStepPositionAtEnd = pulsesAtEndOfCycle; // Current Position
             timerIsRunning = 1;
             MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->resume();
@@ -95,19 +97,17 @@ void StepGen::timerCB()
         // Input for reload is timerNewEndStepPosition and timerNewEndTime
         // The timer has current position and current time and from this
         // can set new frequency and new endtarget for steps
-        MyTim->pause();
+        MyTim->pause(); // Does this hurt?
         int32_t steps = timerNewEndStepPosition - timerStepPosition;
         if (steps != 0)
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
             digitalWrite(stepPin, sgn);
-            double_t freqf = (abs(steps) * 1000000.0) / double(timerNewCycleTime);
+            double_t freqf = abs(steps) * (1e6 / double(timerNewCycleTime));
             uint32_t freq = uint32_t(freqf);
-            // freq=1428;
             if (freq != 0)
             {
                 MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
-                // freq=1428;
                 MyTim->setOverflow(freq, HERTZ_FORMAT);
                 MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
                 timerStepDirection = steps > 0 ? 1 : -1;

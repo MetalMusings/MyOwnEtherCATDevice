@@ -23,11 +23,11 @@ public:
     const uint32_t maxFreq = 100000;
 
     StepGen(TIM_TypeDef *Timer, uint8_t timerChannel, uint8_t stepPin, uint8_t dirPin, void irq(void));
-    void cmdPos(double_t pos);
-    double actPos();
+    void reqPos(double_t pos);
     double reqPos();
+    void actPos(double_t pos);
+    double actPos();
     void handleStepper(void);
-    void makePulses(uint64_t cycleTime /* in usecs */, int32_t pulsesAtEnd /* end position*/);
     void timerCB();
     void setScale(int32_t spm);
 };
