@@ -96,18 +96,15 @@ void StepGen::timerCB()
             digitalWrite(dirPin, sgn);
             double_t freqf = abs(steps) * (1e6 / double(timerNewCycleTime));
             uint32_t freq = uint32_t(freqf);
-            if (freq != 0)
-            {
-                timerStepDirection = steps > 0 ? 1 : -1;
-                timerStepPositionAtEnd = timerNewEndStepPosition;
-                timerNewEndStepPosition = 0; // Set to zero to not reload next time
-                timerNewCycleTime = 0;
-                MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
-                MyTim->setOverflow(freq, HERTZ_FORMAT);
-                MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
-                MyTim->resume();
-                timerIsRunning = 1;
-            }
+            timerStepDirection = steps > 0 ? 1 : -1;
+            timerStepPositionAtEnd = timerNewEndStepPosition;
+            timerNewEndStepPosition = 0; // Set to zero to not reload next time
+            timerNewCycleTime = 0;
+            MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
+            MyTim->setOverflow(freq, HERTZ_FORMAT);
+            MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
+            MyTim->resume();
+            timerIsRunning = 1;
         }
     }
     if (timerStepPosition == timerStepPositionAtEnd) // Are we finished?
