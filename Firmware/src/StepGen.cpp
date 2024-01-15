@@ -68,13 +68,13 @@ void StepGen::handleStepper(void)
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
             digitalWrite(dirPin, sgn);
-            double_t freqf = (abs(steps) * 1000000.0) / double(sync0CycleTime);
+            timerStepDirection = steps > 0 ? 1 : -1;
+            timerStepPositionAtEnd = pulsesAtEndOfCycle; // Current Position
+            double_t freqf = abs(steps) * (1e6 / double(sync0CycleTime));
             uint32_t freq = uint32_t(freqf);
             MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->setOverflow(freq, HERTZ_FORMAT);
             MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
-            timerStepDirection = steps > 0 ? 1 : -1;
-            timerStepPositionAtEnd = pulsesAtEndOfCycle; // Current Position
             timerIsRunning = 1;
             MyTim->resume();
         }
@@ -88,23 +88,23 @@ void StepGen::timerCB()
         // Input for reload is timerNewEndStepPosition and timerNewEndTime
         // The timer has current position and current time and from this
         // can set new frequency and new endtarget for steps
-        MyTim->pause(); // Does this hurt?
+        MyTim->pause(); // We are not at stop, let's stop it
         int32_t steps = timerNewEndStepPosition - timerStepPosition;
         if (steps != 0)
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
-            digitalWrite(stepPin, sgn);
+            digitalWrite(dirPin, sgn);
             double_t freqf = abs(steps) * (1e6 / double(timerNewCycleTime));
             uint32_t freq = uint32_t(freqf);
             if (freq != 0)
             {
-                MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
-                MyTim->setOverflow(freq, HERTZ_FORMAT);
-                MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
                 timerStepDirection = steps > 0 ? 1 : -1;
                 timerStepPositionAtEnd = timerNewEndStepPosition;
                 timerNewEndStepPosition = 0; // Set to zero to not reload next time
                 timerNewCycleTime = 0;
+                MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
+                MyTim->setOverflow(freq, HERTZ_FORMAT);
+                MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
                 MyTim->resume();
                 timerIsRunning = 1;
             }
