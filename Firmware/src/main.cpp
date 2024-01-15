@@ -98,7 +98,7 @@ void setup(void)
    Serial1.begin(115200);
    rcc_config(); // probably breaks some timers.
 
-   Step1.setScale(1250); // 2000 /rev 4 mm/rev x 2.5 gear => 1250 /mm
+   Step1.setScale(1000); // 2000 /rev 4 mm/rev x 2.5 gear => 1250 /mm
    Step2.setScale(500);  // 2000 /rev 4 mm/rev => 500 /mm
 
    ecat_slv_init(&config);

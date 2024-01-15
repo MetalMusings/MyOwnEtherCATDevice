@@ -21,14 +21,6 @@ StepGen::StepGen(TIM_TypeDef *Timer, uint8_t _timerChannel, uint8_t _stepPin, ui
     MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     MyTim->attachInterrupt(irq);
     pinMode(dirPin, OUTPUT);
-
-    /*
-            TIM_TypeDef *Timer = TIM1;
-            MyTim = new HardwareTimer(Timer);
-            MyTim->setMode(4, TIMER_OUTPUT_COMPARE_PWM2, STEPPER_STEP_PIN);
-            MyTim->attachInterrupt(TimerStep_CB);
-            pinMode(STEPPER_DIR_PIN, OUTPUT);
-      */
 }
 void StepGen::reqPos(double_t pos)
 {
@@ -60,7 +52,7 @@ void StepGen::handleStepper(void)
     }
     int32_t pulsesAtEndOfCycle = stepsPerMM * reqPos(); // From Turner.hal X:5000 Z:2000 ps/mm
 
-    sync0CycleTime = 800;
+    sync0CycleTime = 1000;
 
     if (timerIsRunning)
     {
@@ -78,13 +70,12 @@ void StepGen::handleStepper(void)
             digitalWrite(dirPin, sgn);
             double_t freqf = (abs(steps) * 1000000.0) / double(sync0CycleTime);
             uint32_t freq = uint32_t(freqf);
-            // freq=1428;
+            MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->setOverflow(freq, HERTZ_FORMAT);
             MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
             timerStepDirection = steps > 0 ? 1 : -1;
             timerStepPositionAtEnd = pulsesAtEndOfCycle; // Current Position
             timerIsRunning = 1;
-            MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->resume();
         }
     }
