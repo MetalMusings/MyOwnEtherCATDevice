@@ -183,6 +183,13 @@
             "data": "&Obj.StepGenIn1.CommandedPosition",
             "value": "0",
             "access": "RO"
+          },
+          {
+            "name": "StepsPerMM",
+            "dtype": "INTEGER16",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.StepGenIn1.StepsPerMM"
           }
         ],
         "pdo_mappings": [
@@ -203,6 +210,13 @@
             "data": "&Obj.StepGenIn2.CommandedPosition",
             "value": "0",
             "access": "RO"
+          },
+          {
+            "name": "StepsPerMM",
+            "dtype": "INTEGER16",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.StepGenIn2.StepsPerMM"
           }
         ],
         "pdo_mappings": [

@@ -2,14 +2,13 @@
 #include <stdio.h>
 #include "StepGen.h"
 
-StepGen::StepGen(TIM_TypeDef *Timer, uint8_t _timerChannel, uint8_t _stepPin, uint8_t _dirPin, void irq(void))
+StepGen::StepGen(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void))
 {
     timerIsRunning = 0;
     timerStepPosition = 0;
     timerStepDirection = 0;
     timerStepPositionAtEnd = 0;
     timerNewEndStepPosition = 0;
-    timerNewCycleTime = 0;
     actualPosition = 0;
     requestedPosition = 0;
     stepsPerMM = 0;
@@ -18,7 +17,6 @@ StepGen::StepGen(TIM_TypeDef *Timer, uint8_t _timerChannel, uint8_t _stepPin, ui
     stepPin = _stepPin;
     timerChan = _timerChannel;
     MyTim = new HardwareTimer(Timer);
-    MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     MyTim->attachInterrupt(irq);
     pinMode(dirPin, OUTPUT);
 }
@@ -52,18 +50,13 @@ void StepGen::handleStepper(void)
     }
     int32_t pulsesAtEndOfCycle = stepsPerMM * reqPos(); // From Turner.hal X:5000 Z:2000 ps/mm
 
-    sync0CycleTime = 1000;
+    // Will be picked up by the timer_CB and the timer is reloaded.
+    timerNewEndStepPosition = pulsesAtEndOfCycle;
 
-    if (timerIsRunning)
-    {
-        // Set variables, they will be picked up by the timer_CB and the timer is reloaded.
-        timerNewEndStepPosition = pulsesAtEndOfCycle;
-        timerNewCycleTime = sync0CycleTime;
-    }
-    if (!timerIsRunning)
+    if (!timerIsRunning) // no timer isn't running. start it here
     {
         // Start the timer
-        int32_t steps = pulsesAtEndOfCycle - timerStepPositionAtEnd; // Pulses to go + or -
+        int32_t steps = pulsesAtEndOfCycle - timerStepPosition; // Pulses to go + or -
         if (steps != 0)
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
@@ -83,7 +76,7 @@ void StepGen::handleStepper(void)
 void StepGen::timerCB()
 {
     timerStepPosition += timerStepDirection; // The step that was just completed
-    if (timerNewCycleTime != 0)              // Are we going to reload?
+    if (timerNewEndStepPosition != 0)        // Are we going to reload?
     {
         // Input for reload is timerNewEndStepPosition and timerNewEndTime
         // The timer has current position and current time and from this
@@ -94,12 +87,11 @@ void StepGen::timerCB()
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
             digitalWrite(dirPin, sgn);
-            double_t freqf = abs(steps) * (1e6 / double(timerNewCycleTime));
+            double_t freqf = abs(steps) * (1e6 / double(sync0CycleTime));
             uint32_t freq = uint32_t(freqf);
             timerStepDirection = steps > 0 ? 1 : -1;
             timerStepPositionAtEnd = timerNewEndStepPosition;
             timerNewEndStepPosition = 0; // Set to zero to not reload next time
-            timerNewCycleTime = 0;
             MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->setOverflow(freq, HERTZ_FORMAT);
             MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50 %
@@ -114,7 +106,7 @@ void StepGen::timerCB()
     }
 }
 
-void StepGen::setScale(int32_t spm)
+void StepGen::setScale(int16_t spm)
 {
     stepsPerMM = spm;
 }

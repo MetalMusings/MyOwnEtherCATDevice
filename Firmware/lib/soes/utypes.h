@@ -34,10 +34,12 @@ typedef struct
    struct
    {
       double CommandedPosition;
+      int16_t StepsPerMM;
    } StepGenIn1;
    struct
    {
       double CommandedPosition;
+      int16_t StepsPerMM;
    } StepGenIn2;
 
 } _Objects;

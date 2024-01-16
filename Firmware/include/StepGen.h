@@ -15,21 +15,23 @@ public:
     volatile double_t actualPosition;
     volatile double_t requestedPosition;
     HardwareTimer *MyTim;
-    uint32_t stepsPerMM;
+    uint16_t stepsPerMM;
     static uint32_t sync0CycleTime;
     uint8_t dirPin;
-    uint8_t stepPin;
-    uint8_t timerChan;
+    PinName stepPin;
+    uint32_t timerChan;
     const uint32_t maxFreq = 100000;
+    volatile uint32_t prevFreq1 = 0;
+    volatile uint32_t prevFreq2 = 0;
 
-    StepGen(TIM_TypeDef *Timer, uint8_t timerChannel, uint8_t stepPin, uint8_t dirPin, void irq(void));
+    StepGen(TIM_TypeDef *Timer, uint32_t timerChannel, PinName stepPin, uint8_t dirPin, void irq(void));
     void reqPos(double_t pos);
     double reqPos();
     void actPos(double_t pos);
     double actPos();
     void handleStepper(void);
     void timerCB();
-    void setScale(int32_t spm);
+    void setScale(int16_t spm);
 };
 
 #endif

@@ -125,7 +125,7 @@
               </DataType>
               <DataType>
                 <Name>DT1602</Name>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -142,6 +142,16 @@
                   <Type>ULINT</Type>
                   <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>StepsPerMM</Name>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -149,7 +159,7 @@
               </DataType>
               <DataType>
                 <Name>DT1603</Name>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -166,6 +176,16 @@
                   <Type>ULINT</Type>
                   <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>StepsPerMM</Name>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -487,7 +507,7 @@
               </DataType>
               <DataType>
                 <Name>DT7002</Name>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -509,10 +529,21 @@
                   <PdoMapping>R</PdoMapping>
                   </Flags>
                 </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>StepsPerMM</Name>
+                  <Type>INT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>80</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                  </Flags>
+                </SubItem>
               </DataType>
               <DataType>
                 <Name>DT7003</Name>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -529,6 +560,17 @@
                   <Type>LREAL</Type>
                   <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>StepsPerMM</Name>
+                  <Type>INT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">ro</Access>
                   <PdoMapping>R</PdoMapping>
@@ -566,6 +608,10 @@
               <DataType>
                 <Name>DINT</Name>
                 <BitSize>32</BitSize>
+              </DataType>
+              <DataType>
+                <Name>INT</Name>
+                <BitSize>16</BitSize>
               </DataType>
             </DataTypes>
             <Objects>
@@ -710,18 +756,24 @@
                 <Index>#x1602</Index>
                 <Name>StepGenIn1</Name>
                 <Type>DT1602</Type>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>2</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>CommandedPosition</Name>
                     <Info>
                       <DefaultValue>#x70020140</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>StepsPerMM</Name>
+                    <Info>
+                      <DefaultValue>#x70020210</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -733,18 +785,24 @@
                 <Index>#x1603</Index>
                 <Name>StepGenIn2</Name>
                 <Type>DT1603</Type>
-                <BitSize>80</BitSize>
+                <BitSize>144</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>2</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>CommandedPosition</Name>
                     <Info>
                       <DefaultValue>#x70030140</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>StepsPerMM</Name>
+                    <Info>
+                      <DefaultValue>#x70030210</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1195,16 +1253,22 @@
                 <Index>#x7002</Index>
                 <Name>StepGenIn1</Name>
                 <Type>DT7002</Type>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>2</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>CommandedPosition</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>StepsPerMM</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
                     </Info>
@@ -1218,16 +1282,22 @@
                 <Index>#x7003</Index>
                 <Name>StepGenIn2</Name>
                 <Type>DT7003</Type>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>2</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>CommandedPosition</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>StepsPerMM</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
                     </Info>
@@ -1279,6 +1349,13 @@
             <Name>CommandedPosition</Name>
             <DataType>LREAL</DataType>
           </Entry>
+          <Entry>
+            <Index>#x7002</Index>
+            <SubIndex>#x2</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>StepsPerMM</Name>
+            <DataType>INT</DataType>
+          </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
           <Index>#x1603</Index>
@@ -1289,6 +1366,13 @@
             <BitLen>64</BitLen>
             <Name>CommandedPosition</Name>
             <DataType>LREAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x7003</Index>
+            <SubIndex>#x2</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>StepsPerMM</Name>
+            <DataType>INT</DataType>
           </Entry>
         </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">

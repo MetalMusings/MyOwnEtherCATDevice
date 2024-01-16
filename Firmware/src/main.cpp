@@ -27,13 +27,13 @@ void indexPulseEncoderCB2(void)
 
 #include "StepGen.h"
 void timerCallbackStep1(void);
-StepGen Step1(TIM1, 4, PA11, PA12, timerCallbackStep1);
+StepGen Step1(TIM1, 4, PA_11, PA12, timerCallbackStep1);
 void timerCallbackStep1(void)
 {
    Step1.timerCB();
 }
 void timerCallbackStep2(void);
-StepGen Step2(TIM8, 4, PC9, PC10, timerCallbackStep2);
+StepGen Step2(TIM8, 4, PC_9, PC10, timerCallbackStep2);
 void timerCallbackStep2(void)
 {
    Step2.timerCB();
@@ -45,7 +45,9 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Encoder1.setScale(Obj.EncPosScale);
 
    Step1.reqPos(Obj.StepGenIn1.CommandedPosition);
+   Step1.setScale(Obj.StepGenIn1.StepsPerMM);
    Step2.reqPos(Obj.StepGenIn2.CommandedPosition);
+   Step2.setScale(Obj.StepGenIn2.StepsPerMM);
 }
 
 void handleStepper(void)
@@ -97,9 +99,6 @@ void setup(void)
 {
    Serial1.begin(115200);
    rcc_config(); // probably breaks some timers.
-
-   Step1.setScale(1000); // 2000 /rev 4 mm/rev x 2.5 gear => 1250 /mm
-   Step2.setScale(500);  // 2000 /rev 4 mm/rev => 500 /mm
 
    ecat_slv_init(&config);
 }
