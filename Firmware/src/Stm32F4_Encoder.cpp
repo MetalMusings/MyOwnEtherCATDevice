@@ -282,10 +282,10 @@ void rcc_config()
 
     GPIO_PinAF(GPIOA, GPIO_PinSource6, GPIO_AF_TIM3);
     GPIO_PinAF(GPIOA, GPIO_PinSource7, GPIO_AF_TIM3);
-
+#if 0 // Skipping since TIM8 is step generator
     GPIO_PinAF(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
     GPIO_PinAF(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
-
+#endif
     GPIO_PinAF(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
     GPIO_PinAF(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
 
