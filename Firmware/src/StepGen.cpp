@@ -46,7 +46,7 @@ void StepGen::enable(uint8_t yes)
 void StepGen::handleStepper(void)
 {
     if (!enabled)
-    return;
+        return;
 
     actPos(timerStepPosition / double(stepsPerMM));
     double diffPosition = reqPos() - actPos();

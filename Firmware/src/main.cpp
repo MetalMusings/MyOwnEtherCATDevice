@@ -9,6 +9,7 @@ _Objects Obj;
 
 HardwareSerial Serial1(PA10, PA9);
 
+#define DEBUG_TIM8 1
 #include "MyEncoder.h"
 void indexPulseEncoderCB1(void);
 MyEncoder Encoder1(TIM2, PA2, indexPulseEncoderCB1);
@@ -16,14 +17,6 @@ void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
-#if 0
-void indexPulseEncoderCB2(void);
-MyEncoder Encoder2(TIM3, PB6, indexPulseEncoderCB2);
-void indexPulseEncoderCB2(void)
-{
-   Encoder2.indexPulse();
-}
-#endif
 
 #include "StepGen.h"
 void timerCallbackStep1(void);
@@ -33,10 +26,10 @@ void timerCallbackStep1(void)
    Step1.timerCB();
 }
 void timerCallbackStep2(void);
-StepGen Step2(TIM8, 4, PC_9, PC10, timerCallbackStep2);
+StepGen Step2(TIM3, 4, PC_9, PC10, timerCallbackStep2);
 void timerCallbackStep2(void)
 {
-   Step2.timerCB();
+   //Step2.timerCB();
 }
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
@@ -50,6 +43,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Step2.reqPos(Obj.StepGenIn2.CommandedPosition);
    Step2.setScale(Obj.StepGenIn2.StepsPerMM);
    Step2.enable(Obj.Enable1);
+#
 }
 
 void handleStepper(void)
@@ -101,7 +95,6 @@ void setup(void)
 {
    Serial1.begin(115200);
    rcc_config(); // probably breaks some timers.
-
    ecat_slv_init(&config);
 }
 
