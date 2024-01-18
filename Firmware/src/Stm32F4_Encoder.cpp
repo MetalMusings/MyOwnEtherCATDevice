@@ -271,18 +271,18 @@ void rcc_config()
     RCC->AHB1ENR |= 0x10; // GPIOE
 
     RCC->APB1ENR |= 0x20000000; // ENABLE DAC
-    RCC->APB2ENR |= 0x00000002; // APB2 TIM8
+  //  RCC->APB2ENR |= 0x00000002; // APB2 TIM8
     RCC->APB1ENR |= 0x00000004; // APB1 TIM4
     RCC->APB1ENR |= 0x00000001; // APB1 TIM2
-    RCC->APB1ENR |= 0x00000002; // APB1 TIM3
+ //   RCC->APB1ENR |= 0x00000002; // APB1 TIM3
 
     GpioConfigPortA(GPIOA);
-    GpioConfigPortC(GPIOC);
+ //   GpioConfigPortC(GPIOC);
     GpioConfigPortD(GPIOD);
-
+#if 0 // Skipping since TIM8 is step generator and TIM3, chan4 is smae as TIM8, chan4
     GPIO_PinAF(GPIOA, GPIO_PinSource6, GPIO_AF_TIM3);
     GPIO_PinAF(GPIOA, GPIO_PinSource7, GPIO_AF_TIM3);
-#if 0 // Skipping since TIM8 is step generator
+ 
     GPIO_PinAF(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
     GPIO_PinAF(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
 #endif
@@ -316,7 +316,7 @@ void rcc_config()
     TIM_Cmd(TIM2, ENABLE);
 
     TIM2->CNT = 0;
-
+#if 0
     TIM_EncoderInterConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
     TIMER_InitStructureEEG.TIM_Period = 65535;
     TIMER_InitStructureEEG.TIM_CounterMode = TIM_CounterMode_Up | TIM_CounterMode_Down;
@@ -325,4 +325,5 @@ void rcc_config()
     TIM_Cmd(TIM3, ENABLE);
 
     TIM3->CNT = 0;
+#endif
 }
