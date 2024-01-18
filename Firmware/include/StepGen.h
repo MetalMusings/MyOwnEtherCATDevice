@@ -5,7 +5,7 @@
 
 class StepGen
 {
-public:
+private:
     volatile uint8_t timerIsRunning;
     volatile int32_t timerStepPosition;
     volatile int32_t timerStepDirection;
@@ -17,13 +17,15 @@ public:
     volatile uint8_t enabled;
     HardwareTimer *MyTim;
     uint16_t stepsPerMM;
-    static uint32_t sync0CycleTime;
     uint8_t dirPin;
     PinName stepPin;
     uint32_t timerChan;
     const uint32_t maxFreq = 100000;
     volatile uint32_t prevFreq1 = 0;
     volatile uint32_t prevFreq2 = 0;
+
+public:
+    static uint32_t sync0CycleTime;
 
     StepGen(TIM_TypeDef *Timer, uint32_t timerChannel, PinName stepPin, uint8_t dirPin, void irq(void));
     void reqPos(double_t pos);

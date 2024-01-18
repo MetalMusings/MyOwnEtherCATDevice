@@ -19,17 +19,19 @@ void indexPulseEncoderCB1(void)
 }
 
 #include "StepGen.h"
+
 void timerCallbackStep1(void);
 StepGen Step1(TIM1, 4, PA_11, PA12, timerCallbackStep1);
 void timerCallbackStep1(void)
 {
    Step1.timerCB();
 }
+
 void timerCallbackStep2(void);
 StepGen Step2(TIM3, 4, PC_9, PC10, timerCallbackStep2);
 void timerCallbackStep2(void)
 {
-   //Step2.timerCB();
+   Step2.timerCB();
 }
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
