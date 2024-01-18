@@ -41,6 +41,7 @@ typedef struct
       double CommandedPosition;
       int16_t StepsPerMM;
    } StepGenIn2;
+   uint8_t Enable1;
 
 } _Objects;
 

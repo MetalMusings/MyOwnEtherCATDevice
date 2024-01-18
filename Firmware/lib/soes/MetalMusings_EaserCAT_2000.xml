@@ -192,6 +192,40 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT1604</Name>
+                <BitSize>144</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Enable1</Name>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Padding 1</Name>
+                  <Type>ULINT</Type>
+                  <BitSize>64</BitSize>
+                  <BitOffs>80</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT1A00</Name>
                 <BitSize>80</BitSize>
                 <SubItem>
@@ -394,15 +428,15 @@
               <DataType>
                 <Name>DT1C12ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>64</BitSize>
+                <BitSize>80</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>4</Elements>
+                  <Elements>5</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C12</Name>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -416,7 +450,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C12ARR</Type>
-                  <BitSize>64</BitSize>
+                  <BitSize>80</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -613,6 +647,10 @@
                 <Name>INT</Name>
                 <BitSize>16</BitSize>
               </DataType>
+              <DataType>
+                <Name>BOOL</Name>
+                <BitSize>1</BitSize>
+              </DataType>
             </DataTypes>
             <Objects>
               <Object>
@@ -803,6 +841,35 @@
                     <Name>StepsPerMM</Name>
                     <Info>
                       <DefaultValue>#x70030210</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1604</Index>
+                <Name>Enable1</Name>
+                <Type>DT1604</Type>
+                <BitSize>144</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>2</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Enable1</Name>
+                    <Info>
+                      <DefaultValue>#x70040001</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Padding 1</Name>
+                    <Info>
+                      <DefaultValue>#x00000007</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1016,12 +1083,12 @@
                 <Index>#x1C12</Index>
                 <Name>Sync Manager 2 PDO Assignment</Name>
                 <Type>DT1C12</Type>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>4</DefaultValue>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1046,6 +1113,12 @@
                     <Name>PDO Mapping</Name>
                     <Info>
                       <DefaultValue>#x1603</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1604</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1307,6 +1380,19 @@
                   <Access>ro</Access>
                 </Flags>
               </Object>
+              <Object>
+                <Index>#x7004</Index>
+                <Name>Enable1</Name>
+                <Type>BOOL</Type>
+                <BitSize>1</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
             </Objects>
           </Dictionary>
         </Profile>
@@ -1373,6 +1459,22 @@
             <BitLen>16</BitLen>
             <Name>StepsPerMM</Name>
             <DataType>INT</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1604</Index>
+          <Name>Enable1</Name>
+          <Entry>
+            <Index>#x7004</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Enable1</Name>
+            <DataType>BOOL</DataType>
+          </Entry>
+          <Entry>
+            <Index>0</Index>
+            <SubIndex>0</SubIndex>
+            <BitLen>7</BitLen>
           </Entry>
         </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">

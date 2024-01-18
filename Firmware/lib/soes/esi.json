@@ -223,6 +223,17 @@
           "rxpdo"
         ]
       },
+      "7004": {
+        "otype": "VAR",
+        "name": "Enable1",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "BOOLEAN",
+        "value": "0",
+        "data": "&Obj.Enable1"
+      },
       "60664": {
         "otype": "VAR",
         "name": "ActualPosition",

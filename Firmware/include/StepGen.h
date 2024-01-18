@@ -14,6 +14,7 @@ public:
     volatile uint32_t timerNewCycleTime;
     volatile double_t actualPosition;
     volatile double_t requestedPosition;
+    volatile uint8_t enabled;
     HardwareTimer *MyTim;
     uint16_t stepsPerMM;
     static uint32_t sync0CycleTime;
@@ -32,6 +33,7 @@ public:
     void handleStepper(void);
     void timerCB();
     void setScale(int16_t spm);
+    void enable(uint8_t yes);
 };
 
 #endif

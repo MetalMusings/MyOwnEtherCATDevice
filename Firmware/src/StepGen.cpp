@@ -12,6 +12,7 @@ StepGen::StepGen(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, u
     actualPosition = 0;
     requestedPosition = 0;
     stepsPerMM = 0;
+    enabled = 0;
 
     dirPin = _dirPin;
     stepPin = _stepPin;
@@ -37,8 +38,16 @@ double StepGen::actPos()
     return actualPosition;
 }
 
+void StepGen::enable(uint8_t yes)
+{
+    enabled = yes;
+}
+
 void StepGen::handleStepper(void)
 {
+    if (!enabled)
+    return;
+
     actPos(timerStepPosition / double(stepsPerMM));
     double diffPosition = reqPos() - actPos();
 

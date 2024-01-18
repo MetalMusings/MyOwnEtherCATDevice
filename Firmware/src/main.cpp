@@ -46,8 +46,10 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 
    Step1.reqPos(Obj.StepGenIn1.CommandedPosition);
    Step1.setScale(Obj.StepGenIn1.StepsPerMM);
+   Step1.enable(Obj.Enable1);
    Step2.reqPos(Obj.StepGenIn2.CommandedPosition);
    Step2.setScale(Obj.StepGenIn2.StepsPerMM);
+   Step2.enable(Obj.Enable1);
 }
 
 void handleStepper(void)
@@ -123,9 +125,8 @@ void sync0Handler(void)
 void ESC_interrupt_enable(uint32_t mask)
 {
    // Enable interrupt for SYNC0 or SM2 or SM3
-   uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 |
-                            ESCREG_ALEVENT_SM2 |
-                            ESCREG_ALEVENT_SM3;
+   // uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3;
+   uint32_t user_int_mask = ESCREG_ALEVENT_SM2; // Only SM2
    if (mask & user_int_mask)
    {
       ESC_ALeventmaskwrite(ESC_ALeventmaskread() | (mask & user_int_mask));
@@ -144,9 +145,8 @@ void ESC_interrupt_enable(uint32_t mask)
 void ESC_interrupt_disable(uint32_t mask)
 {
    // Enable interrupt for SYNC0 or SM2 or SM3
-   uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 |
-                            ESCREG_ALEVENT_SM2 |
-                            ESCREG_ALEVENT_SM3;
+   // uint32_t user_int_mask = ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_SM2 | ESCREG_ALEVENT_SM3;
+   uint32_t user_int_mask = ESCREG_ALEVENT_SM2;
 
    if (mask & user_int_mask)
    {
@@ -160,11 +160,12 @@ void ESC_interrupt_disable(uint32_t mask)
 }
 
 extern "C" uint32_t ESC_SYNC0cycletime(void);
+
 // Setup of DC
 uint16_t dc_checker(void)
 {
    // Indicate we run DC
-   ESCvar.dcsync = 0;
+   ESCvar.dcsync = 1;
    StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000;
    return 0;
 }
