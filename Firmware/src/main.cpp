@@ -34,6 +34,8 @@ void timerCallbackStep2(void)
    Step2.timerCB();
 }
 
+CircularBuffer<uint32_t, 200> Tim;
+
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
    Encoder1.setLatch(Obj.IndexLatchEnable);
@@ -45,7 +47,6 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Step2.reqPos(Obj.StepGenIn2.CommandedPosition);
    Step2.setScale(Obj.StepGenIn2.StepsPerMM);
    Step2.enable(Obj.Enable1);
-#
 }
 
 void handleStepper(void)
@@ -54,6 +55,7 @@ void handleStepper(void)
    Step2.handleStepper();
 }
 
+uint32_t prevTim = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = Encoder1.indexHappened();
@@ -63,7 +65,20 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
    Obj.StepGenOut2.ActualPosition = Step2.actPos();
-   Obj.DiffT = 10000 * Step1.reqPos(); // Debug
+   uint32_t dTim = ESCvar.Time - prevTim;
+   if (dTim > 1000)
+      Tim.push(dTim);
+   uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
+   for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
+   {
+      uint32_t aTim = Tim[i];
+      if (aTim > max_Tim)
+         max_Tim = aTim;
+      if (aTim < min_Tim)
+         min_Tim = aTim;
+   }
+   prevTim = ESCvar.Time;
+   Obj.DiffT = max_Tim - min_Tim; // Debug
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -161,6 +176,6 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000;
+   StepGen::sync0CycleTime = 10*ESC_SYNC0cycletime() / 1000;
    return 0;
 }
