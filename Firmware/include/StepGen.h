@@ -26,7 +26,7 @@ private:
 
 public:
     static uint32_t sync0CycleTime;
-    static uint32_t pwmCycleTime;
+    volatile uint32_t pwmCycleTime;
 
     StepGen(TIM_TypeDef *Timer, uint32_t timerChannel, PinName stepPin, uint8_t dirPin, void irq(void));
     void reqPos(double_t pos);

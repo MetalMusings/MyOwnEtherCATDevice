@@ -177,6 +177,5 @@ uint16_t dc_checker(void)
    // Indicate we run DC
    ESCvar.dcsync = 1;
    StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
-   StepGen::pwmCycleTime = 10 * StepGen::sync0CycleTime;
    return 0;
 }

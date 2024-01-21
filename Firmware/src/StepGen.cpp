@@ -47,12 +47,18 @@ void StepGen::handleStepper(void)
 {
     if (!enabled)
         return;
+    pwmCycleTime = StepGen::sync0CycleTime;
 
     actPos(timerStepPosition / double(stepsPerMM));
     double diffPosition = reqPos() - actPos();
+    // Wild "tone" kludge
+    if (abs(diffPosition) > 0.0005) // 60 mm/min = 0.001 mm/ms
+    {
+        pwmCycleTime = 10 * StepGen::sync0CycleTime;
+    }
 
     uint64_t fre = abs(diffPosition) * stepsPerMM * 1000000 / double(pwmCycleTime); // Frequency needed
-    if (fre > maxFreq)                                                                // Only do maxFre
+    if (fre > maxFreq)                                                              // Only do maxFre
     {
         double maxDist = maxFreq / stepsPerMM * pwmCycleTime / 1000000.0 * (diffPosition > 0 ? 1 : -1);
         reqPos(actualPosition + maxDist);
@@ -72,7 +78,7 @@ void StepGen::handleStepper(void)
             digitalWrite(dirPin, sgn);
             timerStepDirection = steps > 0 ? 1 : -1;
             timerStepPositionAtEnd = pulsesAtEndOfCycle; // Current Position
-            double_t freqf = abs(steps) * (1e6 / double(pwmCycleTime));
+            float_t freqf = abs(steps) * (1e6 / float(pwmCycleTime));
             uint32_t freq = uint32_t(freqf);
             MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->setOverflow(freq, HERTZ_FORMAT);
@@ -96,7 +102,7 @@ void StepGen::timerCB()
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
             digitalWrite(dirPin, sgn);
-            double_t freqf = abs(steps) * (1e6 / double(pwmCycleTime));
+            float_t freqf = abs(steps) * (1e6 / float(pwmCycleTime));
             uint32_t freq = uint32_t(freqf);
             timerStepDirection = steps > 0 ? 1 : -1;
             timerStepPositionAtEnd = timerNewEndStepPosition;
@@ -121,4 +127,3 @@ void StepGen::setScale(int16_t spm)
 }
 
 uint32_t StepGen::sync0CycleTime = 0;
-uint32_t StepGen::pwmCycleTime = 0;
