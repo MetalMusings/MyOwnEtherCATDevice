@@ -67,7 +67,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
    Obj.StepGenOut2.ActualPosition = Step2.actPos();
 
-   uint32_t dTim = nowTime - thenTime;
+   uint32_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 microseconds
    Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
@@ -118,7 +118,6 @@ void setup(void)
 
 void loop(void)
 {
-
    ESCvar.PrevTime = ESCvar.Time;
    if (serveIRQ)
    {
@@ -126,7 +125,7 @@ void loop(void)
                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
    }
-   if (nowTime < 500 || nowTime > 1500)
+   if (nowTime < 500 || nowTime > 1500) // Don't run ecat_slv_poll when expecting to server interrupt
       ecat_slv_poll();
 }
 
