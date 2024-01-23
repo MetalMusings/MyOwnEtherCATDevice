@@ -118,12 +118,12 @@ void setup(void)
 
 void loop(void)
 {
-   ESCvar.PrevTime = ESCvar.Time;
    if (serveIRQ)
    {
       DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
+      ESCvar.PrevTime = ESCvar.Time;
    }
    if (nowTime < 500 || nowTime > 1500) // Don't run ecat_slv_poll when expecting to server interrupt
       ecat_slv_poll();
