@@ -1,5 +1,6 @@
 AX58100-stm32-ethercat-backups
 .~lock*
 fp-info-cache
-#auto_saved_files#
-gerbers
+\#auto_saved_file*
+gerbers/
+Ax58100-stm32-ethercat-backups/
