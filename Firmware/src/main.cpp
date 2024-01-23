@@ -56,7 +56,6 @@ void handleStepper(void)
    Step2.handleStepper();
 }
 
-uint32_t prevTim = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = Encoder1.indexHappened();
@@ -125,8 +124,8 @@ void loop(void)
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
    }
-   uint64_t superNow=micros();
-   if (superNow - nowTime < 500 || superNow - nowTime > 1500) // Don't run ecat_slv_poll when expecting to server interrupt
+   uint32_t dTime=micros()-nowTime;
+   if ((dTime > 100 && dTime < 800) || dTime > 1500) // Don't run ecat_slv_poll when expecting to server interrupt
       ecat_slv_poll(); 
 }
 
