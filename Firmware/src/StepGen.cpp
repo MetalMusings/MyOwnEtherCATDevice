@@ -51,12 +51,25 @@ void StepGen::handleStepper(void)
 
     actPos(timerStepPosition / double(stepsPerMM));
     double diffPosition = reqPos() - actPos();
-    // Wild "tone" kludge
-    if (abs(diffPosition) > 0.0005) // 60 mm/min = 0.001 mm/ms
+#if 1
+// Wild "tone" kludge. map() function
+#define SPEED_MIN 0.00005
+#define SPEED_MAX 0.0005
+#define FACT_LOW 1.0
+#define FACT_HIGH 20.0
+    if (abs(diffPosition) < SPEED_MIN) // 60 mm/min = 0.001 mm/ms
     {
-        pwmCycleTime = 10 * StepGen::sync0CycleTime;
+        pwmCycleTime = FACT_LOW * StepGen::sync0CycleTime;
     }
-
+    else if (abs(diffPosition) > SPEED_MAX) // 60 mm/min = 0.001 mm/ms
+    {
+        pwmCycleTime = FACT_HIGH * StepGen::sync0CycleTime;
+    }
+    else
+    {
+        pwmCycleTime = (FACT_LOW + (FACT_HIGH - FACT_LOW) * (abs(diffPosition) - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * StepGen::sync0CycleTime;
+    }
+#endif
     uint64_t fre = abs(diffPosition) * stepsPerMM * 1000000 / double(pwmCycleTime); // Frequency needed
     if (fre > maxFreq)                                                              // Only do maxFre
     {
@@ -68,9 +81,8 @@ void StepGen::handleStepper(void)
     // Will be picked up by the timer_CB and the timer is reloaded.
     timerNewEndStepPosition = pulsesAtEndOfCycle;
 
-    if (!timerIsRunning) // no timer isn't running. start it here
+    if (!timerIsRunning) // Timer isn't running. Start it here
     {
-        // Start the timer
         int32_t steps = pulsesAtEndOfCycle - timerStepPosition; // Pulses to go + or -
         if (steps != 0)
         {
@@ -93,8 +105,8 @@ void StepGen::timerCB()
     timerStepPosition += timerStepDirection; // The step that was just completed
     if (timerNewEndStepPosition != 0)        // Are we going to reload?
     {
-        // Input for reload is timerNewEndStepPosition and timerNewEndTime
-        // The timer has current position and current time and from this
+        // Input for reload is timerNewEndStepPosition
+        // The timer has current position and from this
         // can set new frequency and new endtarget for steps
         MyTim->pause(); // We are not at stop, let's stop it
         int32_t steps = timerNewEndStepPosition - timerStepPosition;
