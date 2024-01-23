@@ -35,6 +35,7 @@ void timerCallbackStep2(void)
 }
 
 CircularBuffer<uint32_t, 200> Tim;
+volatile uint64_t nowTime = 0, thenTime = 0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -65,9 +66,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
    Obj.StepGenOut2.ActualPosition = Step2.actPos();
-   uint32_t dTim = ESCvar.Time - prevTim;
-   if (dTim > 1000)
-      Tim.push(dTim);
+
+   uint32_t dTim = nowTime - thenTime;
+   Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
    {
@@ -77,7 +78,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       if (aTim < min_Tim)
          min_Tim = aTim;
    }
-   prevTim = ESCvar.Time;
+   thenTime = nowTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
 }
 
@@ -117,6 +118,7 @@ void setup(void)
 
 void loop(void)
 {
+
    ESCvar.PrevTime = ESCvar.Time;
    if (serveIRQ)
    {
@@ -124,11 +126,13 @@ void loop(void)
                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
    }
-   ecat_slv_poll();
+   if (nowTime < 500 || nowTime > 1500)
+      ecat_slv_poll();
 }
 
 void sync0Handler(void)
 {
+   nowTime = micros();
    serveIRQ = 1;
 }
 
