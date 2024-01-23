@@ -125,8 +125,9 @@ void loop(void)
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
    }
-   if (nowTime < 500 || nowTime > 1500) // Don't run ecat_slv_poll when expecting to server interrupt
-      ecat_slv_poll();
+   uint64_t superNow=micros();
+   if (superNow - nowTime < 500 || superNow - nowTime > 1500) // Don't run ecat_slv_poll when expecting to server interrupt
+      ecat_slv_poll(); 
 }
 
 void sync0Handler(void)
