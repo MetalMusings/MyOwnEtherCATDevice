@@ -9,8 +9,10 @@ how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
 
 
-## Make my own EtherCAT device 7. Turning in the latheI have now put things together so the
-EaserCAT 2000 card controls my small CNC lathe. Two stepper generators, one each for the X and Z axes,
+## Make my own EtherCAT device 7. Turning in the lathe
+
+I have now put things together so the EaserCAT 2000 card controls
+my small CNC lathe. Two stepper generators, one each for the X and Z axes,
 and an encoder counter for the spindle encoder are on this small card.
 
 While it works there are still issues caused by the variation in cycle time. Thankfully
