@@ -6,6 +6,18 @@ that I used during the creation of my own EtherCAT device.
 This job is documented in a series of Youtube videos, from my first attempts to understand
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
+
+
+
+## Make my own EtherCAT device 7. Turning in the latheI have now put things together so the
+EaserCAT 2000 card controls my small CNC lathe. Two stepper generators, one each for the X and Z axes,
+and an encoder counter for the spindle encoder are on this small card.
+
+While it works there are still issues caused by the variation in cycle time. Thankfully
+I was able to reduce the variation from 80-100 microseconds down to 2-3 microseconds,
+
+[![Watch the video](https://img.youtube.com/vi/Bqi1KXEVI1Q/default.jpg)](https://youtu.be/Bqi1KXEVI1Q)
+
 ## Make my own EtherCAT device 6. Stepper motor driver
 
 The stepper driver generator shows up and makes some stepper motor sounds. The two big things
