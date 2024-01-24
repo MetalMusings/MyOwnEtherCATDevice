@@ -4,6 +4,10 @@
 
   (paper "A4")
 
+  (title_block
+    (title "MetalMusings EaserCAT 3000")
+  )
+
   (lib_symbols
     (symbol "Device:C" (pin_numbers hide) (pin_names (offset 0.254)) (in_bom yes) (on_board yes)
       (property "Reference" "C" (at 0.635 2.54 0)
@@ -3724,7 +3728,7 @@
     (property "Reference" "D?" (at 228.6 46.99 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "Green led" (at 228.6 53.34 0)
+    (property "Value" "Green led" (at 231.775 51.435 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "LED_SMD:LED_0805_2012Metric" (at 228.6 49.53 0)

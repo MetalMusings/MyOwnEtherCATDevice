@@ -390,7 +390,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "simulation_model_issue": "ignore",
@@ -499,7 +499,11 @@
     ],
     [
       "0a376a6c-0f15-42f8-81f6-3a55619be267",
-      "Peripherals"
+      "Input-Output"
+    ],
+    [
+      "cd91a270-7393-4003-91a3-e42304da540b",
+      "Stepper+encoder"
     ]
   ],
   "text_variables": {}

@@ -2,25 +2,24 @@
 
   (uuid 5597aedc-b607-407f-bbfd-31b3b298ecb1)
 
-  (paper "A3")
+  (paper "A4")
+
+  (title_block
+    (title "MetalMusings EaserCAT 3000")
+  )
 
   (lib_symbols
   )
 
 
-  (text "Huvudsida" (at 162.56 85.09 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid adf2be63-7ec7-44be-837f-901ddbc80717)
-  )
-
-  (sheet (at 144.78 224.79) (size 71.12 16.51) (fields_autoplaced)
+  (sheet (at 57.15 156.21) (size 93.98 39.37) (fields_autoplaced)
     (stroke (width 0.1524) (type solid))
     (fill (color 0 0 0 0.0000))
     (uuid 0a376a6c-0f15-42f8-81f6-3a55619be267)
-    (property "Sheetname" "Peripherals" (at 144.78 224.0784 0)
+    (property "Sheetname" "Input-Output" (at 57.15 155.4984 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
-    (property "Sheetfile" "peripherals.kicad_sch" (at 144.78 241.8846 0)
+    (property "Sheetfile" "peripherals.kicad_sch" (at 57.15 196.1646 0)
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
@@ -30,14 +29,14 @@
     )
   )
 
-  (sheet (at 234.95 198.12) (size 102.87 34.29) (fields_autoplaced)
+  (sheet (at 170.18 31.75) (size 101.6 58.42) (fields_autoplaced)
     (stroke (width 0.1524) (type solid))
     (fill (color 0 0 0 0.0000))
     (uuid 5bf93325-f5d9-4344-9bf3-f5fc91bc1622)
-    (property "Sheetname" "AX58100 phys etc" (at 234.95 197.4084 0)
+    (property "Sheetname" "AX58100 phys etc" (at 170.18 31.0384 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
-    (property "Sheetfile" "AX58100_phy_etc.kicad_sch" (at 234.95 232.9946 0)
+    (property "Sheetfile" "AX58100_phy_etc.kicad_sch" (at 170.18 90.7546 0)
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
@@ -47,14 +46,14 @@
     )
   )
 
-  (sheet (at 233.68 123.19) (size 93.98 60.96) (fields_autoplaced)
+  (sheet (at 57.15 31.75) (size 93.98 60.96) (fields_autoplaced)
     (stroke (width 0.1524) (type solid))
     (fill (color 0 0 0 0.0000))
     (uuid 9f485422-734f-43d3-94ea-443cbc453d2e)
-    (property "Sheetname" "AX58100" (at 233.68 122.4784 0)
+    (property "Sheetname" "AX58100" (at 57.15 31.0384 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
-    (property "Sheetfile" "AX48100.kicad_sch" (at 233.68 184.7346 0)
+    (property "Sheetfile" "AX48100.kicad_sch" (at 57.15 93.2946 0)
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
@@ -64,14 +63,31 @@
     )
   )
 
-  (sheet (at 142.24 200.66) (size 74.93 17.78) (fields_autoplaced)
+  (sheet (at 171.45 156.21) (size 105.41 39.37) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid cd91a270-7393-4003-91a3-e42304da540b)
+    (property "Sheetname" "Stepper+encoder" (at 171.45 155.4984 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "Steppers.kicad_sch" (at 171.45 196.1646 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "Ax58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1" (page "6"))
+      )
+    )
+  )
+
+  (sheet (at 57.15 106.68) (size 93.98 35.56) (fields_autoplaced)
     (stroke (width 0.1524) (type solid))
     (fill (color 0 0 0 0.0000))
     (uuid d564400f-40ba-4aca-9c2a-14ec52a8353b)
-    (property "Sheetname" "STM32F4" (at 142.24 199.9484 0)
+    (property "Sheetname" "STM32F4" (at 57.15 105.9684 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
-    (property "Sheetfile" "STM32F4.kicad_sch" (at 142.24 219.0246 0)
+    (property "Sheetfile" "STM32F4.kicad_sch" (at 57.15 142.8246 0)
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
