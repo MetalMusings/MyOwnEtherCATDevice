@@ -3428,7 +3428,7 @@
     (property "Value" "5V Power IN" (at 78.105 177.2737 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical" (at 77.47 179.07 0)
+    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-2_P5.08mm" (at 77.47 179.07 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 77.47 179.07 0)
