@@ -5,3 +5,4 @@ fp-info-cache
 gerbers/
 Ax58100-stm32-ethercat-backups/
 freerouting.*
+*.dsn
