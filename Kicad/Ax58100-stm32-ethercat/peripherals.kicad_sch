@@ -1948,7 +1948,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 57.15 0) (mirror y) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0063676f-9fbb-4e58-b416-c0bbde50e1a9)
-    (property "Reference" "U5" (at 68.58 49.1957 0)
+    (property "Reference" "U4" (at 68.58 49.1957 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 51.6199 0)
@@ -1979,7 +1979,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U5") (unit 2)
+          (reference "U4") (unit 2)
         )
       )
     )
@@ -2045,7 +2045,7 @@
   (symbol (lib_id "Device:R") (at 48.26 89.535 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 03509207-13d5-4649-8e27-4ac1d4770c69)
-    (property "Reference" "R63" (at 48.26 91.44 90)
+    (property "Reference" "R30" (at 48.26 91.44 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 46.99 96.52 90)
@@ -2062,7 +2062,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R63") (unit 1)
+          (reference "R30") (unit 1)
         )
       )
     )
@@ -2091,7 +2091,35 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R57") (unit 1)
+          (reference "R21") (unit 1)
+        )
+      )
+    )
+  )
+
+  (symbol (lib_id "Connector_Generic:Conn_01x04") (at 125.73 63.5 0) (mirror x) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 080a9476-cf42-49e9-b5ab-f6c1201c4a36)
+    (property "Reference" "J6" (at 125.73 53.0057 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Value" "In1-4" (at 125.73 55.4299 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Footprint" "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_4-G-3.5_1x04_P3.50mm_Vertical" (at 125.73 63.5 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 125.73 63.5 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 4deb3926-4878-4cf7-b6f2-4312d247f64c))
+    (pin "2" (uuid bd7c10f2-0785-4ddc-a330-77fa833202a1))
+    (pin "3" (uuid b99a7507-ce94-41db-8287-e408582b5f58))
+    (pin "4" (uuid 3377285f-f525-49c5-925c-ee6e3838da78))
+    (instances
+      (project "Ax58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
+          (reference "J6") (unit 1)
         )
       )
     )
@@ -2157,7 +2185,7 @@
   (symbol (lib_id "Device:R") (at 50.8 89.535 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1de9d667-2586-4ac6-b800-6be65c5a7266)
-    (property "Reference" "R64" (at 50.8 91.44 90)
+    (property "Reference" "R31" (at 50.8 91.44 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 49.53 96.52 90)
@@ -2174,7 +2202,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R64") (unit 1)
+          (reference "R31") (unit 1)
         )
       )
     )
@@ -2186,7 +2214,7 @@
     (property "Reference" "R46" (at 92.71 153.67 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 156.21 90)
+    (property "Value" "4k7" (at 92.71 156.21 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 155.448 90)
@@ -2203,7 +2231,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R10") (unit 1)
+          (reference "R6") (unit 1)
         )
       )
     )
@@ -2232,7 +2260,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R54") (unit 1)
+          (reference "R26") (unit 1)
         )
       )
     )
@@ -2241,13 +2269,13 @@
   (symbol (lib_id "Connector_Generic:Conn_01x03") (at 202.565 132.08 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 285285bf-6368-4358-9336-b46872972ebe)
-    (property "Reference" "J12" (at 200.533 130.8679 0)
+    (property "Reference" "J13" (at 200.533 130.8679 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "DAC" (at 200.533 133.2921 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-3_P5.08mm" (at 202.565 132.08 0)
+    (property "Footprint" "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_3-G-3.5_1x03_P3.50mm_Vertical" (at 202.565 132.08 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 202.565 132.08 0)
@@ -2259,7 +2287,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J12") (unit 1)
+          (reference "J13") (unit 1)
         )
       )
     )
@@ -2268,7 +2296,7 @@
   (symbol (lib_id "Device:R") (at 48.26 166.37 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2b327b95-dc75-47ca-9926-1314b27e80ac)
-    (property "Reference" "R67" (at 48.26 168.275 90)
+    (property "Reference" "R34" (at 48.26 168.275 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 46.99 173.355 90)
@@ -2285,7 +2313,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R67") (unit 1)
+          (reference "R34") (unit 1)
         )
       )
     )
@@ -2326,7 +2354,7 @@
     (property "Reference" "R46" (at 92.71 43.18 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 45.72 90)
+    (property "Value" "4k7" (at 92.71 45.72 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 44.958 90)
@@ -2343,7 +2371,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R9") (unit 1)
+          (reference "R5") (unit 1)
         )
       )
     )
@@ -2352,7 +2380,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 121.92 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3195adda-bbb2-4c55-a4bd-9272d1e0e39e)
-    (property "Reference" "U6" (at 68.58 113.9657 0)
+    (property "Reference" "U5" (at 68.58 113.9657 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 116.3899 0)
@@ -2383,7 +2411,35 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U6") (unit 1)
+          (reference "U5") (unit 1)
+        )
+      )
+    )
+  )
+
+  (symbol (lib_id "Connector_Generic:Conn_01x04") (at 125.73 139.7 0) (mirror x) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 3557e8a0-3197-4e1c-9385-a7d983f7c846)
+    (property "Reference" "J7" (at 125.73 129.2057 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Value" "In5-8" (at 125.73 131.6299 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Footprint" "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_4-G-3.5_1x04_P3.50mm_Vertical" (at 125.73 139.7 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 125.73 139.7 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 5aba79be-11de-47c0-8bea-a45db4ccc9a6))
+    (pin "2" (uuid c602e6cd-d3d5-4357-b57a-17da41d5f7f0))
+    (pin "3" (uuid 7b05915c-e358-457d-967b-943eea1eaea7))
+    (pin "4" (uuid 6be4b8ec-4f42-4869-bc2f-70aff793ad38))
+    (instances
+      (project "Ax58100-stm32-ethercat"
+        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
+          (reference "J7") (unit 1)
         )
       )
     )
@@ -2395,7 +2451,7 @@
     (property "Reference" "R46" (at 92.71 77.47 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 80.01 90)
+    (property "Value" "4k7" (at 92.71 80.01 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 79.248 90)
@@ -2412,7 +2468,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R6") (unit 1)
+          (reference "R2") (unit 1)
         )
       )
     )
@@ -2450,7 +2506,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 223.52 72.39 0) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3b14df21-15dc-444a-bce0-73acd24921e7)
-    (property "Reference" "U4" (at 223.52 64.4357 0)
+    (property "Reference" "U3" (at 223.52 64.4357 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 223.52 66.8599 0)
@@ -2481,7 +2537,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U4") (unit 4)
+          (reference "U3") (unit 4)
         )
       )
     )
@@ -2490,7 +2546,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 80.01 0) (mirror y) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 4263fc2c-6eac-4686-87d5-c8dc9829a1e5)
-    (property "Reference" "U5" (at 68.58 72.0557 0)
+    (property "Reference" "U4" (at 68.58 72.0557 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 74.4799 0)
@@ -2521,7 +2577,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U5") (unit 4)
+          (reference "U4") (unit 4)
         )
       )
     )
@@ -2530,7 +2586,7 @@
   (symbol (lib_id "Device:R") (at 210.82 83.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 454eac27-0507-4e89-9a7a-a33bafe05b16)
-    (property "Reference" "R61" (at 210.82 85.725 90)
+    (property "Reference" "R14" (at 210.82 85.725 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 209.55 90.805 90)
@@ -2547,7 +2603,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R61") (unit 1)
+          (reference "R14") (unit 1)
         )
       )
     )
@@ -2556,7 +2612,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 223.52 38.1 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 465d4948-c2f6-4eea-a40e-75836c809e78)
-    (property "Reference" "U4" (at 223.52 30.1457 0)
+    (property "Reference" "U3" (at 223.52 30.1457 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 223.52 32.5699 0)
@@ -2587,35 +2643,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U4") (unit 1)
-        )
-      )
-    )
-  )
-
-  (symbol (lib_id "Connector_Generic:Conn_01x04") (at 125.73 137.16 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid 4a87b4ce-033e-4c5b-abcd-ff95aac7cd3a)
-    (property "Reference" "J7" (at 125.73 147.6543 0)
-      (effects (font (size 1.27 1.27)))
-    )
-    (property "Value" "In5-8" (at 125.73 145.2301 0)
-      (effects (font (size 1.27 1.27)))
-    )
-    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-4_P5.08mm" (at 125.73 137.16 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "~" (at 125.73 137.16 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 4d06b0ba-5d09-4849-ac11-526996af1737))
-    (pin "2" (uuid 18970d2e-a3b7-4099-bd1e-3201f6faba05))
-    (pin "3" (uuid 24c3c4d7-715d-4251-83ea-c97b764eb791))
-    (pin "4" (uuid 2ab76de4-ac03-47b4-9ca9-7776a69af2be))
-    (instances
-      (project "Ax58100-stm32-ethercat"
-        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J7") (unit 1)
+          (reference "U3") (unit 1)
         )
       )
     )
@@ -2644,7 +2672,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R53") (unit 1)
+          (reference "R25") (unit 1)
         )
       )
     )
@@ -2712,13 +2740,13 @@
   (symbol (lib_id "Connector_Generic:Conn_01x02") (at 118.11 95.25 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 52cf381e-ce00-44e3-82a7-93a7f7416edc)
-    (property "Reference" "J11" (at 120.142 95.3079 0)
+    (property "Reference" "J12" (at 120.142 95.3079 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "24V Field" (at 120.142 97.7321 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-2_P5.08mm" (at 118.11 95.25 0)
+    (property "Footprint" "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_2-G-3.5_1x02_P3.50mm_Vertical" (at 118.11 95.25 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 118.11 95.25 0)
@@ -2729,35 +2757,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J11") (unit 1)
-        )
-      )
-    )
-  )
-
-  (symbol (lib_id "Connector_Generic:Conn_01x04") (at 125.73 60.96 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid 5489977d-38be-4b48-88d2-3e33717b6aee)
-    (property "Reference" "J6" (at 125.73 71.4543 0)
-      (effects (font (size 1.27 1.27)))
-    )
-    (property "Value" "In1-4" (at 125.73 69.0301 0)
-      (effects (font (size 1.27 1.27)))
-    )
-    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-4_P5.08mm" (at 125.73 60.96 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "~" (at 125.73 60.96 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid bff3fdc0-676f-42d6-b7c1-4e5f911502f2))
-    (pin "2" (uuid 8c95f147-ca6a-46fe-957e-08f4c8ed75ac))
-    (pin "3" (uuid 4a4115ae-b40b-40df-a8b7-a2869752b788))
-    (pin "4" (uuid 4f5264d2-986b-4ee2-8319-76c9876386c9))
-    (instances
-      (project "Ax58100-stm32-ethercat"
-        (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J6") (unit 1)
+          (reference "J12") (unit 1)
         )
       )
     )
@@ -2815,7 +2815,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R55") (unit 1)
+          (reference "R19") (unit 1)
         )
       )
     )
@@ -2824,7 +2824,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x06") (at 156.21 62.23 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5b80ef1d-5348-4e86-923f-941ecf6d43a0)
-    (property "Reference" "J17" (at 158.242 62.2879 0)
+    (property "Reference" "J14" (at 158.242 62.2879 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "In_opt1" (at 158.242 64.7121 0)
@@ -2845,7 +2845,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J17") (unit 1)
+          (reference "J14") (unit 1)
         )
       )
     )
@@ -2854,7 +2854,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 156.21 0) (mirror y) (unit 4)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5dfd5e29-0625-45bf-809c-a5ea758f0520)
-    (property "Reference" "U6" (at 68.58 148.2557 0)
+    (property "Reference" "U5" (at 68.58 148.2557 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 150.6799 0)
@@ -2885,7 +2885,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U6") (unit 4)
+          (reference "U5") (unit 4)
         )
       )
     )
@@ -2923,7 +2923,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 45.72 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5ef589bf-87a7-43f6-99bd-8429b3c56e1d)
-    (property "Reference" "U5" (at 68.58 37.7657 0)
+    (property "Reference" "U4" (at 68.58 37.7657 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 40.1899 0)
@@ -2954,7 +2954,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U5") (unit 1)
+          (reference "U4") (unit 1)
         )
       )
     )
@@ -2966,7 +2966,7 @@
     (property "Reference" "R46" (at 92.71 54.61 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 57.15 90)
+    (property "Value" "4k7" (at 92.71 57.15 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 56.388 90)
@@ -2983,7 +2983,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R8") (unit 1)
+          (reference "R4") (unit 1)
         )
       )
     )
@@ -2992,7 +2992,7 @@
   (symbol (lib_id "Device:R") (at 208.28 83.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 687e99cb-9f05-4818-a635-808c87bfa619)
-    (property "Reference" "R60" (at 208.28 85.725 90)
+    (property "Reference" "R16" (at 208.28 85.725 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 207.01 90.805 90)
@@ -3009,7 +3009,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R60") (unit 1)
+          (reference "R16") (unit 1)
         )
       )
     )
@@ -3076,7 +3076,7 @@
   (symbol (lib_id "Device:R") (at 205.74 83.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8015b95f-7f64-443a-bc04-f7613e48d27e)
-    (property "Reference" "R59" (at 205.74 85.725 90)
+    (property "Reference" "R27" (at 205.74 85.725 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 204.47 90.805 90)
@@ -3093,7 +3093,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R59") (unit 1)
+          (reference "R27") (unit 1)
         )
       )
     )
@@ -3122,7 +3122,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R51") (unit 1)
+          (reference "R23") (unit 1)
         )
       )
     )
@@ -3131,7 +3131,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 68.58 0) (mirror y) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 83aaed36-08ea-4714-9dac-f33d8d962378)
-    (property "Reference" "U5" (at 68.58 60.6257 0)
+    (property "Reference" "U4" (at 68.58 60.6257 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 63.0499 0)
@@ -3162,7 +3162,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U5") (unit 3)
+          (reference "U4") (unit 3)
         )
       )
     )
@@ -3199,7 +3199,7 @@
   (symbol (lib_id "Device:R") (at 50.8 166.37 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 891c6a85-e3e7-4e28-8efe-aeb46b04298f)
-    (property "Reference" "R68" (at 50.8 168.275 90)
+    (property "Reference" "R35" (at 50.8 168.275 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 49.53 173.355 90)
@@ -3216,7 +3216,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R68") (unit 1)
+          (reference "R35") (unit 1)
         )
       )
     )
@@ -3254,7 +3254,7 @@
   (symbol (lib_id "Device:R") (at 55.88 166.37 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8c133de0-7f39-4a86-8278-56a3f783fd7f)
-    (property "Reference" "R70" (at 55.88 168.275 90)
+    (property "Reference" "R37" (at 55.88 168.275 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 54.61 173.355 90)
@@ -3271,7 +3271,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R70") (unit 1)
+          (reference "R37") (unit 1)
         )
       )
     )
@@ -3337,7 +3337,7 @@
   (symbol (lib_id "Device:R") (at 53.34 89.535 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 91ace963-0d54-4dce-8065-bec6a6dab5de)
-    (property "Reference" "R65" (at 53.34 91.44 90)
+    (property "Reference" "R32" (at 53.34 91.44 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 52.07 96.52 90)
@@ -3354,7 +3354,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R65") (unit 1)
+          (reference "R32") (unit 1)
         )
       )
     )
@@ -3363,7 +3363,7 @@
   (symbol (lib_id "Device:R") (at 55.88 89.535 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 94000301-0752-438b-a8e9-9d024fced845)
-    (property "Reference" "R66" (at 55.88 91.44 90)
+    (property "Reference" "R33" (at 55.88 91.44 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 54.61 96.52 90)
@@ -3380,7 +3380,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R66") (unit 1)
+          (reference "R33") (unit 1)
         )
       )
     )
@@ -3479,7 +3479,7 @@
     (property "Reference" "R46" (at 92.71 66.04 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 68.58 90)
+    (property "Value" "4k7" (at 92.71 68.58 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 67.818 90)
@@ -3496,7 +3496,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R7") (unit 1)
+          (reference "R3") (unit 1)
         )
       )
     )
@@ -3505,7 +3505,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 144.78 0) (mirror y) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid a14b1e3d-0593-44f6-9aca-e417a3aa4c2a)
-    (property "Reference" "U6" (at 68.58 136.8257 0)
+    (property "Reference" "U5" (at 68.58 136.8257 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 139.2499 0)
@@ -3536,7 +3536,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U6") (unit 3)
+          (reference "U5") (unit 3)
         )
       )
     )
@@ -3545,7 +3545,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 68.58 133.35 0) (mirror y) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid a3900afd-e25e-45e3-b9a1-9daf6869aae2)
-    (property "Reference" "U6" (at 68.58 125.3957 0)
+    (property "Reference" "U5" (at 68.58 125.3957 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 68.58 127.8199 0)
@@ -3576,7 +3576,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U6") (unit 2)
+          (reference "U5") (unit 2)
         )
       )
     )
@@ -3634,7 +3634,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R58") (unit 1)
+          (reference "R22") (unit 1)
         )
       )
     )
@@ -3663,7 +3663,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R52") (unit 1)
+          (reference "R24") (unit 1)
         )
       )
     )
@@ -3748,7 +3748,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R56") (unit 1)
+          (reference "R20") (unit 1)
         )
       )
     )
@@ -3757,7 +3757,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 223.52 60.96 0) (unit 3)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid bc430bd2-a007-422b-a9a2-ed94fa94a384)
-    (property "Reference" "U4" (at 223.52 53.0057 0)
+    (property "Reference" "U3" (at 223.52 53.0057 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 223.52 55.4299 0)
@@ -3788,7 +3788,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U4") (unit 3)
+          (reference "U3") (unit 3)
         )
       )
     )
@@ -3832,7 +3832,7 @@
     (property "Value" "Output1-2" (at 269.24 47.625 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-4_P5.08mm" (at 260.985 48.26 0)
+    (property "Footprint" "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_4-G-3.5_1x04_P3.50mm_Vertical" (at 260.985 48.26 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 260.985 48.26 0)
@@ -3883,7 +3883,7 @@
   (symbol (lib_id "Device:R") (at 213.36 83.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d0799865-5fbf-42a3-a0f3-c203103bf167)
-    (property "Reference" "R62" (at 213.36 85.725 90)
+    (property "Reference" "R11" (at 213.36 85.725 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "330" (at 212.09 90.805 90)
@@ -3900,7 +3900,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R62") (unit 1)
+          (reference "R11") (unit 1)
         )
       )
     )
@@ -3941,7 +3941,7 @@
     (property "Reference" "R46" (at 92.71 119.38 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 121.92 90)
+    (property "Value" "4k7" (at 92.71 121.92 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 121.158 90)
@@ -3958,7 +3958,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R13") (unit 1)
+          (reference "R9") (unit 1)
         )
       )
     )
@@ -4001,7 +4001,7 @@
     (property "Reference" "R46" (at 92.71 130.81 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 133.35 90)
+    (property "Value" "4k7" (at 92.71 133.35 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 132.588 90)
@@ -4018,7 +4018,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R12") (unit 1)
+          (reference "R8") (unit 1)
         )
       )
     )
@@ -4027,7 +4027,7 @@
   (symbol (lib_id "Device:R") (at 53.34 166.37 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d7decf4d-e33c-4c2e-bed1-901090ccc901)
-    (property "Reference" "R69" (at 53.34 168.275 90)
+    (property "Reference" "R36" (at 53.34 168.275 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "39k" (at 52.07 173.355 90)
@@ -4044,7 +4044,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R69") (unit 1)
+          (reference "R36") (unit 1)
         )
       )
     )
@@ -4084,7 +4084,7 @@
     (property "Reference" "R46" (at 92.71 142.24 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "1k" (at 92.71 144.78 90)
+    (property "Value" "4k7" (at 92.71 144.78 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 92.71 144.018 90)
@@ -4101,7 +4101,7 @@
           (reference "R46") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "R11") (unit 1)
+          (reference "R7") (unit 1)
         )
       )
     )
@@ -4116,7 +4116,7 @@
     (property "Value" "Output3-4" (at 268.605 59.055 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "TerminalBlock:TerminalBlock_bornier-4_P5.08mm" (at 260.985 58.42 0)
+    (property "Footprint" "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_4-G-3.5_1x04_P3.50mm_Vertical" (at 260.985 58.42 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 260.985 58.42 0)
@@ -4166,7 +4166,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x06") (at 156.21 137.16 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid e8e5467e-f57e-4f5c-a8b0-44b01c3f13f2)
-    (property "Reference" "J14" (at 158.242 137.2179 0)
+    (property "Reference" "J16" (at 158.242 137.2179 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "In_opt2" (at 158.242 139.6421 0)
@@ -4187,7 +4187,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "J14") (unit 1)
+          (reference "J16") (unit 1)
         )
       )
     )
@@ -4225,7 +4225,7 @@
   (symbol (lib_id "Isolator:TLP291-4") (at 223.52 49.53 0) (unit 2)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid edd8aa3d-c16d-4a57-99d1-fb49646042aa)
-    (property "Reference" "U4" (at 223.52 41.5757 0)
+    (property "Reference" "U3" (at 223.52 41.5757 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TLP292-4" (at 223.52 43.9999 0)
@@ -4256,7 +4256,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/0a376a6c-0f15-42f8-81f6-3a55619be267"
-          (reference "U4") (unit 2)
+          (reference "U3") (unit 2)
         )
       )
     )

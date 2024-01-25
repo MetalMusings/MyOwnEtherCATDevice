@@ -6,3 +6,7 @@ gerbers/
 Ax58100-stm32-ethercat-backups/
 freerouting.*
 *.dsn
+*.frb
+*.rules
+*.ses
+
