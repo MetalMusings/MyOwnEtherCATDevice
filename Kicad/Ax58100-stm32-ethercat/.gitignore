@@ -10,3 +10,5 @@ freerouting.*
 *.rules
 *.ses
 
+Ax58100-stm32-ethercat.csv
+Ax58100-stm32-ethercat.ods
