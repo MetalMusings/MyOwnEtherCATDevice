@@ -2052,7 +2052,7 @@
           (reference "R2") (unit 1)
         )
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R71") (unit 1)
+          (reference "R42") (unit 1)
         )
       )
     )
@@ -2218,7 +2218,7 @@
   (symbol (lib_id "Device:R") (at 80.01 127 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 32075a8b-69da-4a9b-bc51-4abd88b43499)
-    (property "Reference" "R42" (at 80.01 127 90)
+    (property "Reference" "R43" (at 80.01 127 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22" (at 78.74 124.46 90)
@@ -2235,7 +2235,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R42") (unit 1)
+          (reference "R43") (unit 1)
         )
       )
     )
@@ -2375,7 +2375,7 @@
   (symbol (lib_id "Device:R") (at 52.07 60.96 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 45a449d5-9134-41f8-aaba-983731aca91e)
-    (property "Reference" "R46" (at 52.07 60.96 90)
+    (property "Reference" "R47" (at 52.07 60.96 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22" (at 54.61 59.69 90)
@@ -2392,7 +2392,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R46") (unit 1)
+          (reference "R47") (unit 1)
         )
       )
     )
@@ -2508,7 +2508,7 @@
   (symbol (lib_id "Device:R") (at 236.22 78.74 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 57d23afb-3e89-43f3-b8ac-d446fddb5c78)
-    (property "Reference" "R66" (at 236.22 78.74 90)
+    (property "Reference" "R67" (at 236.22 78.74 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 234.95 76.2 90)
@@ -2525,7 +2525,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R66") (unit 1)
+          (reference "R67") (unit 1)
         )
       )
     )
@@ -2640,7 +2640,7 @@
   (symbol (lib_id "Device:R") (at 142.24 73.66 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 64094713-7d76-4b8b-9bf9-b7f64f75c920)
-    (property "Reference" "R68" (at 142.24 73.66 90)
+    (property "Reference" "R69" (at 142.24 73.66 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 144.78 72.39 90)
@@ -2657,7 +2657,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R68") (unit 1)
+          (reference "R69") (unit 1)
         )
       )
     )
@@ -2666,7 +2666,7 @@
   (symbol (lib_id "Device:R") (at 142.24 91.44 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6624d943-f8e6-4441-982c-3de575b1dc6e)
-    (property "Reference" "R64" (at 142.24 91.44 90)
+    (property "Reference" "R65" (at 142.24 91.44 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 144.78 90.17 90)
@@ -2683,7 +2683,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R64") (unit 1)
+          (reference "R65") (unit 1)
         )
       )
     )
@@ -2718,7 +2718,7 @@
   (symbol (lib_id "Device:R") (at 236.22 133.35 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 687437c4-7aa9-4046-9f4a-5ed469d0a577)
-    (property "Reference" "R44" (at 236.22 133.35 90)
+    (property "Reference" "R45" (at 236.22 133.35 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 234.95 128.27 90)
@@ -2735,7 +2735,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R44") (unit 1)
+          (reference "R45") (unit 1)
         )
       )
     )
@@ -3224,7 +3224,7 @@
   (symbol (lib_id "Device:R") (at 142.24 76.2 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 95dffa01-7efa-4524-83d7-dd663891f3a6)
-    (property "Reference" "R65" (at 142.24 76.2 90)
+    (property "Reference" "R66" (at 142.24 76.2 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "12k 1%" (at 144.78 74.93 90)
@@ -3241,7 +3241,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R65") (unit 1)
+          (reference "R66") (unit 1)
         )
       )
     )
@@ -3378,7 +3378,7 @@
   (symbol (lib_id "Device:R") (at 69.85 36.83 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b162f748-c4c9-4222-9aec-552919872ce9)
-    (property "Reference" "R57" (at 69.85 36.83 90)
+    (property "Reference" "R58" (at 69.85 36.83 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "22" (at 68.58 34.29 90)
@@ -3395,7 +3395,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R57") (unit 1)
+          (reference "R58") (unit 1)
         )
       )
     )
@@ -3692,7 +3692,7 @@
   (symbol (lib_id "Device:R") (at 241.3 133.35 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid dbb53c1f-a3e9-40f7-9c26-4cfbc7e7faea)
-    (property "Reference" "R43" (at 241.3 133.35 90)
+    (property "Reference" "R44" (at 241.3 133.35 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 240.03 128.27 90)
@@ -3709,7 +3709,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R43") (unit 1)
+          (reference "R44") (unit 1)
         )
       )
     )
@@ -3799,7 +3799,7 @@
   (symbol (lib_id "Device:R") (at 223.52 99.06 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e42bfe7f-7ca3-4fd5-a029-2fee492bb34b)
-    (property "Reference" "R67" (at 223.52 99.06 90)
+    (property "Reference" "R68" (at 223.52 99.06 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "4k7" (at 222.25 96.52 90)
@@ -3816,7 +3816,7 @@
     (instances
       (project "Ax58100-stm32-ethercat"
         (path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/9f485422-734f-43d3-94ea-443cbc453d2e"
-          (reference "R67") (unit 1)
+          (reference "R68") (unit 1)
         )
       )
     )
