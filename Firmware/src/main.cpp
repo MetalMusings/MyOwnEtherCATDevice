@@ -17,23 +17,22 @@ void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
-
+#if 0
 #include "StepGen.h"
-
 void timerCallbackStep1(void);
 StepGen Step1(TIM1, 4, PA_11, PA12, timerCallbackStep1);
 void timerCallbackStep1(void)
 {
    Step1.timerCB();
 }
-
 void timerCallbackStep2(void);
 StepGen Step2(TIM3, 4, PC_9, PC10, timerCallbackStep2);
 void timerCallbackStep2(void)
 {
    Step2.timerCB();
 }
-
+#endif
+#include "StepGen2.h"
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t nowTime = 0, thenTime = 0;
 
@@ -41,19 +40,22 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 {
    Encoder1.setLatch(Obj.IndexLatchEnable);
    Encoder1.setScale(Obj.EncPosScale);
-
+#if 0
    Step1.reqPos(Obj.StepGenIn1.CommandedPosition);
    Step1.setScale(Obj.StepGenIn1.StepsPerMM);
    Step1.enable(Obj.Enable1);
    Step2.reqPos(Obj.StepGenIn2.CommandedPosition);
    Step2.setScale(Obj.StepGenIn2.StepsPerMM);
    Step2.enable(Obj.Enable1);
+#endif
 }
 
 void handleStepper(void)
 {
+#if 0
    Step1.handleStepper();
    Step2.handleStepper();
+#endif
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -62,10 +64,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncPos = Encoder1.currentPos();
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
-
+#if 0
    Obj.StepGenOut1.ActualPosition = Step1.actPos();
    Obj.StepGenOut2.ActualPosition = Step2.actPos();
-
+#endif
    uint32_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
@@ -179,6 +181,9 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
+   #if 0
+   StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000;  // usecs
+   #endif
+   StepGen2::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
    return 0;
 }
