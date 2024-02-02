@@ -18,6 +18,7 @@ private:
     volatile int32_t oldStepPosition;
     volatile uint8_t enabled;
     HardwareTimer *MyTim;
+    HardwareTimer *MyTim2;
     int16_t stepsPerMM;
     uint8_t dirPin;
     PinName stepPin;
@@ -33,7 +34,7 @@ public:
     static uint32_t sync0CycleTime;
     volatile uint32_t lcncCycleTime; // Linuxcnc nominal cycle time (1 ms often)
 
-    StepGen2(TIM_TypeDef *Timer, uint32_t timerChannel, PinName stepPin, uint8_t dirPin, void irq(void));
+    StepGen2(TIM_TypeDef *Timer, TIM_TypeDef *Timer2, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void));
 
     uint32_t handleStepper(void);
     void timerCB();
@@ -50,7 +51,6 @@ public:
     void setScale(int16_t spm) { stepsPerMM = spm; }
     int16_t getScale() { return stepsPerMM; }
     uint32_t updatePosAndReturn(int32_t stepPosStop, uint32_t i);
-
 };
 
 #endif

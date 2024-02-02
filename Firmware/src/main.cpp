@@ -33,6 +33,9 @@ void timerCallbackStep2(void)
 }
 #endif
 #include "StepGen2.h"
+void timerCallbackStep(void);
+StepGen2 Step(TIM1, TIM10, 4, PA_11, PA12, timerCallbackStep);
+void timerCallbackStep(void) { Step.timerCB(); }
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t nowTime = 0, thenTime = 0;
 
@@ -181,9 +184,9 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   #if 0
+#if 0
    StepGen::sync0CycleTime = ESC_SYNC0cycletime() / 1000;  // usecs
-   #endif
+#endif
    StepGen2::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
    return 0;
 }

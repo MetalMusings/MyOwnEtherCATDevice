@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "StepGen2.h"
 
-StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void))
+StepGen2::StepGen2(TIM_TypeDef *Timer, TIM_TypeDef *Timer2, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void))
 {
     timerIsRunning = 0;
     timerStepPosition = 0;
@@ -22,6 +22,7 @@ StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin,
     MyTim = new HardwareTimer(Timer);
     MyTim->attachInterrupt(irq);
     pinMode(dirPin, OUTPUT);
+    MyTim2 = new HardwareTimer(Timer2);
 }
 
 uint32_t StepGen2::handleStepper(void)

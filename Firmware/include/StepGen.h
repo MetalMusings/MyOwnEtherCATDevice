@@ -16,6 +16,7 @@ private:
     volatile double_t requestedPosition;
     volatile uint8_t enabled;
     HardwareTimer *MyTim;
+    HardwareTimer *MyTim2;
     uint16_t stepsPerMM;
     uint8_t dirPin;
     PinName stepPin;
