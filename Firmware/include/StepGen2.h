@@ -34,7 +34,7 @@ public:
 
     StepGen2(TIM_TypeDef *Timer, uint32_t timerChannel, PinName stepPin, uint8_t dirPin, void irq(void));
 
-    void handleStepper(void);
+    uint32_t handleStepper(void);
     void timerCB();
     void enable(uint8_t yes);
 
@@ -48,6 +48,8 @@ public:
     double actPos() { return actualPosition; };
     void setScale(int16_t spm) { stepsPerMM = spm; }
     int16_t getScale() { return stepsPerMM; }
+    uint32_t updatePosAndReturn(int32_t stepPosStop, uint32_t i);
+
 };
 
 #endif
