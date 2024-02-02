@@ -25,6 +25,7 @@ private:
     const uint32_t maxFreq = 100000;
     volatile uint32_t prevFreq1 = 0;
     volatile uint32_t prevFreq2 = 0;
+    const float Tjitter = 50.0; // Time unit is microseconds
 
     uint32_t err = 0;
 
