@@ -6,19 +6,17 @@
 class StepGen2
 {
 private:
-    volatile uint8_t timerIsRunning;
-    volatile int32_t timerStepPosition;
-    volatile int32_t timerStepDirection;
-    volatile int32_t timerStepPositionAtEnd;
-    volatile int32_t timerNewEndStepPosition;
-    volatile uint32_t timerNewCycleTime;
     volatile double_t actualPosition;
     volatile double_t requestedPosition;
     volatile double_t oldPosition;
     volatile int32_t oldStepPosition;
     volatile uint8_t enabled;
+    volatile int32_t nSteps;
+    volatile float Tstart;
+    volatile float Tstop;
+    volatile float Tstep;
     HardwareTimer *MyTim;
-    HardwareTimer *MyTim2;
+    HardwareTimer *MyTim2; // 10,11,13,14
     int16_t stepsPerMM;
     uint8_t dirPin;
     PinName stepPin;
@@ -34,10 +32,11 @@ public:
     static uint32_t sync0CycleTime;
     volatile uint32_t lcncCycleTime; // Linuxcnc nominal cycle time (1 ms often)
 
-    StepGen2(TIM_TypeDef *Timer, TIM_TypeDef *Timer2, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void));
+    StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void), TIM_TypeDef *Timer2, void irq2(void));
 
     uint32_t handleStepper(void);
     void timerCB();
+    void timer2CB();
     void enable(uint8_t yes);
 
     void reqPos(double_t pos) { requestedPosition = pos; };

@@ -2,13 +2,8 @@
 #include <stdio.h>
 #include "StepGen2.h"
 
-StepGen2::StepGen2(TIM_TypeDef *Timer, TIM_TypeDef *Timer2, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void))
+StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void), TIM_TypeDef *Timer2, void irq2(void))
 {
-    timerIsRunning = 0;
-    timerStepPosition = 0;
-    timerStepDirection = 0;
-    timerStepPositionAtEnd = 0;
-    timerNewEndStepPosition = 0;
     actualPosition = 0;
     requestedPosition = 0;
     oldPosition = 0;
@@ -23,6 +18,7 @@ StepGen2::StepGen2(TIM_TypeDef *Timer, TIM_TypeDef *Timer2, uint32_t _timerChann
     MyTim->attachInterrupt(irq);
     pinMode(dirPin, OUTPUT);
     MyTim2 = new HardwareTimer(Timer2);
+    MyTim2->attachInterrupt(irq2);
 }
 
 uint32_t StepGen2::handleStepper(void)
@@ -31,42 +27,55 @@ uint32_t StepGen2::handleStepper(void)
         return 1;
     lcncCycleTime = StepGen2::sync0CycleTime;
 
-    float y0TRAJ = oldPos() * getScale();              // Straight line equation between old and new point
-    float y1TRAJ = reqPos() * getScale();              // Time runs between 0 and lcncCycleTime (1 ms)
-    float kTRAJ = (y1TRAJ - y0TRAJ) / lcncCycleTime;   // Slope
-    float mTRAJ = y1TRAJ - kTRAJ * lcncCycleTime;      // Intercept
-    int32_t stepPosStart = floor(y0TRAJ);              // First step position, integer value of first point position
-    int32_t stepPosStop = floor(y1TRAJ);               // End step position
-                                                       //
-    float Tstart = (stepPosStart - mTRAJ) / kTRAJ;     // First step at this time
-    float Tstop = (stepPosStop - mTRAJ) / kTRAJ;       // And the last step
-    float Tstep = fabs(1.0 / kTRAJ);                   // Time between steps
-    float stepFrequency = fabs(kTRAJ);                 // 1/Tstep - which is kTRAJ
-                                                       //
-    if (Tstart > lcncCycleTime)                        // Not enough movement to make a step
-        return updatePosAndReturn(stepPosStop, 2);     //
-    if (/* 1.0 / Tstep */ kTRAJ > 200000)              //
-    {                                                  // Too high frequency, deal with this later.
-        return updatePosAndReturn(stepPosStop, 3);     //
-    }                                                  //
-    int8_t dir = stepPosStart > stepPosStop ? -1 : 1;  // Which direction to step in
-                                                       //
-    if (abs(stepPosStart - oldStepPos()) == 0)         // StepPosStart and oldStepPos() are often the same, but don't redo the step
-    {                                                  //
-        stepPosStart += dir;                           // New first step
-        Tstart += Tstep;                               //
-        if (Tstart > lcncCycleTime)                    // Not enough movement to make a step
-            return updatePosAndReturn(stepPosStop, 4); //
-    }                                                  //
-    if (abs(stepPosStart - oldStepPos()) > 1)          // Shouldn't happen
-    {                                                  //
-        return updatePosAndReturn(stepPosStop, 5);     //
-    }                                                  //
-                                                       // Now the old point and the start point should be separate.
-    if (Tstart > lcncCycleTime)                        // Not enough movement to make a step
-        return updatePosAndReturn(stepPosStop, 6);     // Check this again
-                                                       // Tstart, Tstep and Tstop defines the coming pwm-sequence.
-    return 0;                                          // Always do one pulse at Tstart when we come here. Next Tstart+Tstep and so on until Tstop.
+    float y0TRAJ = oldPos() * getScale();                   // Straight line equation between old and new point
+    float y1TRAJ = reqPos() * getScale();                   // Time runs between 0 and lcncCycleTime (1 ms)
+    float kTRAJ = (y1TRAJ - y0TRAJ) / lcncCycleTime;        // Slope
+    float mTRAJ = y1TRAJ - kTRAJ * lcncCycleTime;           // Intercept
+    int32_t stepPosStart = floor(y0TRAJ);                   // First step position, integer value of first point position
+    int32_t stepPosStop = floor(y1TRAJ);                    // End step position
+                                                            //
+    float Tstart = (stepPosStart - mTRAJ) / kTRAJ;          // First step at this time
+    float Tstop = (stepPosStop - mTRAJ) / kTRAJ;            // And the last step
+    float Tstep = fabs(1.0 / kTRAJ);                        // Time between steps
+    float stepFrequency = fabs(kTRAJ);                      // 1/Tstep - which is kTRAJ
+                                                            //
+    if (Tstart > lcncCycleTime)                             // Not enough movement to make a step
+        return updatePosAndReturn(stepPosStop, 2);          //
+    if (/* 1.0 / Tstep */ kTRAJ > 200000)                   //
+    {                                                       // Too high frequency, deal with this later.
+        return updatePosAndReturn(stepPosStop, 3);          //
+    }                                                       //
+    int8_t dir = stepPosStart > stepPosStop ? -1 : 1;       // Which direction to step in
+                                                            //
+    if (abs(stepPosStart - oldStepPos()) == 0)              // StepPosStart and oldStepPos() are often the same, but don't redo the step
+    {                                                       //
+        stepPosStart += dir;                                // New first step
+        Tstart += Tstep;                                    //
+        if (Tstart > lcncCycleTime)                         // Not enough movement to make a step
+            return updatePosAndReturn(stepPosStop, 4);      //
+    }                                                       //
+    if (abs(stepPosStart - oldStepPos()) > 1)               // Shouldn't happen
+    {                                                       //
+        return updatePosAndReturn(stepPosStop, 5);          //
+    }                                                       //
+                                                            // Now the old point and the start point should be separate.
+    if (Tstart > lcncCycleTime)                             // Not enough movement to make a step
+        return updatePosAndReturn(stepPosStop, 6);          // Check this again
+                                                            // Tstart, Tstep and Tstop defines the coming pwm-sequence.
+                                                            //
+    MyTim2->setOverflow(Tstart + Tjitter, MICROSEC_FORMAT); // All handled by irqs
+    MyTim2->resume();
+    return updatePosAndReturn(stepPosStop, 0);
+}
+void StepGen2::timer2CB()
+{
+    MyTim2->pause(); // Once is enough.
+    MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
+    MyTim->setOverflow(floor(1e6 / Tstep), HERTZ_FORMAT);            // 100000 microseconds = 100 milliseconds
+    MyTim->setCaptureCompare(timerChan, 50, PERCENT_COMPARE_FORMAT); // 50%
+    nSteps = round((Tstop - Tstart) / Tstep + 1);
+    if (nSteps > 0)
+        MyTim->resume();
 }
 void StepGen2::timerCB()
 {
@@ -102,6 +111,7 @@ void StepGen2::timerCB()
     }
 #endif
 }
+
 uint32_t StepGen2::updatePosAndReturn(int32_t stepPosStop, uint32_t i)
 {                            //
     oldPos(reqPos());        // Save the numeric position for next step

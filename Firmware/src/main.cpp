@@ -34,8 +34,10 @@ void timerCallbackStep2(void)
 #endif
 #include "StepGen2.h"
 void timerCallbackStep(void);
-StepGen2 Step(TIM1, TIM10, 4, PA_11, PA12, timerCallbackStep);
+void timerCallbackStepStart(void);
+StepGen2 Step(TIM1, 4, PA_11, PA12, timerCallbackStep, TIM10, timerCallbackStepStart);
 void timerCallbackStep(void) { Step.timerCB(); }
+void timerCallbackStepStart(void) { Step.timer2CB(); }
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t nowTime = 0, thenTime = 0;
 
