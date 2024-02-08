@@ -1,7 +1,7 @@
 #ifndef MYENCODER
 #define MYENCODER
 #include "Stm32F4_Encoder.h"
-#include <CircularBuffer.h>
+#include <CircularBuffer.hpp>
 #define RINGBUFFERLEN 101
 
 class MyEncoder
