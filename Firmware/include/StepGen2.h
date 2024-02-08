@@ -10,18 +10,13 @@ private:
     volatile int32_t nSteps;
     volatile uint32_t timerPulseSteps;
     volatile float Tstart;
-    volatile float Tstop;
-    volatile float Tstep;
     const float maxAllowedFrequency = 100000; // 100 kHz for now
     HardwareTimer *pulseTimer;
     uint32_t pulseTimerChan;
     HardwareTimer *startTimer; // 10,11,13,14
     uint8_t dirPin;
     PinName stepPin;
-    const uint32_t maxFreq = 100000;
     const float Tjitter = 50.0; // Time unit is microseconds
-
-    uint32_t err = 0;
 
 public:
     volatile double_t commandedPosition;    // End position when this cycle is completed
