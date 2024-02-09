@@ -21,7 +21,7 @@ public:
     HardwareTimer *startTimer; // 10,11,13,14
     uint8_t dirPin;
     PinName stepPin;
-    const float Tjitter = 50.0; // Time unit is microseconds
+    const float Tjitter = 5.0; // Time unit is microseconds
 
 public:
     volatile double_t commandedPosition;    // End position when this cycle is completed

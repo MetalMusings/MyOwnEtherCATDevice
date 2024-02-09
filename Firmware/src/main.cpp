@@ -8,7 +8,7 @@ extern "C"
 _Objects Obj;
 
 HardwareSerial Serial1(PA10, PA9);
-
+volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 #define DEBUG_TIM8 1
 #include "MyEncoder.h"
 void indexPulseEncoderCB1(void);
@@ -33,9 +33,10 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Encoder1.setLatch(Obj.IndexLatchEnable);
    Encoder1.setScale(Obj.EncPosScale);
 }
-
+volatile uint32_t cmt;
 void handleStepper(void)
 {
+   digitalWrite(Step.dirPin, cmt++ % 2);
    Step.enabled = true;
    Step.commandedPosition = Obj.StepGenIn1.CommandedPosition;
    Obj.StepGenOut1.ActualPosition = Step.commandedPosition;
@@ -66,7 +67,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
-   Obj.DiffT = ESCvar.ALevent;
+   Obj.DiffT = ALEventIRQ;
+   //Obj.DiffT = Step.frequency;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -109,7 +111,7 @@ void loop(void)
    if (serveIRQ)
    {
       CC_ATOMIC_SET(ESCvar.ALevent, ESC_ALeventread());
-      DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+      DIG_process(ALEventIRQ, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
@@ -118,14 +120,12 @@ void loop(void)
    if ((dTime > 200 && dTime < 500) || dTime > 1500) // Don't run ecat_slv_poll when expecting to serve interrupt
       ecat_slv_poll();
 }
-volatile uint32_t cmt;
+
 void sync0Handler(void)
 {
-   uint32_t lTime;
    irqTime = micros();
    serveIRQ = 1;
-   ESC_read(ESCREG_LOCALTIME, (void *)&lTime, sizeof(lTime)); // Careful! Reads and writes update ALevent also.
-   digitalWrite(Step.dirPin, cmt++ % 2);
+   ALEventIRQ = ESC_ALeventread();
 }
 
 void ESC_interrupt_enable(uint32_t mask)
