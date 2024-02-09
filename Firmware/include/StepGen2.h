@@ -9,7 +9,12 @@ private:
     volatile double_t actualPosition;
     volatile int32_t nSteps;
     volatile uint32_t timerPulseSteps;
-    volatile float Tstart;
+
+public:
+    volatile float Tstartf;    // Starting delay in secs
+    volatile uint32_t Tstartu; // Starting delay in usecs
+private:
+public:
     const float maxAllowedFrequency = 100000; // 100 kHz for now
     HardwareTimer *pulseTimer;
     uint32_t pulseTimerChan;
@@ -27,8 +32,8 @@ public:
     volatile uint8_t enabled;               // Enabled step generator
     volatile float frequency;
 
-    static uint32_t sync0CycleTime;  // Nominal EtherCAT cycle time
-    volatile uint32_t lcncCycleTime; // Linuxcnc nominal cycle time (1 ms often)
+    static uint32_t sync0CycleTime; // Nominal EtherCAT cycle time
+    volatile float lcncCycleTime;   // Linuxcnc nominal cycle time in sec (1 ms often)
 
     StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void), TIM_TypeDef *Timer2, void irq2(void));
 

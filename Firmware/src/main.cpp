@@ -25,7 +25,8 @@ StepGen2 Step(TIM1, 4, PA_11, PA12, pulseTimerCallback, TIM10, startTimerCallbac
 void pulseTimerCallback(void) { Step.pulseTimerCB(); }
 void startTimerCallback(void) { Step.startTimerCB(); }
 CircularBuffer<uint32_t, 200> Tim;
-volatile uint64_t nowTime = 0, thenTime = 0;
+volatile uint64_t irqTime = 0, thenTime = 0;
+int64_t extendTime(uint32_t in); // Extend from 32-bit to 64-bit precision
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -38,8 +39,11 @@ void handleStepper(void)
    Step.enabled = true;
    Step.commandedPosition = Obj.StepGenIn1.CommandedPosition;
    Obj.StepGenOut1.ActualPosition = Step.commandedPosition;
-
+   Step.stepsPerMM = Obj.StepGenIn1.StepsPerMM;
+   Step.stepsPerMM = 4000;
    Step.handleStepper();
+
+   Obj.StepGenOut2.ActualPosition = Obj.StepGenIn2.CommandedPosition;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -49,7 +53,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
 
-   uint32_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
+   uint32_t dTim = irqTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
@@ -60,8 +64,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       if (aTim < min_Tim)
          min_Tim = aTim;
    }
-   thenTime = nowTime;
+   thenTime = irqTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
+   Obj.DiffT = ESCvar.ALevent;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -100,22 +105,27 @@ void setup(void)
 
 void loop(void)
 {
+   uint32_t dTime;
    if (serveIRQ)
    {
-      nowTime = micros();
+      CC_ATOMIC_SET(ESCvar.ALevent, ESC_ALeventread());
       DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
    }
-   uint32_t dTime = micros() - nowTime;
+   dTime = micros() - irqTime;
    if ((dTime > 200 && dTime < 500) || dTime > 1500) // Don't run ecat_slv_poll when expecting to serve interrupt
       ecat_slv_poll();
 }
-
+volatile uint32_t cmt;
 void sync0Handler(void)
 {
+   uint32_t lTime;
+   irqTime = micros();
    serveIRQ = 1;
+   ESC_read(ESCREG_LOCALTIME, (void *)&lTime, sizeof(lTime)); // Careful! Reads and writes update ALevent also.
+   digitalWrite(Step.dirPin, cmt++ % 2);
 }
 
 void ESC_interrupt_enable(uint32_t mask)
@@ -125,6 +135,8 @@ void ESC_interrupt_enable(uint32_t mask)
    uint32_t user_int_mask = ESCREG_ALEVENT_SM2; // Only SM2
    if (mask & user_int_mask)
    {
+      ESC_ALeventmaskwrite(ESC_ALeventmaskread() & ~(ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_SM3));
+
       ESC_ALeventmaskwrite(ESC_ALeventmaskread() | (mask & user_int_mask));
       attachInterrupt(digitalPinToInterrupt(PC3), sync0Handler, RISING);
 
@@ -164,4 +176,24 @@ uint16_t dc_checker(void)
    ESCvar.dcsync = 1;
    StepGen2::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
    return 0;
+}
+
+#define ONE_PERIOD UINT32_MAX
+#define HALF_PERIOD (UINT32_MAX >> 1)
+static int64_t previousTimeValue = 0;
+
+int64_t extendTime(uint32_t in) // Extend from 32-bit to 64-bit precision
+{
+   int64_t c64 = (int64_t)in - HALF_PERIOD; // remove half period to determine (+/-) sign of the wrap
+   int64_t dif = (c64 - previousTimeValue); // core concept: prev + (current - prev) = current
+
+   // wrap difference from -HALF_PERIOD to HALF_PERIOD. modulo prevents differences after the wrap from having an incorrect result
+   int64_t mod_dif = ((dif + HALF_PERIOD) % ONE_PERIOD) - HALF_PERIOD;
+   if (dif < -HALF_PERIOD)
+      mod_dif += ONE_PERIOD; // account for mod of negative number behavior in C
+
+   int64_t unwrapped = previousTimeValue + mod_dif;
+   previousTimeValue = unwrapped; // load previous value
+
+   return unwrapped + HALF_PERIOD; // remove the shift we applied at the beginning, and return
 }
