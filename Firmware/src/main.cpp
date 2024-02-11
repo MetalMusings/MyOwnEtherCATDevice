@@ -26,6 +26,7 @@ void pulseTimerCallback(void) { Step.pulseTimerCB(); }
 void startTimerCallback(void) { Step.startTimerCB(); }
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0;
+volatile uint32_t ccnnt = 0;
 int64_t extendTime(uint32_t in); // Extend from 32-bit to 64-bit precision
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
@@ -42,7 +43,7 @@ void handleStepper(void)
    Obj.StepGenOut1.ActualPosition = Step.commandedPosition;
    Step.stepsPerMM = Obj.StepGenIn1.StepsPerMM;
    Step.stepsPerMM = 4000;
-   Step.handleStepper();
+   Step.handleStepper(irqTime);
 
    Obj.StepGenOut2.ActualPosition = Obj.StepGenIn2.CommandedPosition;
 }
@@ -54,7 +55,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
 
-   uint32_t dTim = irqTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
+   uint32_t dTim = extendTime(micros()) - irqTime; // thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
@@ -67,8 +68,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
-   Obj.DiffT = ALEventIRQ;
-   //Obj.DiffT = Step.frequency;
+   Obj.DiffT = ccnnt--;
+   // Obj.DiffT = Step.frequency;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -112,7 +113,7 @@ void loop(void)
    {
       CC_ATOMIC_SET(ESCvar.ALevent, ESC_ALeventread());
       DIG_process(ALEventIRQ, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
-                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+                                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
    }
@@ -120,14 +121,17 @@ void loop(void)
    if ((dTime > 200 && dTime < 500) || dTime > 1500) // Don't run ecat_slv_poll when expecting to serve interrupt
       ecat_slv_poll();
 }
-
+volatile uint32_t cnt = 0;
 void sync0Handler(void)
 {
-   irqTime = micros();
-   serveIRQ = 1;
+   ccnnt++;
    ALEventIRQ = ESC_ALeventread();
+   serveIRQ = 1;
+   irqTime = extendTime(micros());
+   digitalWrite(Step.dirPin, cnt++ % 2);
 }
 
+// Enable SM2 interrupts
 void ESC_interrupt_enable(uint32_t mask)
 {
    // Enable interrupt for SYNC0 or SM2 or SM3
@@ -135,9 +139,8 @@ void ESC_interrupt_enable(uint32_t mask)
    uint32_t user_int_mask = ESCREG_ALEVENT_SM2; // Only SM2
    if (mask & user_int_mask)
    {
-      ESC_ALeventmaskwrite(ESC_ALeventmaskread() & ~(ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_SM3));
-
       ESC_ALeventmaskwrite(ESC_ALeventmaskread() | (mask & user_int_mask));
+      ESC_ALeventmaskwrite(ESC_ALeventmaskread() & ~(ESCREG_ALEVENT_DC_SYNC0 | ESCREG_ALEVENT_SM3));
       attachInterrupt(digitalPinToInterrupt(PC3), sync0Handler, RISING);
 
       // Set LAN9252 interrupt pin driver as push-pull active high
@@ -150,6 +153,7 @@ void ESC_interrupt_enable(uint32_t mask)
    }
 }
 
+// Disable SM2 interrupts
 void ESC_interrupt_disable(uint32_t mask)
 {
    // Enable interrupt for SYNC0 or SM2 or SM3
@@ -182,7 +186,8 @@ uint16_t dc_checker(void)
 #define HALF_PERIOD (UINT32_MAX >> 1)
 static int64_t previousTimeValue = 0;
 
-int64_t extendTime(uint32_t in) // Extend from 32-bit to 64-bit precision
+// Extend from 32-bit to 64-bit precision
+int64_t extendTime(uint32_t in)
 {
    int64_t c64 = (int64_t)in - HALF_PERIOD; // remove half period to determine (+/-) sign of the wrap
    int64_t dif = (c64 - previousTimeValue); // core concept: prev + (current - prev) = current

@@ -21,7 +21,8 @@ public:
     HardwareTimer *startTimer; // 10,11,13,14
     uint8_t dirPin;
     PinName stepPin;
-    const float Tjitter = 5.0; // Time unit is microseconds
+    const float Tjitter = 500.0; // Time unit is microseconds
+    uint64_t dbg;
 
 public:
     volatile double_t commandedPosition;    // End position when this cycle is completed
@@ -37,7 +38,7 @@ public:
 
     StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void), TIM_TypeDef *Timer2, void irq2(void));
 
-    uint32_t handleStepper(void);
+    uint32_t handleStepper(uint64_t irqTime/* time for irq nanosecs */);
     void startTimerCB();
     void pulseTimerCB();
     uint32_t updatePos(uint32_t i);
