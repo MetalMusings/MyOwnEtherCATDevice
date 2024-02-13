@@ -144,6 +144,50 @@
         "pdo_mappings": [
           "txpdo"
         ]
+      },
+      "6007": {
+        "otype": "VAR",
+        "name": "D1",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.D1"
+      },
+      "6008": {
+        "otype": "VAR",
+        "name": "D2",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.D2"
+      },
+      "6009": {
+        "otype": "VAR",
+        "name": "D3",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.D3"
+      },
+      "600A": {
+        "otype": "VAR",
+        "name": "D4",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.D4"
       }
     },
     "rxpdo": {
@@ -222,17 +266,6 @@
         "pdo_mappings": [
           "rxpdo"
         ]
-      },
-      "7004": {
-        "otype": "VAR",
-        "name": "Enable1",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "BOOLEAN",
-        "value": "0",
-        "data": "&Obj.Enable1"
       },
       "60664": {
         "otype": "VAR",

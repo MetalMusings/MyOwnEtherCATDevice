@@ -26,6 +26,10 @@ typedef struct
    {
       double ActualPosition;
    } StepGenOut2;
+   int32_t D1;
+   int32_t D2;
+   int32_t D3;
+   int32_t D4;
 
    /* Outputs */
 
@@ -41,7 +45,6 @@ typedef struct
       double CommandedPosition;
       int16_t StepsPerMM;
    } StepGenIn2;
-   uint8_t Enable1;
 
 } _Objects;
 
