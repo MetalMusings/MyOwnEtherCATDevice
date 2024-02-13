@@ -27,7 +27,7 @@ void startTimerCallback(void) { Step.startTimerCB(); }
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0;
 volatile uint32_t ccnnt = 0;
-int64_t extendTime(uint32_t in); // Extend from 32-bit to 64-bit precision
+extend32to64 longTime;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -42,7 +42,7 @@ void handleStepper(void)
    Step.commandedPosition = Obj.StepGenIn1.CommandedPosition;
    Obj.StepGenOut1.ActualPosition = Step.commandedPosition;
    Step.stepsPerMM = Obj.StepGenIn1.StepsPerMM;
-   Step.stepsPerMM = 4000;
+   Step.stepsPerMM = 400;
    Step.handleStepper(irqTime);
 
    Obj.StepGenOut2.ActualPosition = Obj.StepGenIn2.CommandedPosition;
@@ -55,7 +55,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
 
-   uint32_t dTim = extendTime(micros()) - irqTime; // thenTime; // Debug. Getting jitter over the last 200 milliseconds
+   uint32_t dTim = longTime.extendTime(micros()) - irqTime; // thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
@@ -68,8 +68,11 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
-   Obj.DiffT = ccnnt--;
-   // Obj.DiffT = Step.frequency;
+   Obj.DiffT = abs(Step.nSteps);
+   Obj.D1 = Step.Tjitter;
+   Obj.D2 = Step.Tstartf * 1e6;
+   Obj.D3 = Step.dbg;
+   Obj.D4 = Obj.D1+Obj.D2-Obj.D3;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -127,7 +130,7 @@ void sync0Handler(void)
    ccnnt++;
    ALEventIRQ = ESC_ALeventread();
    serveIRQ = 1;
-   irqTime = extendTime(micros());
+   irqTime = longTime.extendTime(micros());
    digitalWrite(Step.dirPin, cnt++ % 2);
 }
 
@@ -180,25 +183,4 @@ uint16_t dc_checker(void)
    ESCvar.dcsync = 1;
    StepGen2::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
    return 0;
-}
-
-#define ONE_PERIOD UINT32_MAX
-#define HALF_PERIOD (UINT32_MAX >> 1)
-static int64_t previousTimeValue = 0;
-
-// Extend from 32-bit to 64-bit precision
-int64_t extendTime(uint32_t in)
-{
-   int64_t c64 = (int64_t)in - HALF_PERIOD; // remove half period to determine (+/-) sign of the wrap
-   int64_t dif = (c64 - previousTimeValue); // core concept: prev + (current - prev) = current
-
-   // wrap difference from -HALF_PERIOD to HALF_PERIOD. modulo prevents differences after the wrap from having an incorrect result
-   int64_t mod_dif = ((dif + HALF_PERIOD) % ONE_PERIOD) - HALF_PERIOD;
-   if (dif < -HALF_PERIOD)
-      mod_dif += ONE_PERIOD; // account for mod of negative number behavior in C
-
-   int64_t unwrapped = previousTimeValue + mod_dif;
-   previousTimeValue = unwrapped; // load previous value
-
-   return unwrapped + HALF_PERIOD; // remove the shift we applied at the beginning, and return
 }
