@@ -29,34 +29,26 @@ StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin,
 extern volatile uint32_t cnt;
 uint32_t StepGen2::handleStepper(uint64_t irqTime)
 {
-    digitalWrite(dirPin, cnt++ % 2);
     if (!enabled)
         return updatePos(0);
 
     lcncCycleTime = StepGen2::sync0CycleTime * 1.0e-6;             // was usec, became sec
     commandedStepPosition = floor(commandedPosition * stepsPerMM); // Scale position to steps
     if (initialStepPosition == commandedStepPosition)              // No movement
-        return 1;
+        return updatePos(1);
 
-    float approximateFrequency = fabs(initialStepPosition - commandedStepPosition) // We must take at least one step
-                                 / lcncCycleTime;                                  // from here on
-                                                                                   //   if (approximateFrequency > maxAllowedFrequency)                                // Stay on this position
-                                                                                   //       return 1;
-
-    float kTRAJ = (commandedPosition - initialPosition) / lcncCycleTime; // Straight line equation
-    float mTRAJ = initialPosition;                                       // position = kTRAJ x time + mTRAJ
-                                                                         // Operating on incoming positions (not steps)
-                                                                         //   if (fabs(kTRAJ * lcncCycleTime * stepsPerMM) < 0.01)                 // Very flat slope
-    nSteps = commandedStepPosition - initialStepPosition;                //
+    nSteps = commandedStepPosition - initialStepPosition;
 
     if (abs(nSteps) < 1000) // Some small number
-    {                      //
+    {
         frequency = (abs(nSteps) + 1) / lcncCycleTime;
         Tpulses = abs(nSteps) / frequency;
         Tstartf = (lcncCycleTime - Tpulses) / 2.0;
     }
     else // Regular step train, up or down
     {
+        float kTRAJ = (commandedPosition - initialPosition) / lcncCycleTime; // Straight line equation.  position = kTRAJ x time + mTRAJ
+        float mTRAJ = initialPosition;                                       // Operating on incoming positions (not steps)
         if (kTRAJ > 0)
             Tstartf = (float(initialStepPosition + 1) / float(stepsPerMM) - mTRAJ) / kTRAJ;
         else
@@ -69,15 +61,17 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime)
     dbg = timeSinceISR;
     Tstartu = Tjitter + uint32_t(Tstartf * 1e6) - timeSinceISR; // Have already wasted some time since the irq.
 
-    timerFrequency = uint32_t(frequency);
+    timerFrequency = uint32_t(ceil(frequency));
     startTimer->setOverflow(Tstartu, MICROSEC_FORMAT); // All handled by irqs
     startTimer->resume();
     return 1;
 }
 void StepGen2::startTimerCB()
 {
-    digitalWrite(dirPin, cnt++ % 2);
+
     startTimer->pause(); // Once is enough.
+    digitalWrite(dirPin, nSteps > 0 ? HIGH : LOW);
+    // There will be a short break here for t2 usecs, in the future.
     timerPulseSteps = abs(nSteps);
     pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
@@ -90,7 +84,6 @@ void StepGen2::pulseTimerCB()
     if (timerPulseSteps == 0)
     {
         pulseTimer->pause();
-        digitalWrite(dirPin, cnt++ % 2);
     }
 }
 

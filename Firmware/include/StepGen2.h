@@ -12,10 +12,10 @@ public:
     volatile uint32_t timerFrequency;
 
 public:
-    volatile float Tstartf;                   // Starting delay in secs
-    volatile uint32_t Tstartu;                // Starting delay in usecs
-    volatile float Tpulses;                   // Time it takes to do pulses. Debug
-    const float maxAllowedFrequency = 100000; // 100 kHz for now
+    volatile float Tstartf;    // Starting delay in secs
+    volatile uint32_t Tstartu; // Starting delay in usecs
+    volatile float Tpulses;    // Time it takes to do pulses. Debug
+
     HardwareTimer *pulseTimer;
     uint32_t pulseTimerChan;
     HardwareTimer *startTimer; // 10,11,13,14
@@ -23,6 +23,10 @@ public:
     PinName stepPin;
     const uint32_t Tjitter = 500; // Time unit is microseconds
     uint64_t dbg;
+    const uint16_t t2 = 5;                                            // DIR is ahead of PUL with at least 5 usecs
+    const uint16_t t3 = 3;                                            // Pulse width at least 2.5 usecs
+    const uint16_t t4 = 3;                                            // Low level width not less than 2.5 usecs
+    const float maxAllowedFrequency = 1000000 / float(t3 + t4) * 0.9; // 150 kHz for now
 
 public:
     volatile double_t commandedPosition;    // End position when this cycle is completed
