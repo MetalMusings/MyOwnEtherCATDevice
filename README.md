@@ -7,6 +7,16 @@ This job is documented in a series of Youtube videos, from my first attempts to 
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
 
+## Make my own EtherCAT device 8. EaserCAT 3000
+
+Introducing the new **EaserCAT 3000** board. It's an evolution of the EaserCAT 2000
+and intended to be used in my plasma cutter. It features four stepper driver outputs,
+input for a THCAD arc voltage card, an encoder, an analog output (for spindle +- 10V),
+eigth digital inputs, four digital outputs, plus some 12 I/O for any possible extension.
+
+The KiCAD files are in the (Kicad/Ax58100-stm32-ethercat) folder
+
+[![Watch the video](https://img.youtube.com/vi/boanv6ihYtI/default.jpg)](https://youtu.be/boanv6ihYtI)
 
 
 ## Make my own EtherCAT device 7. Turning in the lathe
