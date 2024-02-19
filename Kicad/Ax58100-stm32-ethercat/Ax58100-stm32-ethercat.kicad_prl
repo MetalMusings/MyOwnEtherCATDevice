@@ -14,6 +14,7 @@
       "vias": 1.0,
       "zones": 0.6
     },
+    "ratsnest_display_mode": 0,
     "selection_filter": {
       "dimensions": true,
       "footprints": true,
@@ -64,7 +65,7 @@
       39,
       40
     ],
-    "visible_layers": "7fcffff_80000007",
+    "visible_layers": "ffc0000_ffffffff",
     "zone_display_mode": 0
   },
   "meta": {
