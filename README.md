@@ -14,7 +14,7 @@ and intended to be used in my plasma cutter. It features four stepper driver out
 input for a THCAD arc voltage card, an encoder, an analog output (for spindle +- 10V),
 eigth digital inputs, four digital outputs, plus some 12 I/O for any possible extension.
 
-The KiCAD files are in the (Kicad/Ax58100-stm32-ethercat) folder
+The KiCAD files are in the [KiCAD folder](Kicad/Ax58100-stm32-ethercat)
 
 [![Watch the video](https://img.youtube.com/vi/boanv6ihYtI/default.jpg)](https://youtu.be/boanv6ihYtI)
 
