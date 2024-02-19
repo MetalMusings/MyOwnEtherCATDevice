@@ -1,4 +1,14 @@
 AX58100-stm32-ethercat-backups
 .~lock*
 fp-info-cache
-#auto_saved_files#
+\#auto_saved_file*
+gerbers/
+Ax58100-stm32-ethercat-backups/
+freerouting.*
+*.dsn
+*.frb
+*.rules
+*.ses
+
+Ax58100-stm32-ethercat.csv
+Ax58100-stm32-ethercat.ods

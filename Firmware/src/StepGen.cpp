@@ -70,15 +70,15 @@ void StepGen::handleStepper(void)
         pwmCycleTime = (FACT_LOW + (FACT_HIGH - FACT_LOW) * (abs(diffPosition) - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * StepGen::sync0CycleTime;
     }
 #endif
-    uint64_t fre = abs(diffPosition) * stepsPerMM * 1000000 / double(pwmCycleTime); // Frequency needed
-    if (fre > maxFreq)                                                              // Only do maxFre
+    uint64_t fre = (abs(diffPosition) * stepsPerMM * 1000000) / pwmCycleTime; // Frequency needed
+    if (fre > maxFreq)                                                        // Only do maxFre
     {
-        double maxDist = maxFreq / stepsPerMM * pwmCycleTime / 1000000.0 * (diffPosition > 0 ? 1 : -1);
-        reqPos(actualPosition + maxDist);
+        double maxDist = (maxFreq * pwmCycleTime) / (stepsPerMM * 1000000.0) * (diffPosition > 0 ? 1 : -1);
+        reqPos(actPos() + maxDist);
     }
-    int32_t pulsesAtEndOfCycle = stepsPerMM * reqPos(); // From Turner.hal X:5000 Z:2000 ps/mm
+    int32_t pulsesAtEndOfCycle = stepsPerMM * reqPos();
 
-    // Will be picked up by the timer_CB and the timer is reloaded.
+    // Will be picked up by the timer_CB and the timer is reloaded, if it runs.
     timerNewEndStepPosition = pulsesAtEndOfCycle;
 
     if (!timerIsRunning) // Timer isn't running. Start it here
@@ -86,11 +86,18 @@ void StepGen::handleStepper(void)
         int32_t steps = pulsesAtEndOfCycle - timerStepPosition; // Pulses to go + or -
         if (steps != 0)
         {
-            uint8_t sgn = steps > 0 ? HIGH : LOW;
-            digitalWrite(dirPin, sgn);
-            timerStepDirection = steps > 0 ? 1 : -1;
+            if (steps > 0)
+            {
+                digitalWrite(dirPin, HIGH);
+                timerStepDirection = 1;
+            }
+            else
+            {
+                digitalWrite(dirPin, LOW);
+                timerStepDirection = -1;
+            }
             timerStepPositionAtEnd = pulsesAtEndOfCycle; // Current Position
-            float_t freqf = abs(steps) * (1e6 / float(pwmCycleTime));
+            float_t freqf = abs(steps) / (pwmCycleTime*1.0e-6);
             uint32_t freq = uint32_t(freqf);
             MyTim->setMode(timerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
             MyTim->setOverflow(freq, HERTZ_FORMAT);
@@ -108,13 +115,13 @@ void StepGen::timerCB()
         // Input for reload is timerNewEndStepPosition
         // The timer has current position and from this
         // can set new frequency and new endtarget for steps
-        MyTim->pause(); // We are not at stop, let's stop it
+        MyTim->pause(); // We are not at stop, let's stop it. Note stepPin is floating
         int32_t steps = timerNewEndStepPosition - timerStepPosition;
         if (steps != 0)
         {
             uint8_t sgn = steps > 0 ? HIGH : LOW;
             digitalWrite(dirPin, sgn);
-            float_t freqf = abs(steps) * (1e6 / float(pwmCycleTime));
+            float_t freqf = abs(steps) / float(pwmCycleTime*1.0e-6);
             uint32_t freq = uint32_t(freqf);
             timerStepDirection = steps > 0 ? 1 : -1;
             timerStepPositionAtEnd = timerNewEndStepPosition;
