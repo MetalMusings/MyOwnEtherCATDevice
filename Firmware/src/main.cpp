@@ -19,11 +19,20 @@ void indexPulseEncoderCB1(void)
 }
 
 #include "StepGen2.h"
-void pulseTimerCallback(void);
-void startTimerCallback(void);
-StepGen2 Step(TIM1, 4, PA_11, PA12, pulseTimerCallback, TIM10, startTimerCallback);
-void pulseTimerCallback(void) { Step.pulseTimerCB(); }
-void startTimerCallback(void) { Step.startTimerCB(); }
+//Stepper 1
+void pulseTimerCallback1(void);
+void startTimerCallback1(void);
+StepGen2 Step1(TIM1, 4, PA_11, PA12, pulseTimerCallback1, TIM10, startTimerCallback1);
+void pulseTimerCallback1(void) { Step1.pulseTimerCB(); }
+void startTimerCallback1(void) { Step1.startTimerCB(); }
+
+//Stepper 2
+void pulseTimerCallback2(void);
+void startTimerCallback2(void);
+StepGen2 Step2(TIM3, 4, PC_9, PC10, pulseTimerCallback2, TIM11, startTimerCallback2);
+void pulseTimerCallback2(void) { Step2.pulseTimerCB(); }
+void startTimerCallback2(void) { Step2.startTimerCB(); }
+
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
 volatile uint32_t ccnnt = 0;
@@ -44,12 +53,15 @@ volatile uint32_t cmt;
 void handleStepper(void)
 {
    //digitalWrite(Step.dirPin, cmt++ % 2);
-   Step.enabled = true;
-   Step.commandedPosition = Obj.CommandedPosition1;
-   Step.stepsPerMM = Obj.StepsPerMM1;
-   Step.handleStepper(irqTime);
+   Step1.enabled = true;
+   Step1.commandedPosition = Obj.CommandedPosition1;
+   Step1.stepsPerMM = Obj.StepsPerMM1;
+   Step1.handleStepper(irqTime);
 
-   Obj.ActualPosition1 = Obj.CommandedPosition1;
+   Step2.enabled = true;
+   Step2.commandedPosition = Obj.CommandedPosition2;
+   Step2.stepsPerMM = Obj.StepsPerMM2;
+   Step2.handleStepper(irqTime);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -72,10 +84,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
-   Obj.DiffT = abs(Step.nSteps);
-   Obj.D1 = Step.Tjitter;
-   Obj.D2 = Step.Tstartf * 1e6;
-   Obj.D3 = Step.dbg;
+   Obj.DiffT = abs(Step1.nSteps);
+   Obj.D1 = Step1.Tjitter;
+   Obj.D2 = Step1.Tstartf * 1e6;
+   Obj.D3 = Step1.dbg;
    Obj.D4 = Obj.D1 + Obj.D2 - Obj.D3;
 }
 
