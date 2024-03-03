@@ -191,7 +191,7 @@ void APP_setwatchdog (int watchdogcnt)
  * write ethercat inputs. Implement watch-dog counter to count-out if we have
  * made state change affecting the App.state.
  */
-void DIG_process (uint16_t ALEvent, uint8_t flags)
+void DIG_process (uint8_t flags)
 {
    /* Handle watchdog */
    if((flags & DIG_PROCESS_WD_FLAG) > 0)
@@ -217,14 +217,14 @@ void DIG_process (uint16_t ALEvent, uint8_t flags)
    if ((flags & DIG_PROCESS_OUTPUTS_FLAG) > 0)
    {
       if(((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) > 0) &&
-         (ALEvent & ESCREG_ALEVENT_SM2))
+         (ESCvar.ALevent & ESCREG_ALEVENT_SM2))
       {
          RXPDO_update();
          CC_ATOMIC_SET(watchdog, ESCvar.watchdogcnt);
          /* Set outputs */
          cb_set_outputs();
       }
-      else if (ALEvent & ESCREG_ALEVENT_SM2)
+      else if (ESCvar.ALevent & ESCREG_ALEVENT_SM2)
       {
          RXPDO_update();
       }
@@ -339,7 +339,7 @@ void ecat_slv_poll (void)
 void ecat_slv (void)
 {
    ecat_slv_poll();
-   DIG_process(ESCvar.ALevent, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
          DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
 }
 

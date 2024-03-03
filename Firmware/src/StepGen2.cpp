@@ -39,7 +39,7 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime)
 
     nSteps = commandedStepPosition - initialStepPosition;
 
-    if (abs(nSteps) < 1000) // Some small number
+    if (abs(nSteps) < 2) // Some small number
     {
         frequency = (abs(nSteps) + 1) / lcncCycleTime;
         Tpulses = abs(nSteps) / frequency;
@@ -73,7 +73,7 @@ void StepGen2::startTimerCB()
     digitalWrite(dirPin, nSteps > 0 ? HIGH : LOW);
     // There will be a short break here for t2 usecs, in the future.
     timerPulseSteps = abs(nSteps);
-    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
+    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM1, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
     pulseTimer->setCaptureCompare(pulseTimerChan, 5, MICROSEC_COMPARE_FORMAT); // 5 usecs
     pulseTimer->resume();

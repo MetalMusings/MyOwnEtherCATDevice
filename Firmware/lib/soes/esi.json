@@ -57,7 +57,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "REAL64",
+        "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.EncPos"
       },
@@ -68,7 +68,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "REAL64",
+        "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.EncFrequency"
       },
@@ -79,7 +79,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "UNSIGNED32",
+        "dtype": "UNSIGNED16",
         "value": "0",
         "data": "&Obj.DiffT"
       },
@@ -106,44 +106,26 @@
         "data": "&Obj.IndexStatus"
       },
       "6005": {
-        "otype": "RECORD",
-        "name": "StepGenOut1",
+        "otype": "VAR",
+        "name": "ActualPosition1",
         "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "ActualPosition",
-            "dtype": "REAL64",
-            "data": "&Obj.StepGenOut1.ActualPosition",
-            "value": "0",
-            "access": "RO"
-          }
-        ],
         "pdo_mappings": [
           "txpdo"
-        ]
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.ActualPosition1"
       },
       "6006": {
-        "otype": "RECORD",
-        "name": "StepGenOut2",
+        "otype": "VAR",
+        "name": "ActualPosition2",
         "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "ActualPosition",
-            "dtype": "REAL64",
-            "data": "&Obj.StepGenOut2.ActualPosition",
-            "value": "0",
-            "access": "RO"
-          }
-        ],
         "pdo_mappings": [
           "txpdo"
-        ]
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.ActualPosition2"
       },
       "6007": {
         "otype": "VAR",
@@ -152,7 +134,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "INTEGER32",
+        "dtype": "INTEGER16",
         "value": "0",
         "data": "&Obj.D1"
       },
@@ -163,7 +145,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "INTEGER32",
+        "dtype": "INTEGER16",
         "value": "0",
         "data": "&Obj.D2"
       },
@@ -174,7 +156,7 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "INTEGER32",
+        "dtype": "INTEGER16",
         "value": "0",
         "data": "&Obj.D3"
       },
@@ -185,24 +167,13 @@
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "INTEGER32",
+        "dtype": "INTEGER16",
         "value": "0",
         "data": "&Obj.D4"
       }
     },
     "rxpdo": {
       "7000": {
-        "otype": "VAR",
-        "name": "EncPosScale",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "INTEGER32",
-        "value": "0",
-        "data": "&Obj.EncPosScale"
-      },
-      "7001": {
         "otype": "VAR",
         "name": "IndexLatchEnable",
         "access": "RO",
@@ -213,59 +184,49 @@
         "value": "0",
         "data": "&Obj.IndexLatchEnable"
       },
-      "7002": {
-        "otype": "RECORD",
-        "name": "StepGenIn1",
+      "7001": {
+        "otype": "VAR",
+        "name": "CommandedPosition1",
         "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "CommandedPosition",
-            "dtype": "REAL64",
-            "data": "&Obj.StepGenIn1.CommandedPosition",
-            "value": "0",
-            "access": "RO"
-          },
-          {
-            "name": "StepsPerMM",
-            "dtype": "INTEGER16",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.StepGenIn1.StepsPerMM"
-          }
-        ],
         "pdo_mappings": [
           "rxpdo"
-        ]
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition1"
+      },
+      "7002": {
+        "otype": "VAR",
+        "name": "CommandedPosition2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition2"
       },
       "7003": {
-        "otype": "RECORD",
-        "name": "StepGenIn2",
+        "otype": "VAR",
+        "name": "StepsPerMM1",
         "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "CommandedPosition",
-            "dtype": "REAL64",
-            "data": "&Obj.StepGenIn2.CommandedPosition",
-            "value": "0",
-            "access": "RO"
-          },
-          {
-            "name": "StepsPerMM",
-            "dtype": "INTEGER16",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.StepGenIn2.StepsPerMM"
-          }
-        ],
         "pdo_mappings": [
           "rxpdo"
-        ]
+        ],
+        "dtype": "INTEGER16",
+        "value": "0",
+        "data": "&Obj.StepsPerMM1"
+      },
+      "7004": {
+        "otype": "VAR",
+        "name": "StepsPerMM2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "INTEGER16",
+        "value": "0",
+        "data": "&Obj.StepsPerMM2"
       },
       "60664": {
         "otype": "VAR",

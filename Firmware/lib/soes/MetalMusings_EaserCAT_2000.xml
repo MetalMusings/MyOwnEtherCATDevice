@@ -23,7 +23,7 @@
             <DataTypes>
               <DataType>
                 <Name>DT1018</Name>
-                <BitSize>272</BitSize>
+                <BitSize>144</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -37,8 +37,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>Vendor ID</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -47,9 +47,9 @@
                 <SubItem>
                   <SubIdx>2</SubIdx>
                   <Name>Product Code</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>80</BitOffs>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>48</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -57,9 +57,9 @@
                 <SubItem>
                   <SubIdx>3</SubIdx>
                   <Name>Revision Number</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>144</BitOffs>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -67,9 +67,9 @@
                 <SubItem>
                   <SubIdx>4</SubIdx>
                   <Name>Serial Number</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>208</BitOffs>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>112</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -77,31 +77,7 @@
               </DataType>
               <DataType>
                 <Name>DT1600</Name>
-                <BitSize>80</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>EncPosScale</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT1601</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -115,8 +91,32 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>IndexLatchEnable</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1601</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>CommandedPosition1</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -125,7 +125,7 @@
               </DataType>
               <DataType>
                 <Name>DT1602</Name>
-                <BitSize>144</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -138,20 +138,10 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Name>CommandedPosition2</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>2</SubIdx>
-                  <Name>StepsPerMM</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -159,7 +149,7 @@
               </DataType>
               <DataType>
                 <Name>DT1603</Name>
-                <BitSize>144</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -172,20 +162,34 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Name>StepsPerMM1</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
                 </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1604</Name>
+                <BitSize>48</BitSize>
                 <SubItem>
-                  <SubIdx>2</SubIdx>
-                  <Name>StepsPerMM</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>80</BitOffs>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>StepsPerMM2</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -193,7 +197,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A00</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -207,8 +211,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>EncPos</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -217,7 +221,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A01</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -231,8 +235,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>EncFrequency</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -241,7 +245,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A02</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -255,8 +259,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>DiffT</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -265,7 +269,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A03</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -279,8 +283,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>IndexByte</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -289,7 +293,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A04</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -303,8 +307,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>IndexStatus</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -313,7 +317,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A05</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -326,9 +330,9 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>ActualPosition</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Name>ActualPosition1</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -337,7 +341,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A06</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -350,9 +354,9 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>ActualPosition</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Name>ActualPosition2</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -361,7 +365,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A07</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -375,8 +379,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>D1</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -385,7 +389,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A08</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -399,8 +403,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>D2</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -409,7 +413,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A09</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -423,8 +427,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>D3</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -433,7 +437,7 @@
               </DataType>
               <DataType>
                 <Name>DT1A0A</Name>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -447,8 +451,8 @@
                 <SubItem>
                   <SubIdx>1</SubIdx>
                   <Name>D4</Name>
-                  <Type>ULINT</Type>
-                  <BitSize>64</BitSize>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -490,15 +494,15 @@
               <DataType>
                 <Name>DT1C12ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>64</BitSize>
+                <BitSize>80</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>4</Elements>
+                  <Elements>5</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C12</Name>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -512,7 +516,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C12ARR</Type>
-                  <BitSize>64</BitSize>
+                  <BitSize>80</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -552,130 +556,8 @@
                 </SubItem>
               </DataType>
               <DataType>
-                <Name>DT6005</Name>
-                <BitSize>80</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>ActualPosition</Name>
-                  <Type>LREAL</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>T</PdoMapping>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT6006</Name>
-                <BitSize>80</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>ActualPosition</Name>
-                  <Type>LREAL</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>T</PdoMapping>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT7002</Name>
-                <BitSize>96</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition</Name>
-                  <Type>LREAL</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>2</SubIdx>
-                  <Name>StepsPerMM</Name>
-                  <Type>INT</Type>
-                  <BitSize>16</BitSize>
-                  <BitOffs>80</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT7003</Name>
-                <BitSize>96</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition</Name>
-                  <Type>LREAL</Type>
-                  <BitSize>64</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>2</SubIdx>
-                  <Name>StepsPerMM</Name>
-                  <Type>INT</Type>
-                  <BitSize>16</BitSize>
-                  <BitOffs>80</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>ULINT</Name>
-                <BitSize>64</BitSize>
+                <Name>UDINT</Name>
+                <BitSize>32</BitSize>
               </DataType>
               <DataType>
                 <Name>STRING(26)</Name>
@@ -694,15 +576,7 @@
                 <BitSize>16</BitSize>
               </DataType>
               <DataType>
-                <Name>LREAL</Name>
-                <BitSize>64</BitSize>
-              </DataType>
-              <DataType>
-                <Name>UDINT</Name>
-                <BitSize>32</BitSize>
-              </DataType>
-              <DataType>
-                <Name>DINT</Name>
+                <Name>REAL</Name>
                 <BitSize>32</BitSize>
               </DataType>
               <DataType>
@@ -714,8 +588,8 @@
               <Object>
                 <Index>#x1000</Index>
                 <Name>Device Type</Name>
-                <Type>ULINT</Type>
-                <BitSize>64</BitSize>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>5001</DefaultValue>
                 </Info>
@@ -765,7 +639,7 @@
                 <Index>#x1018</Index>
                 <Name>Identity Object</Name>
                 <Type>DT1018</Type>
-                <BitSize>272</BitSize>
+                <BitSize>144</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -804,9 +678,9 @@
               </Object>
               <Object>
                 <Index>#x1600</Index>
-                <Name>EncPosScale</Name>
+                <Name>IndexLatchEnable</Name>
                 <Type>DT1600</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -815,7 +689,7 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>EncPosScale</Name>
+                    <Name>IndexLatchEnable</Name>
                     <Info>
                       <DefaultValue>#x70000020</DefaultValue>
                     </Info>
@@ -827,9 +701,9 @@
               </Object>
               <Object>
                 <Index>#x1601</Index>
-                <Name>IndexLatchEnable</Name>
+                <Name>CommandedPosition1</Name>
                 <Type>DT1601</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -838,7 +712,7 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>IndexLatchEnable</Name>
+                    <Name>CommandedPosition1</Name>
                     <Info>
                       <DefaultValue>#x70010020</DefaultValue>
                     </Info>
@@ -850,26 +724,20 @@
               </Object>
               <Object>
                 <Index>#x1602</Index>
-                <Name>StepGenIn1</Name>
+                <Name>CommandedPosition2</Name>
                 <Type>DT1602</Type>
-                <BitSize>144</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>2</DefaultValue>
+                      <DefaultValue>1</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>CommandedPosition</Name>
+                    <Name>CommandedPosition2</Name>
                     <Info>
-                      <DefaultValue>#x70020140</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM</Name>
-                    <Info>
-                      <DefaultValue>#x70020210</DefaultValue>
+                      <DefaultValue>#x70020020</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -879,26 +747,43 @@
               </Object>
               <Object>
                 <Index>#x1603</Index>
-                <Name>StepGenIn2</Name>
+                <Name>StepsPerMM1</Name>
                 <Type>DT1603</Type>
-                <BitSize>144</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>2</DefaultValue>
+                      <DefaultValue>1</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>CommandedPosition</Name>
+                    <Name>StepsPerMM1</Name>
                     <Info>
-                      <DefaultValue>#x70030140</DefaultValue>
+                      <DefaultValue>#x70030010</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1604</Index>
+                <Name>StepsPerMM2</Name>
+                <Type>DT1604</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>StepsPerMM</Name>
+                    <Name>StepsPerMM2</Name>
                     <Info>
-                      <DefaultValue>#x70030210</DefaultValue>
+                      <DefaultValue>#x70040010</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -910,7 +795,7 @@
                 <Index>#x1A00</Index>
                 <Name>EncPos</Name>
                 <Type>DT1A00</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -921,7 +806,7 @@
                   <SubItem>
                     <Name>EncPos</Name>
                     <Info>
-                      <DefaultValue>#x60000040</DefaultValue>
+                      <DefaultValue>#x60000020</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -933,7 +818,7 @@
                 <Index>#x1A01</Index>
                 <Name>EncFrequency</Name>
                 <Type>DT1A01</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -944,7 +829,7 @@
                   <SubItem>
                     <Name>EncFrequency</Name>
                     <Info>
-                      <DefaultValue>#x60010040</DefaultValue>
+                      <DefaultValue>#x60010020</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -956,7 +841,7 @@
                 <Index>#x1A02</Index>
                 <Name>DiffT</Name>
                 <Type>DT1A02</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -967,7 +852,7 @@
                   <SubItem>
                     <Name>DiffT</Name>
                     <Info>
-                      <DefaultValue>#x60020020</DefaultValue>
+                      <DefaultValue>#x60020010</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -979,7 +864,7 @@
                 <Index>#x1A03</Index>
                 <Name>IndexByte</Name>
                 <Type>DT1A03</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1002,7 +887,7 @@
                 <Index>#x1A04</Index>
                 <Name>IndexStatus</Name>
                 <Type>DT1A04</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1023,9 +908,9 @@
               </Object>
               <Object>
                 <Index>#x1A05</Index>
-                <Name>StepGenOut1</Name>
+                <Name>ActualPosition1</Name>
                 <Type>DT1A05</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1034,9 +919,9 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>ActualPosition</Name>
+                    <Name>ActualPosition1</Name>
                     <Info>
-                      <DefaultValue>#x60050140</DefaultValue>
+                      <DefaultValue>#x60050020</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1046,9 +931,9 @@
               </Object>
               <Object>
                 <Index>#x1A06</Index>
-                <Name>StepGenOut2</Name>
+                <Name>ActualPosition2</Name>
                 <Type>DT1A06</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1057,9 +942,9 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>ActualPosition</Name>
+                    <Name>ActualPosition2</Name>
                     <Info>
-                      <DefaultValue>#x60060140</DefaultValue>
+                      <DefaultValue>#x60060020</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1071,7 +956,7 @@
                 <Index>#x1A07</Index>
                 <Name>D1</Name>
                 <Type>DT1A07</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1082,7 +967,7 @@
                   <SubItem>
                     <Name>D1</Name>
                     <Info>
-                      <DefaultValue>#x60070020</DefaultValue>
+                      <DefaultValue>#x60070010</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1094,7 +979,7 @@
                 <Index>#x1A08</Index>
                 <Name>D2</Name>
                 <Type>DT1A08</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1105,7 +990,7 @@
                   <SubItem>
                     <Name>D2</Name>
                     <Info>
-                      <DefaultValue>#x60080020</DefaultValue>
+                      <DefaultValue>#x60080010</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1117,7 +1002,7 @@
                 <Index>#x1A09</Index>
                 <Name>D3</Name>
                 <Type>DT1A09</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1128,7 +1013,7 @@
                   <SubItem>
                     <Name>D3</Name>
                     <Info>
-                      <DefaultValue>#x60090020</DefaultValue>
+                      <DefaultValue>#x60090010</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1140,7 +1025,7 @@
                 <Index>#x1A0A</Index>
                 <Name>D4</Name>
                 <Type>DT1A0A</Type>
-                <BitSize>80</BitSize>
+                <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -1151,7 +1036,7 @@
                   <SubItem>
                     <Name>D4</Name>
                     <Info>
-                      <DefaultValue>#x600A0020</DefaultValue>
+                      <DefaultValue>#x600A0010</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1204,12 +1089,12 @@
                 <Index>#x1C12</Index>
                 <Name>Sync Manager 2 PDO Assignment</Name>
                 <Type>DT1C12</Type>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>4</DefaultValue>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1234,6 +1119,12 @@
                     <Name>PDO Mapping</Name>
                     <Info>
                       <DefaultValue>#x1603</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1604</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1327,8 +1218,8 @@
               <Object>
                 <Index>#x6000</Index>
                 <Name>EncPos</Name>
-                <Type>LREAL</Type>
-                <BitSize>64</BitSize>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1340,8 +1231,8 @@
               <Object>
                 <Index>#x6001</Index>
                 <Name>EncFrequency</Name>
-                <Type>LREAL</Type>
-                <BitSize>64</BitSize>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1353,8 +1244,8 @@
               <Object>
                 <Index>#x6002</Index>
                 <Name>DiffT</Name>
-                <Type>UDINT</Type>
-                <BitSize>32</BitSize>
+                <Type>UINT</Type>
+                <BitSize>16</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1391,55 +1282,35 @@
               </Object>
               <Object>
                 <Index>#x6005</Index>
-                <Name>StepGenOut1</Name>
-                <Type>DT6005</Type>
-                <BitSize>80</BitSize>
+                <Name>ActualPosition1</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
                 <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>ActualPosition</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
+                  <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
                 </Flags>
               </Object>
               <Object>
                 <Index>#x6006</Index>
-                <Name>StepGenOut2</Name>
-                <Type>DT6006</Type>
-                <BitSize>80</BitSize>
+                <Name>ActualPosition2</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
                 <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>ActualPosition</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
+                  <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
                 </Flags>
               </Object>
               <Object>
                 <Index>#x6007</Index>
                 <Name>D1</Name>
-                <Type>DINT</Type>
-                <BitSize>32</BitSize>
+                <Type>INT</Type>
+                <BitSize>16</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1451,8 +1322,8 @@
               <Object>
                 <Index>#x6008</Index>
                 <Name>D2</Name>
-                <Type>DINT</Type>
-                <BitSize>32</BitSize>
+                <Type>INT</Type>
+                <BitSize>16</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1464,8 +1335,8 @@
               <Object>
                 <Index>#x6009</Index>
                 <Name>D3</Name>
-                <Type>DINT</Type>
-                <BitSize>32</BitSize>
+                <Type>INT</Type>
+                <BitSize>16</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1477,8 +1348,8 @@
               <Object>
                 <Index>#x600A</Index>
                 <Name>D4</Name>
-                <Type>DINT</Type>
-                <BitSize>32</BitSize>
+                <Type>INT</Type>
+                <BitSize>16</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -1489,19 +1360,6 @@
               </Object>
               <Object>
                 <Index>#x7000</Index>
-                <Name>EncPosScale</Name>
-                <Type>DINT</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7001</Index>
                 <Name>IndexLatchEnable</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
@@ -1514,61 +1372,55 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x7002</Index>
-                <Name>StepGenIn1</Name>
-                <Type>DT7002</Type>
-                <BitSize>96</BitSize>
+                <Index>#x7001</Index>
+                <Name>CommandedPosition1</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
                 <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>2</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>CommandedPosition</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
+                  <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7002</Index>
+                <Name>CommandedPosition2</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
                 </Flags>
               </Object>
               <Object>
                 <Index>#x7003</Index>
-                <Name>StepGenIn2</Name>
-                <Type>DT7003</Type>
-                <BitSize>96</BitSize>
+                <Name>StepsPerMM1</Name>
+                <Type>INT</Type>
+                <BitSize>16</BitSize>
                 <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>2</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>CommandedPosition</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
+                  <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7004</Index>
+                <Name>StepsPerMM2</Name>
+                <Type>INT</Type>
+                <BitSize>16</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
                 </Flags>
               </Object>
             </Objects>
@@ -1583,20 +1435,9 @@
         <Sm StartAddress="#x1A00" ControlByte="#x20" Enable="1">Inputs</Sm>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
           <Index>#x1600</Index>
-          <Name>EncPosScale</Name>
-          <Entry>
-            <Index>#x7000</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>EncPosScale</Name>
-            <DataType>DINT</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1601</Index>
           <Name>IndexLatchEnable</Name>
           <Entry>
-            <Index>#x7001</Index>
+            <Index>#x7000</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>32</BitLen>
             <Name>IndexLatchEnable</Name>
@@ -1604,38 +1445,46 @@
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1602</Index>
-          <Name>StepGenIn1</Name>
+          <Index>#x1601</Index>
+          <Name>CommandedPosition1</Name>
           <Entry>
-            <Index>#x7002</Index>
-            <SubIndex>#x1</SubIndex>
-            <BitLen>64</BitLen>
-            <Name>CommandedPosition</Name>
-            <DataType>LREAL</DataType>
+            <Index>#x7001</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>CommandedPosition1</Name>
+            <DataType>REAL</DataType>
           </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1602</Index>
+          <Name>CommandedPosition2</Name>
           <Entry>
             <Index>#x7002</Index>
-            <SubIndex>#x2</SubIndex>
-            <BitLen>16</BitLen>
-            <Name>StepsPerMM</Name>
-            <DataType>INT</DataType>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>CommandedPosition2</Name>
+            <DataType>REAL</DataType>
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
           <Index>#x1603</Index>
-          <Name>StepGenIn2</Name>
+          <Name>StepsPerMM1</Name>
           <Entry>
             <Index>#x7003</Index>
-            <SubIndex>#x1</SubIndex>
-            <BitLen>64</BitLen>
-            <Name>CommandedPosition</Name>
-            <DataType>LREAL</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x7003</Index>
-            <SubIndex>#x2</SubIndex>
+            <SubIndex>#x0</SubIndex>
             <BitLen>16</BitLen>
-            <Name>StepsPerMM</Name>
+            <Name>StepsPerMM1</Name>
+            <DataType>INT</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1604</Index>
+          <Name>StepsPerMM2</Name>
+          <Entry>
+            <Index>#x7004</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>StepsPerMM2</Name>
             <DataType>INT</DataType>
           </Entry>
         </RxPdo>
@@ -1645,9 +1494,9 @@
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>64</BitLen>
+            <BitLen>32</BitLen>
             <Name>EncPos</Name>
-            <DataType>LREAL</DataType>
+            <DataType>REAL</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1656,9 +1505,9 @@
           <Entry>
             <Index>#x6001</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>64</BitLen>
+            <BitLen>32</BitLen>
             <Name>EncFrequency</Name>
-            <DataType>LREAL</DataType>
+            <DataType>REAL</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1667,9 +1516,9 @@
           <Entry>
             <Index>#x6002</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>16</BitLen>
             <Name>DiffT</Name>
-            <DataType>UDINT</DataType>
+            <DataType>UINT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1696,24 +1545,24 @@
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A05</Index>
-          <Name>StepGenOut1</Name>
+          <Name>ActualPosition1</Name>
           <Entry>
             <Index>#x6005</Index>
-            <SubIndex>#x1</SubIndex>
-            <BitLen>64</BitLen>
-            <Name>ActualPosition</Name>
-            <DataType>LREAL</DataType>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>ActualPosition1</Name>
+            <DataType>REAL</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A06</Index>
-          <Name>StepGenOut2</Name>
+          <Name>ActualPosition2</Name>
           <Entry>
             <Index>#x6006</Index>
-            <SubIndex>#x1</SubIndex>
-            <BitLen>64</BitLen>
-            <Name>ActualPosition</Name>
-            <DataType>LREAL</DataType>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>ActualPosition2</Name>
+            <DataType>REAL</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1722,9 +1571,9 @@
           <Entry>
             <Index>#x6007</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>16</BitLen>
             <Name>D1</Name>
-            <DataType>DINT</DataType>
+            <DataType>INT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1733,9 +1582,9 @@
           <Entry>
             <Index>#x6008</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>16</BitLen>
             <Name>D2</Name>
-            <DataType>DINT</DataType>
+            <DataType>INT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1744,9 +1593,9 @@
           <Entry>
             <Index>#x6009</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>16</BitLen>
             <Name>D3</Name>
-            <DataType>DINT</DataType>
+            <DataType>INT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -1755,9 +1604,9 @@
           <Entry>
             <Index>#x600A</Index>
             <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
+            <BitLen>16</BitLen>
             <Name>D4</Name>
-            <DataType>DINT</DataType>
+            <DataType>INT</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">
@@ -1777,7 +1626,7 @@
         </Dc>
         <Eeprom>
           <ByteSize>2048</ByteSize>
-          <ConfigData>8006034C640000</ConfigData>
+          <ConfigData>80060344640000</ConfigData>
         </Eeprom>
       </Device>
     </Devices>

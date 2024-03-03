@@ -36,7 +36,7 @@ void APP_setwatchdog (int watchdogcnt);
  *
  * @param[in]   flags     = User input what to execute
  */
-void DIG_process (uint16_t ALEvent, uint8_t flags);
+void DIG_process (uint8_t flags);
 
 /**
  * Handler for SM change, SM0/1, AL CONTROL and EEPROM events, the application

@@ -13,38 +13,25 @@ typedef struct
 
    /* Inputs */
 
-   double EncPos;
-   double EncFrequency;
-   uint32_t DiffT;
+   float EncPos;
+   float EncFrequency;
+   uint16_t DiffT;
    uint32_t IndexByte;
    uint32_t IndexStatus;
-   struct
-   {
-      double ActualPosition;
-   } StepGenOut1;
-   struct
-   {
-      double ActualPosition;
-   } StepGenOut2;
-   int32_t D1;
-   int32_t D2;
-   int32_t D3;
-   int32_t D4;
+   float ActualPosition1;
+   float ActualPosition2;
+   int16_t D1;
+   int16_t D2;
+   int16_t D3;
+   int16_t D4;
 
    /* Outputs */
 
-   int32_t EncPosScale;
    uint32_t IndexLatchEnable;
-   struct
-   {
-      double CommandedPosition;
-      int16_t StepsPerMM;
-   } StepGenIn1;
-   struct
-   {
-      double CommandedPosition;
-      int16_t StepsPerMM;
-   } StepGenIn2;
+   float CommandedPosition1;
+   float CommandedPosition2;
+   int16_t StepsPerMM1;
+   int16_t StepsPerMM2;
 
 } _Objects;
 

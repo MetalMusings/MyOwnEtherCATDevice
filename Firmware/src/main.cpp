@@ -25,27 +25,31 @@ StepGen2 Step(TIM1, 4, PA_11, PA12, pulseTimerCallback, TIM10, startTimerCallbac
 void pulseTimerCallback(void) { Step.pulseTimerCB(); }
 void startTimerCallback(void) { Step.startTimerCB(); }
 CircularBuffer<uint32_t, 200> Tim;
-volatile uint64_t irqTime = 0, thenTime = 0;
+volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
 volatile uint32_t ccnnt = 0;
 extend32to64 longTime;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
    Encoder1.setLatch(Obj.IndexLatchEnable);
-   Encoder1.setScale(Obj.EncPosScale);
+   Encoder1.setScale(500);
+
+   // Step2.reqPos(Obj.CommandedPosition2);
+   // Step2.setScale(Obj.StepsPerMM2);
+   // Step2.enable(1);
+   Obj.ActualPosition1 = Obj.CommandedPosition1; // Step1.actPos();
+   Obj.ActualPosition2 = Obj.CommandedPosition2; // Step2.actPos();
 }
 volatile uint32_t cmt;
 void handleStepper(void)
 {
-   digitalWrite(Step.dirPin, cmt++ % 2);
+   //digitalWrite(Step.dirPin, cmt++ % 2);
    Step.enabled = true;
-   Step.commandedPosition = Obj.StepGenIn1.CommandedPosition;
-   Obj.StepGenOut1.ActualPosition = Step.commandedPosition;
-   Step.stepsPerMM = Obj.StepGenIn1.StepsPerMM;
-   Step.stepsPerMM = 400;
+   Step.commandedPosition = Obj.CommandedPosition1;
+   Step.stepsPerMM = Obj.StepsPerMM1;
    Step.handleStepper(irqTime);
 
-   Obj.StepGenOut2.ActualPosition = Obj.StepGenIn2.CommandedPosition;
+   Obj.ActualPosition1 = Obj.CommandedPosition1;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -55,7 +59,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
 
-   uint32_t dTim = longTime.extendTime(micros()) - irqTime; // thenTime; // Debug. Getting jitter over the last 200 milliseconds
+   uint32_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
@@ -72,7 +76,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.D1 = Step.Tjitter;
    Obj.D2 = Step.Tstartf * 1e6;
    Obj.D3 = Step.dbg;
-   Obj.D4 = Obj.D1+Obj.D2-Obj.D3;
+   Obj.D4 = Obj.D1 + Obj.D2 - Obj.D3;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -114,9 +118,12 @@ void loop(void)
    uint32_t dTime;
    if (serveIRQ)
    {
-      CC_ATOMIC_SET(ESCvar.ALevent, ESC_ALeventread());
-      DIG_process(ALEventIRQ, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
-                                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+      nowTime = micros();
+      /* Read local time from ESC*/
+      ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
+      ESCvar.Time = etohl(ESCvar.Time);
+      DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
    }
@@ -131,7 +138,6 @@ void sync0Handler(void)
    ALEventIRQ = ESC_ALeventread();
    serveIRQ = 1;
    irqTime = longTime.extendTime(micros());
-   digitalWrite(Step.dirPin, cnt++ % 2);
 }
 
 // Enable SM2 interrupts
