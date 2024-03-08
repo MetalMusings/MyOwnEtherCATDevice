@@ -68,12 +68,11 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime)
 }
 void StepGen2::startTimerCB()
 {
-
     startTimer->pause(); // Once is enough.
-    digitalWrite(dirPin, nSteps > 0 ? HIGH : LOW);
+    digitalWrite(dirPin, nSteps < 0 ? HIGH : LOW);
     // There will be a short break here for t2 usecs, in the future.
     timerPulseSteps = abs(nSteps);
-    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM1, stepPin);
+    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
     pulseTimer->setCaptureCompare(pulseTimerChan, 5, MICROSEC_COMPARE_FORMAT); // 5 usecs
     pulseTimer->resume();

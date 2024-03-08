@@ -41,7 +41,7 @@ extend32to64 longTime;
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
    Encoder1.setLatch(Obj.IndexLatchEnable);
-   Encoder1.setScale(500);
+   Encoder1.setScale(2000);
 
    // Step2.reqPos(Obj.CommandedPosition2);
    // Step2.setScale(Obj.StepsPerMM2);
