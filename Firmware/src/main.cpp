@@ -19,14 +19,14 @@ void indexPulseEncoderCB1(void)
 }
 
 #include "StepGen2.h"
-//Stepper 1
+// Stepper 1
 void pulseTimerCallback1(void);
 void startTimerCallback1(void);
 StepGen2 Step1(TIM1, 4, PA_11, PA12, pulseTimerCallback1, TIM10, startTimerCallback1);
 void pulseTimerCallback1(void) { Step1.pulseTimerCB(); }
 void startTimerCallback1(void) { Step1.startTimerCB(); }
 
-//Stepper 2
+// Stepper 2
 void pulseTimerCallback2(void);
 void startTimerCallback2(void);
 StepGen2 Step2(TIM3, 4, PC_9, PC10, pulseTimerCallback2, TIM11, startTimerCallback2);
@@ -35,6 +35,8 @@ void startTimerCallback2(void) { Step2.startTimerCB(); }
 
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
+volatile uint64_t EcatTimeIRQ = 0, EcatTimeThen = 0, EcatTimeDiff = 0;
+;
 volatile uint32_t ccnnt = 0;
 extend32to64 longTime;
 
@@ -49,19 +51,29 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    Obj.ActualPosition1 = Obj.CommandedPosition1; // Step1.actPos();
    Obj.ActualPosition2 = Obj.CommandedPosition2; // Step2.actPos();
 }
-volatile uint32_t cmt;
+
+uint16_t nLoops;
 void handleStepper(void)
 {
-   //digitalWrite(Step.dirPin, cmt++ % 2);
+   if (!(ALEventIRQ & ESCREG_ALEVENT_SM2))
+      return;
+   // Catch the case when we miss a loop for some reason
+   uint64_t EcatTimeNow;
+   ESC_read(ESCREG_LOCALTIME, (void *)&EcatTimeNow, sizeof(EcatTimeNow));
+   EcatTimeNow = etohl(EcatTimeNow);
+   EcatTimeDiff = EcatTimeNow - EcatTimeThen;
+   nLoops = round(EcatTimeDiff / double(StepGen2::sync0CycleTime));
+   EcatTimeThen = EcatTimeNow;
+
    Step1.enabled = true;
    Step1.commandedPosition = Obj.CommandedPosition1;
    Step1.stepsPerMM = Obj.StepsPerMM1;
-   Step1.handleStepper(irqTime);
+   Step1.handleStepper(irqTime, nLoops);
 
    Step2.enabled = true;
    Step2.commandedPosition = Obj.CommandedPosition2;
    Step2.stepsPerMM = Obj.StepsPerMM2;
-   Step2.handleStepper(irqTime);
+   Step2.handleStepper(irqTime, nLoops);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -84,10 +96,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = max_Tim - min_Tim; // Debug
-   Obj.DiffT = abs(Step1.nSteps);
-   Obj.D1 = Step1.Tjitter;
-   Obj.D2 = Step1.Tstartf * 1e6;
-   Obj.D3 = Step1.dbg;
+   Obj.D1 = Step2.frequency;
+   Obj.D2 = Step2.Tstartf * 1e6;
+   Obj.D3 = Step2.dbg;
    Obj.D4 = Obj.D1 + Obj.D2 - Obj.D3;
 }
 
@@ -149,6 +160,8 @@ void sync0Handler(void)
    ccnnt++;
    ALEventIRQ = ESC_ALeventread();
    serveIRQ = 1;
+   ESC_read(ESCREG_LOCALTIME, (void *)&EcatTimeIRQ, sizeof(EcatTimeIRQ));
+   EcatTimeIRQ = etohl(EcatTimeIRQ);
    irqTime = longTime.extendTime(micros());
 }
 
@@ -199,6 +212,6 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   StepGen2::sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
+   StepGen2::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
    return 0;
 }

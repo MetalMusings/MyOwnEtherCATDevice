@@ -18,10 +18,10 @@ public:
 
     HardwareTimer *pulseTimer;
     uint32_t pulseTimerChan;
-    HardwareTimer *startTimer; // 10,11,13,14
+    HardwareTimer *startTimer; // Use timers 10,11,13,14
     uint8_t dirPin;
     PinName stepPin;
-    const uint32_t Tjitter = 500; // Time unit is microseconds
+    uint32_t Tjitter = 400; // Longest time from IRQ to handling in handleStepper, unit is microseconds
     uint64_t dbg;
     const uint16_t t2 = 5;                                            // DIR is ahead of PUL with at least 5 usecs
     const uint16_t t3 = 3;                                            // Pulse width at least 2.5 usecs
@@ -37,12 +37,12 @@ public:
     volatile uint8_t enabled;               // Enabled step generator
     volatile float frequency;
 
-    static uint32_t sync0CycleTime; // Nominal EtherCAT cycle time
-    volatile float lcncCycleTime;   // Linuxcnc nominal cycle time in sec (1 ms often)
+    static uint32_t sync0CycleTime;     // Nominal EtherCAT cycle time nanoseconds
+    volatile float lcncCycleTime;       // Linuxcnc nominal cycle time in sec (1 ms often)
 
     StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void), TIM_TypeDef *Timer2, void irq2(void));
 
-    uint32_t handleStepper(uint64_t irqTime /* time for irq nanosecs */);
+    uint32_t handleStepper(uint64_t irqTime /* time when irq happened nanosecs */, uint16_t nLoops);
     void startTimerCB();
     void pulseTimerCB();
     uint32_t updatePos(uint32_t i);

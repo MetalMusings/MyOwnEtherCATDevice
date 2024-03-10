@@ -26,20 +26,20 @@ StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin,
     startTimer = new HardwareTimer(Timer2);
     startTimer->attachInterrupt(irq2);
 }
-extern volatile uint32_t cnt;
-uint32_t StepGen2::handleStepper(uint64_t irqTime)
+
+uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
 {
     if (!enabled)
         return updatePos(0);
 
-    lcncCycleTime = StepGen2::sync0CycleTime * 1.0e-6;             // was usec, became sec
+    lcncCycleTime = nLoops * StepGen2::sync0CycleTime * 1.0e-9;    // // nLoops is there in case we missed a ethercat cycle. secs
     commandedStepPosition = floor(commandedPosition * stepsPerMM); // Scale position to steps
     if (initialStepPosition == commandedStepPosition)              // No movement
         return updatePos(1);
 
     nSteps = commandedStepPosition - initialStepPosition;
 
-    if (abs(nSteps) < 2) // Some small number
+    if (abs(nSteps) < 1) // Some small number
     {
         frequency = (abs(nSteps) + 1) / lcncCycleTime;
         Tpulses = abs(nSteps) / frequency;
@@ -58,14 +58,15 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime)
     }
     updatePos(5);
     uint32_t timeSinceISR = (longTime.extendTime(micros()) - irqTime); // Diff time from ISR (usecs)
-    dbg = timeSinceISR;
-    Tstartu = Tjitter + uint32_t(Tstartf * 1e6) - timeSinceISR; // Have already wasted some time since the irq.
+    dbg = timeSinceISR;                                                //
+    Tstartu = Tjitter + uint32_t(Tstartf * 1e6) - timeSinceISR;        // Have already wasted some time since the irq.
 
     timerFrequency = uint32_t(ceil(frequency));
     startTimer->setOverflow(Tstartu, MICROSEC_FORMAT); // All handled by irqs
     startTimer->resume();
     return 1;
 }
+
 void StepGen2::startTimerCB()
 {
     startTimer->pause(); // Once is enough.
@@ -74,9 +75,11 @@ void StepGen2::startTimerCB()
     timerPulseSteps = abs(nSteps);
     pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
-    pulseTimer->setCaptureCompare(pulseTimerChan, 5, MICROSEC_COMPARE_FORMAT); // 5 usecs
+    // pulseTimer->setCaptureCompare(pulseTimerChan, t3, MICROSEC_COMPARE_FORMAT);
+    pulseTimer->setCaptureCompare(pulseTimerChan, 50, PERCENT_COMPARE_FORMAT);
     pulseTimer->resume();
 }
+
 void StepGen2::pulseTimerCB()
 {
     --timerPulseSteps;
