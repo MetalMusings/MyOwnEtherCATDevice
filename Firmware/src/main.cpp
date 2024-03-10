@@ -68,12 +68,12 @@ void handleStepper(void)
    Step1.enabled = true;
    Step1.commandedPosition = Obj.CommandedPosition1;
    Step1.stepsPerMM = Obj.StepsPerMM1;
-   Step1.handleStepper(irqTime, nLoops);
+   Step1.handleStepper(irqTime, 1/*nLoops*/);
 
    Step2.enabled = true;
    Step2.commandedPosition = Obj.CommandedPosition2;
    Step2.stepsPerMM = Obj.StepsPerMM2;
-   Step2.handleStepper(irqTime, nLoops);
+   Step2.handleStepper(irqTime, 1/*nLoops*/);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -95,10 +95,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
          min_Tim = aTim;
    }
    thenTime = irqTime;
-   Obj.DiffT = max_Tim - min_Tim; // Debug
+   Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.D1 = Step2.frequency;
-   Obj.D2 = Step2.Tstartf * 1e6;
-   Obj.D3 = Step2.dbg;
+   Obj.D2 = abs(Step2.nSteps);
+   Obj.D3 = Step2.Tstartu;
    Obj.D4 = Obj.D1 + Obj.D2 - Obj.D3;
 }
 

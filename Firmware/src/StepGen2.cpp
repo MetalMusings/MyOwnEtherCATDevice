@@ -29,31 +29,37 @@ StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin,
 
 uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
 {
-    if (!enabled)
+    frequency = 0;
+    nSteps = 0;
+    dbg=0;
+    if (!enabled) // Just .... don't
         return updatePos(0);
 
-    lcncCycleTime = nLoops * StepGen2::sync0CycleTime * 1.0e-9;    // // nLoops is there in case we missed a ethercat cycle. secs
     commandedStepPosition = floor(commandedPosition * stepsPerMM); // Scale position to steps
     if (initialStepPosition == commandedStepPosition)              // No movement
+    {
+
         return updatePos(1);
+    }
 
     nSteps = commandedStepPosition - initialStepPosition;
+    lcncCycleTime = nLoops * StepGen2::sync0CycleTime * 1.0e-9; // nLoops is there in case we missed an ethercat cycle. secs
 
-    if (abs(nSteps) < 1) // Some small number
-    {
-        frequency = (abs(nSteps) + 1) / lcncCycleTime;
-        Tpulses = abs(nSteps) / frequency;
-        Tstartf = (lcncCycleTime - Tpulses) / 2.0;
-    }
-    else // Regular step train, up or down
-    {
-        float kTRAJ = (commandedPosition - initialPosition) / lcncCycleTime; // Straight line equation.  position = kTRAJ x time + mTRAJ
-        float mTRAJ = initialPosition;                                       // Operating on incoming positions (not steps)
-        if (kTRAJ > 0)
-            Tstartf = (float(initialStepPosition + 1) / float(stepsPerMM) - mTRAJ) / kTRAJ;
-        else
-            Tstartf = (float(initialStepPosition) / float(stepsPerMM) - mTRAJ) / kTRAJ;
-        frequency = fabs(kTRAJ * stepsPerMM); //
+    if (abs(nSteps) < 1)                                                                    // Some small number
+    {                                                                                       //
+        frequency = (abs(nSteps) + 1) / lcncCycleTime;                                      // Distribute steps inside available time
+        Tpulses = abs(nSteps) / frequency;                                                  //
+        Tstartf = (lcncCycleTime - Tpulses) / 2.0;                                          //
+    }                                                                                       //
+    else                                                                                    // Regular step train, up or down
+    {                                                                                       //
+        float kTRAJ = (commandedPosition - initialPosition) / lcncCycleTime;                // Straight line equation.  position = kTRAJ x time + mTRAJ
+        float mTRAJ = initialPosition;                                                      // Operating on incoming positions (not steps)
+        if (kTRAJ > 0)                                                                      //
+            Tstartf = (float(initialStepPosition + 1) / float(stepsPerMM) - mTRAJ) / kTRAJ; // Crossing upwards
+        else                                                                                //
+            Tstartf = (float(initialStepPosition) / float(stepsPerMM) - mTRAJ) / kTRAJ;     // Crossing downwards
+        frequency = fabs(kTRAJ * stepsPerMM);                                               //
         Tpulses = abs(nSteps) / frequency;
     }
     updatePos(5);
