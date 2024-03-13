@@ -13,25 +13,25 @@
 #define IS_TXPDO(index) ((index) >= 0x1A00 && (index) < 0x1C00)
 
 /* Global variables used by the stack */
-uint8_t     MBX[MBXBUFFERS * MAX(MBXSIZE,MBXSIZEBOOT)];
+uint8_t MBX[MBXBUFFERS * MAX(MBXSIZE, MBXSIZEBOOT)];
 _MBXcontrol MBXcontrol[MBXBUFFERS];
-_SMmap      SMmap2[MAX_MAPPINGS_SM2];
-_SMmap      SMmap3[MAX_MAPPINGS_SM3];
-_ESCvar     ESCvar;
+_SMmap SMmap2[MAX_MAPPINGS_SM2];
+_SMmap SMmap3[MAX_MAPPINGS_SM3];
+_ESCvar ESCvar;
 
 /* Private variables */
 static volatile int watchdog;
 
 #if MAX_MAPPINGS_SM2 > 0
-static uint8_t rxpdo[MAX_RXPDO_SIZE] __attribute__((aligned (8)));
+static uint8_t rxpdo[MAX_RXPDO_SIZE] __attribute__((aligned(8)));
 #else
-extern uint8_t * rxpdo;
+extern uint8_t *rxpdo;
 #endif
 
 #if MAX_MAPPINGS_SM3 > 0
-static uint8_t txpdo[MAX_TXPDO_SIZE] __attribute__((aligned (8)));
+static uint8_t txpdo[MAX_TXPDO_SIZE] __attribute__((aligned(8)));
 #else
-extern uint8_t * txpdo;
+extern uint8_t *txpdo;
 #endif
 
 /** Function to pre-qualify the incoming SDO download.
@@ -40,19 +40,19 @@ extern uint8_t * txpdo;
  * @param[in] sub-index  = sub-index of SDO download request to check
  * @return SDO abort code, or 0 on success
  */
-uint32_t ESC_download_pre_objecthandler (uint16_t index,
-      uint8_t subindex,
-      void * data,
-      size_t size,
-      uint16_t flags)
+uint32_t ESC_download_pre_objecthandler(uint16_t index,
+                                        uint8_t subindex,
+                                        void *data,
+                                        size_t size,
+                                        uint16_t flags)
 {
-   if (IS_RXPDO (index) ||
-       IS_TXPDO (index) ||
+   if (IS_RXPDO(index) ||
+       IS_TXPDO(index) ||
        index == RX_PDO_OBJIDX ||
        index == TX_PDO_OBJIDX)
    {
       uint8_t minSub = ((flags & COMPLETE_ACCESS_FLAG) == 0) ? 0 : 1;
-      if (subindex > minSub && COE_maxSub (index) != 0)
+      if (subindex > minSub && COE_maxSub(index) != 0)
       {
          return ABORT_SUBINDEX0_NOT_ZERO;
       }
@@ -60,11 +60,11 @@ uint32_t ESC_download_pre_objecthandler (uint16_t index,
 
    if (ESCvar.pre_object_download_hook)
    {
-      return (ESCvar.pre_object_download_hook) (index,
-            subindex,
-            data,
-            size,
-            flags);
+      return (ESCvar.pre_object_download_hook)(index,
+                                               subindex,
+                                               data,
+                                               size,
+                                               flags);
    }
 
    return 0;
@@ -77,7 +77,7 @@ uint32_t ESC_download_pre_objecthandler (uint16_t index,
  * @param[in] sub-index  = sub-index of SDO download request to handle
  * @return SDO abort code, or 0 on success
  */
-uint32_t ESC_download_post_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
+uint32_t ESC_download_post_objecthandler(uint16_t index, uint8_t subindex, uint16_t flags)
 {
    if (ESCvar.post_object_download_hook != NULL)
    {
@@ -93,19 +93,19 @@ uint32_t ESC_download_post_objecthandler (uint16_t index, uint8_t subindex, uint
  * @param[in] sub-index  = sub-index of SDO upload request to handle
  * @return SDO abort code, or 0 on success
  */
-uint32_t ESC_upload_pre_objecthandler (uint16_t index,
-      uint8_t subindex,
-      void * data,
-      size_t size,
-      uint16_t flags)
+uint32_t ESC_upload_pre_objecthandler(uint16_t index,
+                                      uint8_t subindex,
+                                      void *data,
+                                      size_t size,
+                                      uint16_t flags)
 {
    if (ESCvar.pre_object_upload_hook != NULL)
    {
-      return (ESCvar.pre_object_upload_hook) (index,
-            subindex,
-            data,
-            size,
-            flags);
+      return (ESCvar.pre_object_upload_hook)(index,
+                                             subindex,
+                                             data,
+                                             size,
+                                             flags);
    }
 
    return 0;
@@ -118,7 +118,7 @@ uint32_t ESC_upload_pre_objecthandler (uint16_t index,
  * @param[in] sub-index  = sub-index of SDO upload request to handle
  * @return SDO abort code, or 0 on success
  */
-uint32_t ESC_upload_post_objecthandler (uint16_t index, uint8_t subindex, uint16_t flags)
+uint32_t ESC_upload_post_objecthandler(uint16_t index, uint8_t subindex, uint16_t flags)
 {
    if (ESCvar.post_object_upload_hook != NULL)
    {
@@ -131,11 +131,11 @@ uint32_t ESC_upload_post_objecthandler (uint16_t index, uint8_t subindex, uint16
 /** Hook called from the slave stack ESC_stopoutputs to act on state changes
  * forcing us to stop outputs. Here we can set them to a safe state.
  */
-void APP_safeoutput (void)
+void APP_safeoutput(void)
 {
-   DPRINT ("APP_safeoutput\n");
+   DPRINT("APP_safeoutput\n");
 
-   if(ESCvar.safeoutput_override != NULL)
+   if (ESCvar.safeoutput_override != NULL)
    {
       (ESCvar.safeoutput_override)();
    }
@@ -143,9 +143,9 @@ void APP_safeoutput (void)
 
 /** Write local process data to Sync Manager 3, Master Inputs.
  */
-void TXPDO_update (void)
+void TXPDO_update(void)
 {
-   if(ESCvar.txpdo_override != NULL)
+   if (ESCvar.txpdo_override != NULL)
    {
       (ESCvar.txpdo_override)();
    }
@@ -153,26 +153,26 @@ void TXPDO_update (void)
    {
       if (MAX_MAPPINGS_SM3 > 0)
       {
-         COE_pdoPack (txpdo, ESCvar.sm3mappings, SMmap3);
+         COE_pdoPack(txpdo, ESCvar.sm3mappings, SMmap3);
       }
-      ESC_write (ESC_SM3_sma, txpdo, ESCvar.ESC_SM3_sml);
+      ESC_write(ESC_SM3_sma, txpdo, ESCvar.ESC_SM3_sml);
    }
 }
 
 /** Read Sync Manager 2 to local process data, Master Outputs.
  */
-void RXPDO_update (void)
+void RXPDO_update(void)
 {
-   if(ESCvar.rxpdo_override != NULL)
+   if (ESCvar.rxpdo_override != NULL)
    {
       (ESCvar.rxpdo_override)();
    }
    else
    {
-      ESC_read (ESC_SM2_sma, rxpdo, ESCvar.ESC_SM2_sml);
+      ESC_read(ESC_SM2_sma, rxpdo, ESCvar.ESC_SM2_sml);
       if (MAX_MAPPINGS_SM2 > 0)
       {
-         COE_pdoUnpack (rxpdo, ESCvar.sm2mappings, SMmap2);
+         COE_pdoUnpack(rxpdo, ESCvar.sm2mappings, SMmap2);
       }
    }
 }
@@ -182,7 +182,7 @@ void RXPDO_update (void)
  *
  * @param[in] watchdogcnt  = new watchdog count value
  */
-void APP_setwatchdog (int watchdogcnt)
+void APP_setwatchdog(int watchdogcnt)
 {
    CC_ATOMIC_SET(ESCvar.watchdogcnt, watchdogcnt);
 }
@@ -191,10 +191,11 @@ void APP_setwatchdog (int watchdogcnt)
  * write ethercat inputs. Implement watch-dog counter to count-out if we have
  * made state change affecting the App.state.
  */
-void DIG_process (uint8_t flags)
+
+void DIG_process(uint16_t ALEvent, uint8_t flags)
 {
    /* Handle watchdog */
-   if((flags & DIG_PROCESS_WD_FLAG) > 0)
+   if ((flags & DIG_PROCESS_WD_FLAG) > 0)
    {
       if (CC_ATOMIC_GET(watchdog) > 0)
       {
@@ -207,7 +208,7 @@ void DIG_process (uint8_t flags)
          DPRINT("DIG_process watchdog expired\n");
          ESC_ALstatusgotoerror((ESCsafeop | ESCerror), ALERR_WATCHDOG);
       }
-      else if(((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) == 0))
+      else if (((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) == 0))
       {
          CC_ATOMIC_SET(watchdog, ESCvar.watchdogcnt);
       }
@@ -216,15 +217,15 @@ void DIG_process (uint8_t flags)
    /* Handle Outputs */
    if ((flags & DIG_PROCESS_OUTPUTS_FLAG) > 0)
    {
-      if(((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) > 0) &&
-         (ESCvar.ALevent & ESCREG_ALEVENT_SM2))
+      if (((CC_ATOMIC_GET(ESCvar.App.state) & APPSTATE_OUTPUT) > 0) &&
+          (ALEvent & ESCREG_ALEVENT_SM2))
       {
          RXPDO_update();
          CC_ATOMIC_SET(watchdog, ESCvar.watchdogcnt);
          /* Set outputs */
          cb_set_outputs();
       }
-      else if (ESCvar.ALevent & ESCREG_ALEVENT_SM2)
+      else if (ALEvent & ESCREG_ALEVENT_SM2)
       {
          RXPDO_update();
       }
@@ -243,7 +244,7 @@ void DIG_process (uint8_t flags)
    /* Handle Inputs */
    if ((flags & DIG_PROCESS_INPUTS_FLAG) > 0)
    {
-      if(CC_ATOMIC_GET(ESCvar.App.state) > 0)
+      if (CC_ATOMIC_GET(ESCvar.App.state) > 0)
       {
          /* Update inputs */
          cb_get_inputs();
@@ -257,7 +258,7 @@ void DIG_process (uint8_t flags)
  * control what interrupts that should be served and re-activated with
  * event mask argument
  */
-void ecat_slv_worker (uint32_t event_mask)
+void ecat_slv_worker(uint32_t event_mask)
 {
    do
    {
@@ -289,21 +290,21 @@ void ecat_slv_worker (uint32_t event_mask)
 
       CC_ATOMIC_SET(ESCvar.ALevent, ESC_ALeventread());
 
-   }while(ESCvar.ALevent & event_mask);
+   } while (ESCvar.ALevent & event_mask);
 
    ESC_ALeventmaskwrite(ESC_ALeventmaskread() | event_mask);
 }
 
 /*
- * Polling function. It should be called periodically for an application 
+ * Polling function. It should be called periodically for an application
  * when only SM2/DC interrupt is active.
  * Read and handle events for the EtherCAT state, status, mailbox and eeprom.
  */
-void ecat_slv_poll (void)
+void ecat_slv_poll(void)
 {
    /* Read local time from ESC*/
-   ESC_read (ESCREG_LOCALTIME, (void *) &ESCvar.Time, sizeof (ESCvar.Time));
-   ESCvar.Time = etohl (ESCvar.Time);
+   ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
+   ESCvar.Time = etohl(ESCvar.Time);
 
    /* Check the state machine */
    ESC_state();
@@ -336,50 +337,50 @@ void ecat_slv_poll (void)
 /*
  * Poll all events in a free-run application
  */
-void ecat_slv (void)
+void ecat_slv(void)
 {
    ecat_slv_poll();
-   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
-         DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+   DIG_process(ESC_ALeventread(), DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+                                      DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
 }
 
 /*
  * Initialize the slave stack.
  */
-void ecat_slv_init (esc_cfg_t * config)
+void ecat_slv_init(esc_cfg_t *config)
 {
    /* Init watchdog */
    watchdog = config->watchdog_cnt;
 
    /* Call stack configuration */
-   ESC_config (config);
+   ESC_config(config);
    /* Call HW init */
-   ESC_init (config);
+   ESC_init(config);
 
    /*  wait until ESC is started up */
    while ((ESCvar.DLstatus & 0x0001) == 0)
    {
-      ESC_read (ESCREG_DLSTATUS, (void *) &ESCvar.DLstatus,
-                sizeof (ESCvar.DLstatus));
-      ESCvar.DLstatus = etohs (ESCvar.DLstatus);
+      ESC_read(ESCREG_DLSTATUS, (void *)&ESCvar.DLstatus,
+               sizeof(ESCvar.DLstatus));
+      ESCvar.DLstatus = etohs(ESCvar.DLstatus);
    }
 
 #if USE_FOE
    /* Init FoE */
-   FOE_init ();
+   FOE_init();
 #endif
 
 #if USE_EOE
    /* Init EoE */
-   EOE_init ();
+   EOE_init();
 #endif
 
    /* reset ESC to init state */
-   ESC_ALstatus (ESCinit);
-   ESC_ALerror (ALERR_NONE);
-   ESC_stopmbx ();
-   ESC_stopinput ();
-   ESC_stopoutput ();
+   ESC_ALstatus(ESCinit);
+   ESC_ALerror(ALERR_NONE);
+   ESC_stopmbx();
+   ESC_stopinput();
+   ESC_stopoutput();
    /* Init Object Dictionary default values */
-   COE_initDefaultValues ();
+   COE_initDefaultValues();
 }

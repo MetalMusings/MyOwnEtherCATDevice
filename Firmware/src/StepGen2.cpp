@@ -31,21 +31,21 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
 {
     frequency = 0;
     nSteps = 0;
-    dbg=0;
+    dbg = 0;
     if (!enabled) // Just .... don't
         return updatePos(0);
 
     commandedStepPosition = floor(commandedPosition * stepsPerMM); // Scale position to steps
+#if 0
     if (initialStepPosition == commandedStepPosition)              // No movement
     {
-
         return updatePos(1);
     }
-
+#endif
     nSteps = commandedStepPosition - initialStepPosition;
     lcncCycleTime = nLoops * StepGen2::sync0CycleTime * 1.0e-9; // nLoops is there in case we missed an ethercat cycle. secs
 
-    if (abs(nSteps) < 1)                                                                    // Some small number
+    if (abs(nSteps) < 0)                                                                    // Some small number
     {                                                                                       //
         frequency = (abs(nSteps) + 1) / lcncCycleTime;                                      // Distribute steps inside available time
         Tpulses = abs(nSteps) / frequency;                                                  //
@@ -63,12 +63,14 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
         Tpulses = abs(nSteps) / frequency;
     }
     updatePos(5);
+    return 1;
     uint32_t timeSinceISR = (longTime.extendTime(micros()) - irqTime); // Diff time from ISR (usecs)
     dbg = timeSinceISR;                                                //
     Tstartu = Tjitter + uint32_t(Tstartf * 1e6) - timeSinceISR;        // Have already wasted some time since the irq.
 
     timerFrequency = uint32_t(ceil(frequency));
     startTimer->setOverflow(Tstartu, MICROSEC_FORMAT); // All handled by irqs
+    startTimer->refresh();
     startTimer->resume();
     return 1;
 }
@@ -83,6 +85,7 @@ void StepGen2::startTimerCB()
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
     // pulseTimer->setCaptureCompare(pulseTimerChan, t3, MICROSEC_COMPARE_FORMAT);
     pulseTimer->setCaptureCompare(pulseTimerChan, 50, PERCENT_COMPARE_FORMAT);
+    pulseTimer->refresh();
     pulseTimer->resume();
 }
 
@@ -112,7 +115,7 @@ int64_t extend32to64::extendTime(uint32_t in)
 
     // wrap difference from -HALF_PERIOD to HALF_PERIOD. modulo prevents differences after the wrap from having an incorrect result
     int64_t mod_dif = ((dif + HALF_PERIOD) % ONE_PERIOD) - HALF_PERIOD;
-    if (dif < -HALF_PERIOD)
+    if (dif < int64_t(-HALF_PERIOD))
         mod_dif += ONE_PERIOD; // account for mod of negative number behavior in C
 
     int64_t unwrapped = previousTimeValue + mod_dif;

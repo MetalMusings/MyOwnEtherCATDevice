@@ -35,9 +35,6 @@ void startTimerCallback2(void) { Step2.startTimerCB(); }
 
 CircularBuffer<uint32_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
-volatile uint64_t EcatTimeIRQ = 0, EcatTimeThen = 0, EcatTimeDiff = 0;
-;
-volatile uint32_t ccnnt = 0;
 extend32to64 longTime;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
@@ -53,27 +50,28 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 }
 
 uint16_t nLoops;
+uint64_t reallyNowTime = 0, reallyThenTime = 0;
+uint64_t timeDiff; // Timediff in nanoseconds
 void handleStepper(void)
 {
    if (!(ALEventIRQ & ESCREG_ALEVENT_SM2))
       return;
    // Catch the case when we miss a loop for some reason
-   uint64_t EcatTimeNow;
-   ESC_read(ESCREG_LOCALTIME, (void *)&EcatTimeNow, sizeof(EcatTimeNow));
-   EcatTimeNow = etohl(EcatTimeNow);
-   EcatTimeDiff = EcatTimeNow - EcatTimeThen;
-   nLoops = round(EcatTimeDiff / double(StepGen2::sync0CycleTime));
-   EcatTimeThen = EcatTimeNow;
+   uint32_t t = micros();
+   reallyNowTime = longTime.extendTime(t);
+   timeDiff = 1000 * (reallyNowTime - reallyThenTime);
+   nLoops = round(timeDiff / double(StepGen2::sync0CycleTime));
+   reallyThenTime = reallyNowTime;
 
    Step1.enabled = true;
    Step1.commandedPosition = Obj.CommandedPosition1;
    Step1.stepsPerMM = Obj.StepsPerMM1;
-   Step1.handleStepper(irqTime, 1/*nLoops*/);
+   Step1.handleStepper(irqTime, nLoops);
 
    Step2.enabled = true;
    Step2.commandedPosition = Obj.CommandedPosition2;
    Step2.stepsPerMM = Obj.StepsPerMM2;
-   Step2.handleStepper(irqTime, 1/*nLoops*/);
+   Step2.handleStepper(irqTime, nLoops);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -97,7 +95,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    thenTime = irqTime;
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.D1 = Step2.frequency;
-   Obj.D2 = abs(Step2.nSteps);
+   Obj.D2 = nLoops;
    Obj.D3 = Step2.Tstartu;
    Obj.D4 = Obj.D1 + Obj.D2 - Obj.D3;
 }
@@ -145,8 +143,8 @@ void loop(void)
       /* Read local time from ESC*/
       ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
       ESCvar.Time = etohl(ESCvar.Time);
-      DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
-                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
+      DIG_process(ALEventIRQ, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
+                                  DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
    }
@@ -157,11 +155,8 @@ void loop(void)
 volatile uint32_t cnt = 0;
 void sync0Handler(void)
 {
-   ccnnt++;
    ALEventIRQ = ESC_ALeventread();
    serveIRQ = 1;
-   ESC_read(ESCREG_LOCALTIME, (void *)&EcatTimeIRQ, sizeof(EcatTimeIRQ));
-   EcatTimeIRQ = etohl(EcatTimeIRQ);
    irqTime = longTime.extendTime(micros());
 }
 
