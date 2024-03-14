@@ -33,7 +33,7 @@ StepGen2 Step2(TIM3, 4, PC_9, PC10, pulseTimerCallback2, TIM11, startTimerCallba
 void pulseTimerCallback2(void) { Step2.pulseTimerCB(); }
 void startTimerCallback2(void) { Step2.startTimerCB(); }
 
-CircularBuffer<uint32_t, 200> Tim;
+CircularBuffer<uint64_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
 extend32to64 longTime;
 
@@ -54,13 +54,11 @@ uint64_t reallyNowTime = 0, reallyThenTime = 0;
 uint64_t timeDiff; // Timediff in nanoseconds
 void handleStepper(void)
 {
-   if (!(ALEventIRQ & ESCREG_ALEVENT_SM2))
-      return;
    // Catch the case when we miss a loop for some reason
    uint32_t t = micros();
    reallyNowTime = longTime.extendTime(t);
    timeDiff = 1000 * (reallyNowTime - reallyThenTime);
-   nLoops = round(timeDiff / double(StepGen2::sync0CycleTime));
+   nLoops = round(double(timeDiff) / double(StepGen2::sync0CycleTime));
    reallyThenTime = reallyNowTime;
 
    Step1.enabled = true;
@@ -81,9 +79,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
 
-   uint32_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
+   uint64_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
-   uint32_t max_Tim = 0, min_Tim = UINT32_MAX;
+   uint64_t max_Tim = 0, min_Tim = UINT64_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
    {
       uint32_t aTim = Tim[i];
@@ -96,8 +94,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.D1 = Step2.frequency;
    Obj.D2 = nLoops;
-   Obj.D3 = Step2.Tstartu;
-   Obj.D4 = Obj.D1 + Obj.D2 - Obj.D3;
+   Obj.D3 = max_Tim - min_Tim;
+   Obj.D4 = ALEventIRQ;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -136,10 +134,10 @@ void setup(void)
 
 void loop(void)
 {
-   uint32_t dTime;
+   uint64_t dTime;
    if (serveIRQ)
    {
-      nowTime = micros();
+      nowTime = longTime.extendTime(micros());
       /* Read local time from ESC*/
       ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
       ESCvar.Time = etohl(ESCvar.Time);
@@ -147,17 +145,21 @@ void loop(void)
                                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
       ESCvar.PrevTime = ESCvar.Time;
+      ecat_slv_poll();
    }
-   dTime = micros() - irqTime;
-   if ((dTime > 200 && dTime < 500) || dTime > 1500) // Don't run ecat_slv_poll when expecting to serve interrupt
+   dTime = longTime.extendTime(micros()) - irqTime;
+   if ((dTime > 500 && dTime < 800) || dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
       ecat_slv_poll();
 }
-volatile uint32_t cnt = 0;
+
 void sync0Handler(void)
 {
    ALEventIRQ = ESC_ALeventread();
-   serveIRQ = 1;
-   irqTime = longTime.extendTime(micros());
+   if (ALEventIRQ & ESCREG_ALEVENT_SM2)
+   {
+      serveIRQ = 1;
+      irqTime = longTime.extendTime(micros());
+   }
 }
 
 // Enable SM2 interrupts
