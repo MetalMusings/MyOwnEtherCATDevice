@@ -8,8 +8,9 @@ class StepGen2
 public:
     volatile double_t actualPosition;
     volatile int32_t nSteps;
-    volatile uint32_t timerPulseSteps;
     volatile uint32_t timerFrequency;
+    volatile int32_t timerPosition = 0;
+    volatile int32_t timerEndPosition = 0;
 
 public:
     volatile float Tstartf;    // Starting delay in secs
@@ -21,7 +22,7 @@ public:
     HardwareTimer *startTimer; // Use timers 10,11,13,14
     uint8_t dirPin;
     PinName stepPin;
-    uint32_t Tjitter = 400; // Longest time from IRQ to handling in handleStepper, unit is microseconds
+    uint32_t Tjitter = 350; // Longest time from IRQ to handling in handleStepper, unit is microseconds
     uint64_t dbg;
     const uint16_t t2 = 5;                                            // DIR is ahead of PUL with at least 5 usecs
     const uint16_t t3 = 3;                                            // Pulse width at least 2.5 usecs
@@ -37,8 +38,8 @@ public:
     volatile uint8_t enabled;               // Enabled step generator
     volatile float frequency;
 
-    static uint32_t sync0CycleTime;     // Nominal EtherCAT cycle time nanoseconds
-    volatile float lcncCycleTime;       // Linuxcnc nominal cycle time in sec (1 ms often)
+    static uint32_t sync0CycleTime; // Nominal EtherCAT cycle time nanoseconds
+    volatile float lcncCycleTime;   // Linuxcnc nominal cycle time in sec (1 ms often)
 
     StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin, uint8_t _dirPin, void irq(void), TIM_TypeDef *Timer2, void irq2(void));
 
@@ -52,7 +53,7 @@ class extend32to64
 {
 public:
     int64_t previousTimeValue = 0;
-    const uint64_t ONE_PERIOD =  4294967296; // almost UINT32_MAX;
+    const uint64_t ONE_PERIOD = 4294967296;  // almost UINT32_MAX;
     const uint64_t HALF_PERIOD = 2147483648; // Half of that
     int64_t extendTime(uint32_t in);
 };

@@ -45,8 +45,6 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    // Step2.reqPos(Obj.CommandedPosition2);
    // Step2.setScale(Obj.StepsPerMM2);
    // Step2.enable(1);
-   Obj.ActualPosition1 = Obj.CommandedPosition1; // Step1.actPos();
-   Obj.ActualPosition2 = Obj.CommandedPosition2; // Step2.actPos();
 }
 
 uint16_t nLoops;
@@ -78,6 +76,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.EncPos = Encoder1.currentPos();
    Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    Obj.IndexByte = Encoder1.getIndexState();
+   float_t ap2 = Obj.ActualPosition2;
+   Obj.ActualPosition1 = Obj.CommandedPosition1; // Step1.actPos();
+   Obj.ActualPosition2 = Obj.CommandedPosition2; // Step2.actPos();
 
    uint64_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
@@ -93,9 +94,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    thenTime = irqTime;
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.D1 = Step2.frequency;
-   Obj.D2 = nLoops;
-   Obj.D3 = max_Tim - min_Tim;
-   Obj.D4 = ALEventIRQ;
+   Obj.D2 = Step2.nSteps;
+   Obj.D3 = abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D4 = Step2.Tstartu;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -139,8 +140,8 @@ void loop(void)
    {
       nowTime = longTime.extendTime(micros());
       /* Read local time from ESC*/
-      ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
-      ESCvar.Time = etohl(ESCvar.Time);
+      // ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
+      // ESCvar.Time = etohl(ESCvar.Time);
       DIG_process(ALEventIRQ, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
                                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
@@ -148,14 +149,14 @@ void loop(void)
       ecat_slv_poll();
    }
    dTime = longTime.extendTime(micros()) - irqTime;
-   if ((dTime > 500 && dTime < 800) || dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
+   if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
       ecat_slv_poll();
 }
 
 void sync0Handler(void)
 {
    ALEventIRQ = ESC_ALeventread();
-   if (ALEventIRQ & ESCREG_ALEVENT_SM2)
+   // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       serveIRQ = 1;
       irqTime = longTime.extendTime(micros());

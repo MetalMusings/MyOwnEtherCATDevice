@@ -63,10 +63,13 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
         Tpulses = abs(nSteps) / frequency;
     }
     updatePos(5);
-    return 1;
+
     uint32_t timeSinceISR = (longTime.extendTime(micros()) - irqTime); // Diff time from ISR (usecs)
     dbg = timeSinceISR;                                                //
     Tstartu = Tjitter + uint32_t(Tstartf * 1e6) - timeSinceISR;        // Have already wasted some time since the irq.
+
+    if (nSteps == 0) // Can do this much earlier, but want some calculated data for debugging
+        return updatePos(1);
 
     timerFrequency = uint32_t(ceil(frequency));
     startTimer->setOverflow(Tstartu, MICROSEC_FORMAT); // All handled by irqs
@@ -77,13 +80,13 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
 
 void StepGen2::startTimerCB()
 {
-    startTimer->pause(); // Once is enough.
-    digitalWrite(dirPin, nSteps < 0 ? HIGH : LOW);
-    // There will be a short break here for t2 usecs, in the future.
-    timerPulseSteps = abs(nSteps);
-    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
+    startTimer->pause();                                                    // Once is enough.
+    digitalWriteFast(digitalPinToPinName(dirPin), nSteps < 0 ? HIGH : LOW); // nSteps negative => decrease, HIGH
+                                                                            // There will be a short break here for t2 usecs, in the future.
+    timerEndPosition += nSteps;
+    pulseTimer->pause();
+    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM1, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
-    // pulseTimer->setCaptureCompare(pulseTimerChan, t3, MICROSEC_COMPARE_FORMAT);
     pulseTimer->setCaptureCompare(pulseTimerChan, 50, PERCENT_COMPARE_FORMAT);
     pulseTimer->refresh();
     pulseTimer->resume();
@@ -91,10 +94,21 @@ void StepGen2::startTimerCB()
 
 void StepGen2::pulseTimerCB()
 {
-    --timerPulseSteps;
-    if (timerPulseSteps == 0)
-    {
+    int16_t dir = digitalReadFast(digitalPinToPinName(dirPin));
+    if (dir == HIGH)
+        timerPosition--;
+    else
+        timerPosition++;
+    int32_t diffPosition = timerEndPosition - timerPosition; // Same "polarity" as nSteps
+    if (diffPosition == 0)
         pulseTimer->pause();
+    else
+    {
+        if (diffPosition < 0 && dir == LOW)                      // Change direction. Should not end up here, but alas
+            digitalWriteFast(digitalPinToPinName(dirPin), HIGH); // Normal is to be HIGH when decreasing
+        if (diffPosition > 0 && dir == HIGH)                     // Change direction. Should not end up here, but alas
+            digitalWriteFast(digitalPinToPinName(dirPin), LOW);  // Normal is to be LOW when increasing
+                                                                 // Normally nothing is needed
     }
 }
 
