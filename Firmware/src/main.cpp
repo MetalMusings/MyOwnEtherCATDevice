@@ -58,7 +58,7 @@ void handleStepper(void)
    timeDiff = 1000 * (reallyNowTime - reallyThenTime);
    nLoops = round(double(timeDiff) / double(StepGen2::sync0CycleTime));
    reallyThenTime = reallyNowTime;
-
+nLoops=1;
    Step1.enabled = true;
    Step1.commandedPosition = Obj.CommandedPosition1;
    Step1.stepsPerMM = Obj.StepsPerMM1;

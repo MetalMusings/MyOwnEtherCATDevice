@@ -84,8 +84,7 @@ void StepGen2::startTimerCB()
     digitalWriteFast(digitalPinToPinName(dirPin), nSteps < 0 ? HIGH : LOW); // nSteps negative => decrease, HIGH
                                                                             // There will be a short break here for t2 usecs, in the future.
     timerEndPosition += nSteps;
-    pulseTimer->pause();
-    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM1, stepPin);
+    pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
     pulseTimer->setCaptureCompare(pulseTimerChan, 50, PERCENT_COMPARE_FORMAT);
     pulseTimer->refresh();

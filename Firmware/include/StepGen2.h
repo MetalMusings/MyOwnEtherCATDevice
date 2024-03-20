@@ -22,7 +22,7 @@ public:
     HardwareTimer *startTimer; // Use timers 10,11,13,14
     uint8_t dirPin;
     PinName stepPin;
-    uint32_t Tjitter = 350; // Longest time from IRQ to handling in handleStepper, unit is microseconds
+    uint32_t Tjitter = 400; // Longest time from IRQ to handling in handleStepper, unit is microseconds
     uint64_t dbg;
     const uint16_t t2 = 5;                                            // DIR is ahead of PUL with at least 5 usecs
     const uint16_t t3 = 3;                                            // Pulse width at least 2.5 usecs
