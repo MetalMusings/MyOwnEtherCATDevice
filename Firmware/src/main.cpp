@@ -18,18 +18,19 @@ void indexPulseEncoderCB1(void)
    Encoder1.indexPulse();
 }
 
-#include "StepGen2.h"
+#include "StepGen3.h"
+#include "extend32to64.h"
 // Stepper 1
 void pulseTimerCallback1(void);
 void startTimerCallback1(void);
-StepGen2 Step1(TIM1, 4, PA_11, PA12, pulseTimerCallback1, TIM10, startTimerCallback1);
+StepGen3 Step1(TIM1, 4, PA_11, PA12, pulseTimerCallback1, TIM10, startTimerCallback1);
 void pulseTimerCallback1(void) { Step1.pulseTimerCB(); }
 void startTimerCallback1(void) { Step1.startTimerCB(); }
 
 // Stepper 2
 void pulseTimerCallback2(void);
 void startTimerCallback2(void);
-StepGen2 Step2(TIM3, 4, PC_9, PC10, pulseTimerCallback2, TIM11, startTimerCallback2);
+StepGen3 Step2(TIM3, 4, PC_9, PC10, pulseTimerCallback2, TIM11, startTimerCallback2);
 void pulseTimerCallback2(void) { Step2.pulseTimerCB(); }
 void startTimerCallback2(void) { Step2.startTimerCB(); }
 
@@ -56,7 +57,7 @@ void handleStepper(void)
    uint32_t t = micros();
    reallyNowTime = longTime.extendTime(t);
    timeDiff = 1000 * (reallyNowTime - reallyThenTime);
-   nLoops = round(double(timeDiff) / double(StepGen2::sync0CycleTime));
+   nLoops = round(double(timeDiff) / double(StepGen3::sync0CycleTime));
    reallyThenTime = reallyNowTime;
 nLoops=1;
    Step1.enabled = true;
@@ -210,6 +211,6 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   StepGen2::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
+   StepGen3::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
    return 0;
 }
