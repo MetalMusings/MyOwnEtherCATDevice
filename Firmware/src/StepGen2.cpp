@@ -18,6 +18,7 @@ StepGen2::StepGen2(TIM_TypeDef *Timer, uint32_t _timerChannel, PinName _stepPin,
     enabled = 0;
 
     dirPin = _dirPin;
+    dirPinName = digitalPinToPinName(dirPin);
     stepPin = _stepPin;
     pulseTimerChan = _timerChannel;
     pulseTimer = new HardwareTimer(Timer);
@@ -36,13 +37,11 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
         return updatePos(0);
 
     commandedStepPosition = floor(commandedPosition * stepsPerMM); // Scale position to steps
-#if 0
-    if (initialStepPosition == commandedStepPosition)              // No movement
+    nSteps = commandedStepPosition - initialStepPosition;
+    if (nSteps == 0) // No movement
     {
         return updatePos(1);
     }
-#endif
-    nSteps = commandedStepPosition - initialStepPosition;
     lcncCycleTime = nLoops * StepGen2::sync0CycleTime * 1.0e-9; // nLoops is there in case we missed an ethercat cycle. secs
 
     if (abs(nSteps) < 0)                                                                    // Some small number
@@ -80,21 +79,23 @@ uint32_t StepGen2::handleStepper(uint64_t irqTime, uint16_t nLoops)
 
 void StepGen2::startTimerCB()
 {
-    startTimer->pause();                                                    // Once is enough.
-    digitalWriteFast(digitalPinToPinName(dirPin), nSteps < 0 ? HIGH : LOW); // nSteps negative => decrease, HIGH
-                                                                            // There will be a short break here for t2 usecs, in the future.
+    startTimer->pause();                                   // Once is enough.
+    digitalWriteFast(dirPinName, nSteps < 0 ? HIGH : LOW); // nSteps negative => decrease, HIGH
+                                                           // There will be a short break here for t2 usecs, in the future.
+
     timerEndPosition += nSteps;
     pulseTimer->setMode(pulseTimerChan, TIMER_OUTPUT_COMPARE_PWM2, stepPin);
     pulseTimer->setOverflow(timerFrequency, HERTZ_FORMAT);
-    pulseTimer->setCaptureCompare(pulseTimerChan, 50, PERCENT_COMPARE_FORMAT);
+    // pulseTimer->setCaptureCompare(pulseTimerChan, 50, PERCENT_COMPARE_FORMAT);
+    pulseTimer->setCaptureCompare(pulseTimerChan, t3, MICROSEC_COMPARE_FORMAT);
     pulseTimer->refresh();
     pulseTimer->resume();
 }
 
 void StepGen2::pulseTimerCB()
 {
-    int16_t dir = digitalReadFast(digitalPinToPinName(dirPin));
-    if (dir == HIGH)
+    int16_t dir = digitalReadFast(dirPinName); //
+    if (dir == HIGH)                           // The step just taken
         timerPosition--;
     else
         timerPosition++;
@@ -103,11 +104,11 @@ void StepGen2::pulseTimerCB()
         pulseTimer->pause();
     else
     {
-        if (diffPosition < 0 && dir == LOW)                      // Change direction. Should not end up here, but alas
-            digitalWriteFast(digitalPinToPinName(dirPin), HIGH); // Normal is to be HIGH when decreasing
-        if (diffPosition > 0 && dir == HIGH)                     // Change direction. Should not end up here, but alas
-            digitalWriteFast(digitalPinToPinName(dirPin), LOW);  // Normal is to be LOW when increasing
-                                                                 // Normally nothing is needed
+        if (diffPosition < 0 && dir == LOW)     // Change direction. Should not end up here, but alas
+            digitalWriteFast(dirPinName, HIGH); // Normal is to be HIGH when decreasing
+        if (diffPosition > 0 && dir == HIGH)    // Change direction. Should not end up here, but alas
+            digitalWriteFast(dirPinName, LOW);  // Normal is to be LOW when increasing
+                                                // Normally nothing is needed
     }
 }
 

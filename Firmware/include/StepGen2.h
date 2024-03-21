@@ -21,12 +21,13 @@ public:
     uint32_t pulseTimerChan;
     HardwareTimer *startTimer; // Use timers 10,11,13,14
     uint8_t dirPin;
+    PinName dirPinName;
     PinName stepPin;
     uint32_t Tjitter = 400; // Longest time from IRQ to handling in handleStepper, unit is microseconds
     uint64_t dbg;
     const uint16_t t2 = 5;                                            // DIR is ahead of PUL with at least 5 usecs
-    const uint16_t t3 = 3;                                            // Pulse width at least 2.5 usecs
-    const uint16_t t4 = 3;                                            // Low level width not less than 2.5 usecs
+    const uint16_t t3 = 5;                                            // Pulse width at least 2.5 usecs
+    const uint16_t t4 = 5;                                            // Low level width not less than 2.5 usecs
     const float maxAllowedFrequency = 1000000 / float(t3 + t4) * 0.9; // 150 kHz for now
 
 public:
