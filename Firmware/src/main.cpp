@@ -103,6 +103,21 @@ static esc_cfg_t config =
 
 volatile byte serveIRQ = 0;
 #endif
+
+StepGen3 *Step = 0;
+
+void basePeriodCB(void)
+{
+   if (Step && Step->stepgen_array)
+   {
+      Step->make_pulses(Step->stepgen_array, BASE_PERIOD);
+      stepgen_t *step;
+      step = &(Step->stepgen_array[0]);
+      digitalWrite(PA6, step->phase[DIR_PIN] ? LOW : HIGH);
+      digitalWrite(PA7, step->phase[STEP_PIN] ? LOW : HIGH);
+   }
+}
+
 void setup(void)
 {
    Serial1.begin(115200);
@@ -114,12 +129,20 @@ void setup(void)
    pinMode(PA7, OUTPUT);
    digitalWrite(PA6, HIGH);
    digitalWrite(PA7, HIGH);
+   Step = new StepGen3;
+
+   HardwareTimer *MyTim = new HardwareTimer(TIM3);
+   MyTim->setOverflow(BASE_PERIOD, MICROSEC_FORMAT);
+   MyTim->attachInterrupt(basePeriodCB);
+   MyTim->resume();
 }
 
+double pos = 0;
 void loop(void)
 {
-   StepGen3 Step;
-
+   Step->test(pos);
+   pos += 1;
+   delay(1000);
 #if SGT
    uint64_t dTime;
    if (serveIRQ)

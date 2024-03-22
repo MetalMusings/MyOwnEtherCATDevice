@@ -75,7 +75,7 @@ public:
     char *ctrl_type[MAX_CHAN] = {0};                                                                                   // control type ("p"pos or "v"vel) for up to 16 channels
     volatile int user_step_type[MAX_CYCLE] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; // lookup table for user-defined step type
 
-    stepgen_t *stepgen_array;
+    stepgen_t *stepgen_array = 0;
 
     volatile int num_chan = 0;  // number of step generators configured */
     volatile long periodns;     // makepulses function period in nanosec */
@@ -88,6 +88,7 @@ public:
     volatile double recip_dt;   // recprocal of period, avoids divides */
 
     StepGen3(void);
+    void test(double pos_cmd);
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
     void make_pulses(void *arg, long period);
@@ -138,5 +139,11 @@ private:
             0,
     };
 };
+
+// For the example
+#define BASE_PERIOD 50000
+#define SERVO_PERIOD 1000000
+#define JOINT_0_STEPGEN_MAXACCEL 520.0
+#define JOINT_0_SCALE 200
 
 #endif
