@@ -7,95 +7,50 @@
 #define MAX_CYCLE 18
 #define USER_STEP_TYPE 13
 
-typedef int hal_s32_t;
-typedef int hal_bit_t;
-typedef unsigned int hal_u32_t;
-typedef float hal_float_t;
-
 typedef struct
 {
     /* stuff that is both read and written by makepulses */
-    unsigned int timer1;      /* times out when step pulse should end */
-    unsigned int timer2;      /* times out when safe to change dir */
-    unsigned int timer3;      /* times out when safe to step in new dir */
-    int hold_dds;             /* prevents accumulator from updating */
-    long addval;              /* actual frequency generator add value */
-    volatile long long accum; /* frequency generator accumulator */
-    hal_s32_t rawcount;       /* param: position feedback in counts */
-    int curr_dir;             /* current direction */
-    int state;                /* current position in state table */
+    volatile unsigned int timer1; /* times out when step pulse should end */
+    volatile unsigned int timer2; /* times out when safe to change dir */
+    volatile unsigned int timer3; /* times out when safe to step in new dir */
+    volatile int hold_dds;        /* prevents accumulator from updating */
+    volatile long addval;         /* actual frequency generator add value */
+    volatile long long accum;     /* frequency generator accumulator */
+    volatile int rawcount;        /* param: position feedback in counts */
+    volatile int curr_dir;        /* current direction */
+    volatile int state;           /* current position in state table */
     /* stuff that is read but not written by makepulses */
-    hal_bit_t enable;         /* pin for enable stepgen */
-    long target_addval;       /* desired freq generator add value */
-    long deltalim;            /* max allowed change per period */
-    hal_u32_t step_len;       /* parameter: step pulse length */
-    hal_u32_t dir_hold_dly;   /* param: direction hold time or delay */
-    hal_u32_t dir_setup;      /* param: direction setup time */
-    int step_type;            /* stepping type - see list above */
-    int cycle_max;            /* cycle length for step types 2 and up */
-    int num_phases;           /* number of phases for types 2 and up */
-    hal_bit_t phase[5];       /* pins for output signals */
-    const unsigned char *lut; /* pointer to state lookup table */
+    volatile int enable;                /* pin for enable stepgen */
+    volatile int target_addval;         /* desired freq generator add value */
+    volatile long deltalim;             /* max allowed change per period */
+    volatile int step_len;              /* parameter: step pulse length */
+    volatile unsigned int dir_hold_dly; /* param: direction hold time or delay */
+    volatile unsigned int dir_setup;    /* param: direction setup time */
+    volatile int step_type;             /* stepping type - see list above */
+    volatile int cycle_max;             /* cycle length for step types 2 and up */
+    volatile int num_phases;            /* number of phases for types 2 and up */
+    volatile int phase[5];              /* pins for output signals */
+    volatile const unsigned char *lut;  /* pointer to state lookup table */
     /* stuff that is not accessed by makepulses */
-    int pos_mode;           /* 1 = position mode, 0 = velocity mode */
-    hal_u32_t step_space;   /* parameter: min step pulse spacing */
-    double old_pos_cmd;     /* previous position command (counts) */
-    hal_s32_t count;        /* pin: captured feedback in counts */
-    hal_float_t pos_scale;  /* param: steps per position unit */
-    double old_scale;       /* stored scale value */
-    double scale_recip;     /* reciprocal value used for scaling */
-    hal_float_t vel_cmd;    /* pin: velocity command (pos units/sec) */
-    hal_float_t pos_cmd;    /* pin: position command (position units) */
-    hal_float_t pos_fb;     /* pin: position feedback (position units) */
-    hal_float_t freq;       /* param: frequency command */
-    hal_float_t maxvel;     /* param: max velocity, (pos units/sec) */
-    hal_float_t maxaccel;   /* param: max accel (pos units/sec^2) */
-    hal_u32_t old_step_len; /* used to detect parameter changes */
-    hal_u32_t old_step_space;
-    hal_u32_t old_dir_hold_dly;
-    hal_u32_t old_dir_setup;
-    int printed_error; /* flag to avoid repeated printing */
+    volatile int pos_mode;              /* 1 = position mode, 0 = velocity mode */
+    volatile unsigned int step_space;   /* parameter: min step pulse spacing */
+    volatile double old_pos_cmd;        /* previous position command (counts) */
+    volatile int count;                 /* pin: captured feedback in counts */
+    volatile double pos_scale;          /* param: steps per position unit */
+    double old_scale;                   /* stored scale value */
+    double scale_recip;                 /* reciprocal value used for scaling */
+    volatile double vel_cmd;            /* pin: velocity command (pos units/sec) */
+    volatile double pos_cmd;            /* pin: position command (position units) */
+    volatile double pos_fb;             /* pin: position feedback (position units) */
+    volatile double freq;               /* param: frequency command */
+    volatile double maxvel;             /* param: max velocity, (pos units/sec) */
+    volatile double maxaccel;           /* param: max accel (pos units/sec^2) */
+    volatile unsigned int old_step_len; /* used to detect parameter changes */
+    volatile unsigned int old_step_space;
+    volatile unsigned int old_dir_hold_dly;
+    volatile unsigned int old_dir_setup;
+    volatile int printed_error; /* flag to avoid repeated printing */
 } stepgen_t;
-
-/* lookup tables for stepping types 2 and higher - phase A is the LSB */
-
-static unsigned char master_lut[][MAX_CYCLE] = {
-    {1, 3, 2, 0, 0, 0, 0, 0, 0, 0},        /* type 2: Quadrature */
-    {1, 2, 4, 0, 0, 0, 0, 0, 0, 0},        /* type 3: Three Wire */
-    {1, 3, 2, 6, 4, 5, 0, 0, 0, 0},        /* type 4: Three Wire Half Step */
-    {1, 2, 4, 8, 0, 0, 0, 0, 0, 0},        /* 5: Unipolar Full Step 1 */
-    {3, 6, 12, 9, 0, 0, 0, 0, 0, 0},       /* 6: Unipoler Full Step 2 */
-    {1, 7, 14, 8, 0, 0, 0, 0, 0, 0},       /* 7: Bipolar Full Step 1 */
-    {5, 6, 10, 9, 0, 0, 0, 0, 0, 0},       /* 8: Bipoler Full Step 2 */
-    {1, 3, 2, 6, 4, 12, 8, 9, 0, 0},       /* 9: Unipolar Half Step */
-    {1, 5, 7, 6, 14, 10, 8, 9, 0, 0},      /* 10: Bipolar Half Step */
-    {1, 2, 4, 8, 16, 0, 0, 0, 0, 0},       /* 11: Five Wire Unipolar */
-    {3, 6, 12, 24, 17, 0, 0, 0, 0, 0},     /* 12: Five Wire Wave */
-    {1, 3, 2, 6, 4, 12, 8, 24, 16, 17},    /* 13: Five Wire Uni Half */
-    {3, 7, 6, 14, 12, 28, 24, 25, 17, 19}, /* 14: Five Wire Wave Half */
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         /* 15: User-defined */
-};
-
-static unsigned char cycle_len_lut[] =
-    {4, 3, 6, 4, 4, 4, 4, 8, 8, 5, 5, 10, 10, 0};
-
-static unsigned char num_phases_lut[] =
-    {
-        2,
-        3,
-        3,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        5,
-        5,
-        5,
-        5,
-        0,
-};
 
 #define MAX_STEP_TYPE 15
 
@@ -116,21 +71,21 @@ typedef enum CONTROL
 class StepGen3
 {
 public:
-    int step_type[MAX_CHAN] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};               // stepping types for up to 16 channels
-    char *ctrl_type[MAX_CHAN] = {0};                                                                          // control type ("p"pos or "v"vel) for up to 16 channels
-    int user_step_type[MAX_CYCLE] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; // lookup table for user-defined step type
+    volatile int step_type[MAX_CHAN] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};               // stepping types for up to 16 channels
+    char *ctrl_type[MAX_CHAN] = {0};                                                                                   // control type ("p"pos or "v"vel) for up to 16 channels
+    volatile int user_step_type[MAX_CYCLE] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; // lookup table for user-defined step type
 
     stepgen_t *stepgen_array;
 
-    int num_chan = 0;       // number of step generators configured */
-    long periodns;          // makepulses function period in nanosec */
-    long old_periodns;      // used to detect changes in periodns */
-    static double periodfp; // makepulses function period in seconds */
-    double freqscale;       // conv. factor from Hz to addval counts */
-    double accelscale;      // conv. Hz/sec to addval cnts/period */
-    long old_dtns;          // update_freq funct period in nsec */
-    double dt;              // update_freq period in seconds */
-    double recip_dt;        // recprocal of period, avoids divides */
+    volatile int num_chan = 0;  // number of step generators configured */
+    volatile long periodns;     // makepulses function period in nanosec */
+    volatile long old_periodns; // used to detect changes in periodns */
+    volatile double periodfp;   // makepulses function period in seconds */
+    volatile double freqscale;  // conv. factor from Hz to addval counts */
+    volatile double accelscale; // conv. Hz/sec to addval cnts/period */
+    volatile long old_dtns;     // update_freq funct period in nsec */
+    volatile double dt;         // update_freq period in seconds */
+    volatile double recip_dt;   // recprocal of period, avoids divides */
 
     StepGen3(void);
     int rtapi_app_main();
@@ -141,6 +96,47 @@ public:
     int setup_user_step_type(void);
     CONTROL parse_ctrl_type(const char *ctrl);
     unsigned long ulceil(unsigned long value, unsigned long increment);
+
+private:
+    /* lookup tables for stepping types 2 and higher - phase A is the LSB */
+
+    unsigned char master_lut[MAX_STEP_TYPE][MAX_CYCLE] = {
+        {1, 3, 2, 0, 0, 0, 0, 0, 0, 0},        /* type 2: Quadrature */
+        {1, 2, 4, 0, 0, 0, 0, 0, 0, 0},        /* type 3: Three Wire */
+        {1, 3, 2, 6, 4, 5, 0, 0, 0, 0},        /* type 4: Three Wire Half Step */
+        {1, 2, 4, 8, 0, 0, 0, 0, 0, 0},        /* 5: Unipolar Full Step 1 */
+        {3, 6, 12, 9, 0, 0, 0, 0, 0, 0},       /* 6: Unipoler Full Step 2 */
+        {1, 7, 14, 8, 0, 0, 0, 0, 0, 0},       /* 7: Bipolar Full Step 1 */
+        {5, 6, 10, 9, 0, 0, 0, 0, 0, 0},       /* 8: Bipoler Full Step 2 */
+        {1, 3, 2, 6, 4, 12, 8, 9, 0, 0},       /* 9: Unipolar Half Step */
+        {1, 5, 7, 6, 14, 10, 8, 9, 0, 0},      /* 10: Bipolar Half Step */
+        {1, 2, 4, 8, 16, 0, 0, 0, 0, 0},       /* 11: Five Wire Unipolar */
+        {3, 6, 12, 24, 17, 0, 0, 0, 0, 0},     /* 12: Five Wire Wave */
+        {1, 3, 2, 6, 4, 12, 8, 24, 16, 17},    /* 13: Five Wire Uni Half */
+        {3, 7, 6, 14, 12, 28, 24, 25, 17, 19}, /* 14: Five Wire Wave Half */
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}         /* 15: User-defined */
+    };
+
+    unsigned char cycle_len_lut[14] =
+        {4, 3, 6, 4, 4, 4, 4, 8, 8, 5, 5, 10, 10, 0};
+
+    unsigned char num_phases_lut[14] =
+        {
+            2,
+            3,
+            3,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            5,
+            5,
+            5,
+            5,
+            0,
+    };
 };
 
 #endif

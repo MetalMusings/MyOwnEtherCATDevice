@@ -1100,7 +1100,7 @@ StepGen3::StepGen3(void)
     step->pos_scale = JOINT_0_SCALE;
     step->maxaccel = JOINT_0_STEPGEN_MAXACCEL;
 
-    for (int servo_thread = 0; servo_thread < 00; servo_thread++)
+    for (int servo_thread = 0; servo_thread < 100; servo_thread++)
     {
         step->pos_cmd = servo_thread * 1;
         update_pos(step, SERVO_PERIOD);
@@ -1108,10 +1108,13 @@ StepGen3::StepGen3(void)
         for (int base_thread = 0; base_thread < 20; base_thread++)
         {
             make_pulses(stepgen_array, BASE_PERIOD);
+            digitalWrite(PA6, step->phase[DIR_PIN] ? LOW : HIGH);
+            digitalWrite(PA7, step->phase[STEP_PIN] ? LOW : HIGH);
+            delay(50);
             // printf("pos_cmd=%f\n", step->pos_cmd);
             // printf("pos_fb=%f\n", step->pos_fb);
-            printf("pickoff=%d accum=%lld addval=%d ", 1 << 28, step->accum, step->addval);
-            printf("dir=%d step=%d\n", step->phase[DIR_PIN], step->phase[STEP_PIN]);
+            // printf("pickoff=%d accum=%lld addval=%d ", 1 << 28, step->accum, step->addval);
+            // printf("dir=%d step=%d\n", step->phase[DIR_PIN], step->phase[STEP_PIN]);
         }
     }
 }

@@ -8,6 +8,10 @@ extern "C"
 _Objects Obj;
 
 HardwareSerial Serial1(PA10, PA9);
+
+// STG = StepGenTest
+#define SGT 0
+#if SGT
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 #define DEBUG_TIM8 1
 #include "MyEncoder.h"
@@ -17,8 +21,9 @@ void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
-
+#endif
 #include "StepGen3.h"
+#if SGT
 #include "extend32to64.h"
 
 CircularBuffer<uint64_t, 200> Tim;
@@ -40,7 +45,6 @@ uint64_t reallyNowTime = 0, reallyThenTime = 0;
 uint64_t timeDiff; // Timediff in nanoseconds
 void handleStepper(void)
 {
-
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -66,7 +70,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
-   Obj.D1 =0;
+   Obj.D1 = 0;
    Obj.D2 = 0;
    Obj.D3 = abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
    Obj.D4 = 0;
@@ -98,16 +102,25 @@ static esc_cfg_t config =
 };
 
 volatile byte serveIRQ = 0;
-
+#endif
 void setup(void)
 {
    Serial1.begin(115200);
+#if SGT
    rcc_config(); // probably breaks some timers.
    ecat_slv_init(&config);
+#endif
+   pinMode(PA6, OUTPUT);
+   pinMode(PA7, OUTPUT);
+   digitalWrite(PA6, HIGH);
+   digitalWrite(PA7, HIGH);
 }
 
 void loop(void)
 {
+   StepGen3 Step;
+
+#if SGT
    uint64_t dTime;
    if (serveIRQ)
    {
@@ -124,16 +137,19 @@ void loop(void)
    dTime = longTime.extendTime(micros()) - irqTime;
    if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
       ecat_slv_poll();
+#endif
 }
 
 void sync0Handler(void)
 {
+#if SGT
    ALEventIRQ = ESC_ALeventread();
    // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       serveIRQ = 1;
       irqTime = longTime.extendTime(micros());
    }
+#endif
 }
 
 // Enable SM2 interrupts
@@ -183,6 +199,6 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   //StepGen3::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
+   // StepGen3::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
    return 0;
 }
