@@ -20,19 +20,6 @@ void indexPulseEncoderCB1(void)
 
 #include "StepGen3.h"
 #include "extend32to64.h"
-// Stepper 1
-void pulseTimerCallback1(void);
-void startTimerCallback1(void);
-StepGen3 Step1(TIM1, 4, PA_11, PA12, pulseTimerCallback1, TIM10, startTimerCallback1);
-void pulseTimerCallback1(void) { Step1.pulseTimerCB(); }
-void startTimerCallback1(void) { Step1.startTimerCB(); }
-
-// Stepper 2
-void pulseTimerCallback2(void);
-void startTimerCallback2(void);
-StepGen3 Step2(TIM3, 4, PC_9, PC10, pulseTimerCallback2, TIM11, startTimerCallback2);
-void pulseTimerCallback2(void) { Step2.pulseTimerCB(); }
-void startTimerCallback2(void) { Step2.startTimerCB(); }
 
 CircularBuffer<uint64_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
@@ -53,22 +40,7 @@ uint64_t reallyNowTime = 0, reallyThenTime = 0;
 uint64_t timeDiff; // Timediff in nanoseconds
 void handleStepper(void)
 {
-   // Catch the case when we miss a loop for some reason
-   uint32_t t = micros();
-   reallyNowTime = longTime.extendTime(t);
-   timeDiff = 1000 * (reallyNowTime - reallyThenTime);
-   nLoops = round(double(timeDiff) / double(StepGen3::sync0CycleTime));
-   reallyThenTime = reallyNowTime;
-nLoops=1;
-   Step1.enabled = true;
-   Step1.commandedPosition = Obj.CommandedPosition1;
-   Step1.stepsPerMM = Obj.StepsPerMM1;
-   Step1.handleStepper(irqTime, nLoops);
 
-   Step2.enabled = true;
-   Step2.commandedPosition = Obj.CommandedPosition2;
-   Step2.stepsPerMM = Obj.StepsPerMM2;
-   Step2.handleStepper(irqTime, nLoops);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -94,10 +66,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
-   Obj.D1 = Step2.frequency;
-   Obj.D2 = Step2.nSteps;
+   Obj.D1 =0;
+   Obj.D2 = 0;
    Obj.D3 = abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
-   Obj.D4 = Step2.Tstartu;
+   Obj.D4 = 0;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -211,6 +183,6 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   StepGen3::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
+   //StepGen3::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
    return 0;
 }
