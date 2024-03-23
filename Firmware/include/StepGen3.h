@@ -143,11 +143,11 @@ private:
 };
 
 // For the example
-#define BASE_PERIOD 50000
+#define BASE_PERIOD 15000 // 12 i smax
 #define SERVO_PERIOD 1000000
 #define JOINT_X_STEPGEN_MAXACCEL 520.0
-#define JOINT_X_SCALE 200
+#define JOINT_X_SCALE -200
 #define JOINT_Z_STEPGEN_MAXACCEL 520.0
-#define JOINT_Z_SCALE 80
+#define JOINT_Z_SCALE -80
 
 #endif

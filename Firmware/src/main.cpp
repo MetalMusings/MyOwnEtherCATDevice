@@ -51,21 +51,18 @@ void handleStepper(void)
    {
       Step->updateStepGen(pos);
       Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
-      Obj.ActualPosition1 = Step->stepgen_array[1].pos_fb;
+      Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    }
 #endif
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
-#if 1
    // Obj.IndexStatus = Encoder1.indexHappened();
    // Obj.EncPos = Encoder1.currentPos();
    // Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    // Obj.IndexByte = Encoder1.getIndexState();
    float_t ap2 = Obj.ActualPosition2;
-   Obj.ActualPosition1 = Obj.CommandedPosition1; // Step1.actPos();
-   Obj.ActualPosition2 = Obj.CommandedPosition2; // Step2.actPos();
 #if 0
    uint64_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
@@ -85,7 +82,6 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.D2 = 0;
    Obj.D3 = abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
    Obj.D4 = 0;
-#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -140,12 +136,8 @@ void setup(void)
 
    pinMode(PA11, OUTPUT);
    pinMode(PA12, OUTPUT);
-   digitalWrite(PA11, HIGH);
-   digitalWrite(PA12, HIGH);
    pinMode(PC9, OUTPUT);
    pinMode(PC10, OUTPUT);
-   digitalWrite(PC9, HIGH);
-   digitalWrite(PC10, HIGH);
    Step = new StepGen3;
 
    HardwareTimer *MyTim = new HardwareTimer(TIM1); // The base period timer
@@ -157,14 +149,6 @@ void setup(void)
 double pos = 0;
 void loop(void)
 {
-#if 0
-   pinMode(PC9, OUTPUT);
-
-   digitalWrite(PC9, LOW);
-   delay(10);
-   digitalWrite(PC9, HIGH);
-   delay(10);
-#endif
    uint64_t dTime;
    if (serveIRQ)
    {
