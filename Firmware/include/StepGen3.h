@@ -31,25 +31,25 @@ typedef struct
     volatile int num_phases;            /* number of phases for types 2 and up */
     volatile int phase[5];              /* pins for output signals */
     volatile const unsigned char *lut;  /* pointer to state lookup table */
-    /* stuff that is not accessed by makepulses */
-    volatile int pos_mode;              /* 1 = position mode, 0 = velocity mode */
-    volatile unsigned int step_space;   /* parameter: min step pulse spacing */
-    volatile double old_pos_cmd;        /* previous position command (counts) */
-    volatile int count;                 /* pin: captured feedback in counts */
-    volatile double pos_scale;          /* param: steps per position unit */
+                                        /* stuff that is not accessed by makepulses */
+    int pos_mode;                       /* 1 = position mode, 0 = velocity mode */
+    unsigned int step_space;            /* parameter: min step pulse spacing */
+    double old_pos_cmd;                 /* previous position command (counts) */
+    int count;                          /* pin: captured feedback in counts */
+    double pos_scale;                   /* param: steps per position unit */
     double old_scale;                   /* stored scale value */
     double scale_recip;                 /* reciprocal value used for scaling */
-    volatile double vel_cmd;            /* pin: velocity command (pos units/sec) */
-    volatile double pos_cmd;            /* pin: position command (position units) */
-    volatile double pos_fb;             /* pin: position feedback (position units) */
-    volatile double freq;               /* param: frequency command */
-    volatile double maxvel;             /* param: max velocity, (pos units/sec) */
-    volatile double maxaccel;           /* param: max accel (pos units/sec^2) */
-    volatile unsigned int old_step_len; /* used to detect parameter changes */
-    volatile unsigned int old_step_space;
-    volatile unsigned int old_dir_hold_dly;
-    volatile unsigned int old_dir_setup;
-    volatile int printed_error; /* flag to avoid repeated printing */
+    double vel_cmd;                     /* pin: velocity command (pos units/sec) */
+    double pos_cmd;                     /* pin: position command (position units) */
+    double pos_fb;                      /* pin: position feedback (position units) */
+    double freq;                        /* param: frequency command */
+    double maxvel;                      /* param: max velocity, (pos units/sec) */
+    double maxaccel;                    /* param: max accel (pos units/sec^2) */
+    unsigned int old_step_len;          /* used to detect parameter changes */
+    unsigned int old_step_space;
+    unsigned int old_dir_hold_dly;
+    unsigned int old_dir_setup;
+    int printed_error; /* flag to avoid repeated printing */
 } stepgen_t;
 
 #define MAX_STEP_TYPE 15
@@ -71,23 +71,23 @@ typedef enum CONTROL
 class StepGen3
 {
 public:
-    volatile int step_type[MAX_CHAN] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};               // stepping types for up to 16 channels
-    char *ctrl_type[MAX_CHAN] = {0};                                                                                   // control type ("p"pos or "v"vel) for up to 16 channels
-    volatile int user_step_type[MAX_CYCLE] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; // lookup table for user-defined step type
+    int step_type[MAX_CHAN] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};               // stepping types for up to 16 channels
+    char *ctrl_type[MAX_CHAN] = {0};                                                                          // control type ("p"pos or "v"vel) for up to 16 channels
+    int user_step_type[MAX_CYCLE] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; // lookup table for user-defined step type
     uint32_t stepPin[MAX_CHAN] = {0};
     uint32_t dirPin[MAX_CHAN] = {0};
 
     stepgen_t *stepgen_array = 0;
 
-    volatile int num_chan = 0;  // number of step generators configured */
-    volatile long periodns;     // makepulses function period in nanosec */
-    volatile long old_periodns; // used to detect changes in periodns */
-    volatile double periodfp;   // makepulses function period in seconds */
-    volatile double freqscale;  // conv. factor from Hz to addval counts */
-    volatile double accelscale; // conv. Hz/sec to addval cnts/period */
-    volatile long old_dtns;     // update_freq funct period in nsec */
-    volatile double dt;         // update_freq period in seconds */
-    volatile double recip_dt;   // recprocal of period, avoids divides */
+    int num_chan = 0;  // number of step generators configured */
+    long periodns;     // makepulses function period in nanosec */
+    long old_periodns; // used to detect changes in periodns */
+    double periodfp;   // makepulses function period in seconds */
+    double freqscale;  // conv. factor from Hz to addval counts */
+    double accelscale; // conv. Hz/sec to addval cnts/period */
+    long old_dtns;     // update_freq funct period in nsec */
+    double dt;         // update_freq period in seconds */
+    double recip_dt;   // recprocal of period, avoids divides */
 
     StepGen3(void);
     void updateStepGen(double *pos_cmd);
@@ -143,7 +143,7 @@ private:
 };
 
 // For the example
-#define BASE_PERIOD 15000 // 12 i smax
+#define BASE_PERIOD 12000 // 12 is max
 #define SERVO_PERIOD 1000000
 #define JOINT_X_STEPGEN_MAXACCEL 520.0
 #define JOINT_X_SCALE -200
