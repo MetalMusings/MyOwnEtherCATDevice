@@ -49,6 +49,8 @@ void handleStepper(void)
    pos[1] = Obj.CommandedPosition2;
    if (Step)
    {
+      Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
+      Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
       Step->updateStepGen(pos);
       Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
       Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
