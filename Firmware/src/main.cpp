@@ -9,9 +9,6 @@ _Objects Obj;
 
 HardwareSerial Serial1(PA10, PA9);
 
-// SGT = StepGenTest
-#define SGT 1
-#if SGT
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 
 #include "MyEncoder.h"
@@ -21,12 +18,10 @@ void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
-#endif
 
 #include "StepGen3.h"
 StepGen3 *Step = 0;
 
-#if SGT
 #include "extend32to64.h"
 
 CircularBuffer<uint64_t, 200> Tim;
@@ -48,6 +43,7 @@ uint64_t reallyNowTime = 0, reallyThenTime = 0;
 uint64_t timeDiff; // Timediff in nanoseconds
 void handleStepper(void)
 {
+#if 1
    double pos[MAX_CHAN];
    pos[0] = Obj.CommandedPosition1;
    pos[1] = Obj.CommandedPosition2;
@@ -57,10 +53,12 @@ void handleStepper(void)
       Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
       Obj.ActualPosition1 = Step->stepgen_array[1].pos_fb;
    }
+#endif
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
+#if 1
    // Obj.IndexStatus = Encoder1.indexHappened();
    // Obj.EncPos = Encoder1.currentPos();
    // Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
@@ -87,6 +85,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.D2 = 0;
    Obj.D3 = abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
    Obj.D4 = 0;
+#endif
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -115,7 +114,6 @@ static esc_cfg_t config =
 };
 
 volatile byte serveIRQ = 0;
-#endif
 
 void basePeriodCB(void)
 {
@@ -148,23 +146,25 @@ void setup(void)
    pinMode(PC10, OUTPUT);
    digitalWrite(PC9, HIGH);
    digitalWrite(PC10, HIGH);
-   // Step = new StepGen3;
+   Step = new StepGen3;
 
    HardwareTimer *MyTim = new HardwareTimer(TIM1); // The base period timer
    MyTim->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
    MyTim->attachInterrupt(basePeriodCB);
-   //  MyTim->resume();
+   MyTim->resume();
 }
 
 double pos = 0;
 void loop(void)
 {
+#if 0
    pinMode(PC9, OUTPUT);
-   digitalWrite(PC9, LOW);
-   delay(50);
-   digitalWrite(PC9, HIGH);
-   delay(50);
 
+   digitalWrite(PC9, LOW);
+   delay(10);
+   digitalWrite(PC9, HIGH);
+   delay(10);
+#endif
    uint64_t dTime;
    if (serveIRQ)
    {
@@ -179,20 +179,18 @@ void loop(void)
       ecat_slv_poll();
    }
    dTime = longTime.extendTime(micros()) - irqTime;
-   //  if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
-   ecat_slv_poll();
+   if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
+      ecat_slv_poll();
 }
 
 void sync0Handler(void)
 {
-#if SGT
    ALEventIRQ = ESC_ALeventread();
    // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       serveIRQ = 1;
       irqTime = longTime.extendTime(micros());
    }
-#endif
 }
 
 // Enable SM2 interrupts
