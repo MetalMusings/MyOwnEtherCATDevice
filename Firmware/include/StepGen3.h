@@ -74,6 +74,8 @@ public:
     volatile int step_type[MAX_CHAN] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};               // stepping types for up to 16 channels
     char *ctrl_type[MAX_CHAN] = {0};                                                                                   // control type ("p"pos or "v"vel) for up to 16 channels
     volatile int user_step_type[MAX_CYCLE] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}; // lookup table for user-defined step type
+    uint32_t stepPin[MAX_CHAN] = {0};
+    uint32_t dirPin[MAX_CHAN] = {0};
 
     stepgen_t *stepgen_array = 0;
 
@@ -88,7 +90,7 @@ public:
     volatile double recip_dt;   // recprocal of period, avoids divides */
 
     StepGen3(void);
-    void test(double pos_cmd);
+    void updateStepGen(double *pos_cmd);
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
     void make_pulses(void *arg, long period);
@@ -143,7 +145,9 @@ private:
 // For the example
 #define BASE_PERIOD 50000
 #define SERVO_PERIOD 1000000
-#define JOINT_0_STEPGEN_MAXACCEL 520.0
-#define JOINT_0_SCALE 200
+#define JOINT_X_STEPGEN_MAXACCEL 520.0
+#define JOINT_X_SCALE 200
+#define JOINT_Z_STEPGEN_MAXACCEL 520.0
+#define JOINT_Z_SCALE 80
 
 #endif

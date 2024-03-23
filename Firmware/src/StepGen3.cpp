@@ -955,8 +955,7 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
     }
 
     printf("Exporting %d\n", num);
-    //	*(addr->phase[STEP_PIN]) = 0; // Several variants possible
-    //	*(addr->phase[DIR_PIN]) = 0;
+
     /* set default parameter values */
     addr->pos_scale = 1.0;
     addr->old_scale = 0.0;
@@ -1086,24 +1085,33 @@ StepGen3::StepGen3(void)
     step_type[0] = 0;
     ctrl_type[0] = (char *)malloc(2);
     strcpy(ctrl_type[0], "p");
+    stepPin[0] = PA11;
+    dirPin[0] = PA12;
+    step_type[1] = 0;
+    ctrl_type[1] = (char *)malloc(2);
+    strcpy(ctrl_type[1], "p");
+    stepPin[1] = PC9;
+    dirPin[1] = PC10;
 
-    printf("Hello World\n");
-    (void)rtapi_app_main();
-    printf("Hello World2\n");
-    stepgen_t *step;
-    step = &(stepgen_array[0]);
-    step->enable = 1;
-    step->pos_scale = JOINT_0_SCALE;
-    step->maxaccel = JOINT_0_STEPGEN_MAXACCEL;
+    rtapi_app_main();
+    stepgen_array[0].enable = 1;
+    stepgen_array[0].pos_scale = JOINT_X_SCALE;
+    stepgen_array[0].maxaccel = JOINT_X_STEPGEN_MAXACCEL;
+    stepgen_array[1].pos_scale = JOINT_Z_SCALE;
+    stepgen_array[1].maxaccel = JOINT_Z_STEPGEN_MAXACCEL;
+    stepgen_array[0].enable = stepgen_array[1].enable = 1;
 }
 
-void StepGen3::test(double pos_cmd)
+void StepGen3::updateStepGen(double *pos_cmd)
 {
-    stepgen_t *step;
-    step = &(stepgen_array[0]);
-    step->pos_cmd = pos_cmd;
-    update_pos(step, SERVO_PERIOD);
-    update_freq(step, SERVO_PERIOD);
+    for (int i = 0; i < num_chan; i++)
+    {
+        stepgen_t *step;
+        step = &(stepgen_array[i]);
+        step->pos_cmd = pos_cmd[i];
+        update_pos(step, SERVO_PERIOD);
+        update_freq(step, SERVO_PERIOD);
+    }
 }
 
 int StepGen3::rtapi_app_main()
@@ -1136,7 +1144,6 @@ int StepGen3::rtapi_app_main()
         printf("STEPGEN: ERROR: no channels configured\n");
         return -1;
     }
-    printf("%d channels configured step_type=%d ctrl_type=%d\n", num_chan, step_type[0], parse_ctrl_type(ctrl_type[0]));
     /* periodns will be set to the proper value when 'make_pulses()' runs for
        the first time.  We load a default value here to avoid glitches at
        startup, but all these 'constants' are recomputed inside

@@ -9,11 +9,11 @@ _Objects Obj;
 
 HardwareSerial Serial1(PA10, PA9);
 
-// STG = StepGenTest
-#define SGT 0
+// SGT = StepGenTest
+#define SGT 1
 #if SGT
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
-#define DEBUG_TIM8 1
+
 #include "MyEncoder.h"
 void indexPulseEncoderCB1(void);
 MyEncoder Encoder1(TIM2, PA2, indexPulseEncoderCB1);
@@ -22,7 +22,10 @@ void indexPulseEncoderCB1(void)
    Encoder1.indexPulse();
 }
 #endif
+
 #include "StepGen3.h"
+StepGen3 *Step = 0;
+
 #if SGT
 #include "extend32to64.h"
 
@@ -32,8 +35,8 @@ extend32to64 longTime;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
-   Encoder1.setLatch(Obj.IndexLatchEnable);
-   Encoder1.setScale(2000);
+   //  Encoder1.setLatch(Obj.IndexLatchEnable);
+   //  Encoder1.setScale(2000);
 
    // Step2.reqPos(Obj.CommandedPosition2);
    // Step2.setScale(Obj.StepsPerMM2);
@@ -45,18 +48,27 @@ uint64_t reallyNowTime = 0, reallyThenTime = 0;
 uint64_t timeDiff; // Timediff in nanoseconds
 void handleStepper(void)
 {
+   double pos[MAX_CHAN];
+   pos[0] = Obj.CommandedPosition1;
+   pos[1] = Obj.CommandedPosition2;
+   if (Step)
+   {
+      Step->updateStepGen(pos);
+      Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
+      Obj.ActualPosition1 = Step->stepgen_array[1].pos_fb;
+   }
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
-   Obj.IndexStatus = Encoder1.indexHappened();
-   Obj.EncPos = Encoder1.currentPos();
-   Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
-   Obj.IndexByte = Encoder1.getIndexState();
+   // Obj.IndexStatus = Encoder1.indexHappened();
+   // Obj.EncPos = Encoder1.currentPos();
+   // Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
+   // Obj.IndexByte = Encoder1.getIndexState();
    float_t ap2 = Obj.ActualPosition2;
    Obj.ActualPosition1 = Obj.CommandedPosition1; // Step1.actPos();
    Obj.ActualPosition2 = Obj.CommandedPosition2; // Step2.actPos();
-
+#if 0
    uint64_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint64_t max_Tim = 0, min_Tim = UINT64_MAX;
@@ -69,6 +81,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
          min_Tim = aTim;
    }
    thenTime = irqTime;
+#endif
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.D1 = 0;
    Obj.D2 = 0;
@@ -104,46 +117,54 @@ static esc_cfg_t config =
 volatile byte serveIRQ = 0;
 #endif
 
-StepGen3 *Step = 0;
-
 void basePeriodCB(void)
 {
    if (Step && Step->stepgen_array)
    {
       Step->make_pulses(Step->stepgen_array, BASE_PERIOD);
       stepgen_t *step;
-      step = &(Step->stepgen_array[0]);
-      digitalWrite(PA6, step->phase[DIR_PIN] ? LOW : HIGH);
-      digitalWrite(PA7, step->phase[STEP_PIN] ? LOW : HIGH);
+      for (int i = 0; i < Step->num_chan; i++)
+      {
+         step = &(Step->stepgen_array[i]);
+         digitalWrite(Step->dirPin[i], step->phase[DIR_PIN] ? LOW : HIGH);
+         digitalWrite(Step->stepPin[i], step->phase[STEP_PIN] ? LOW : HIGH);
+      }
    }
 }
 
 void setup(void)
 {
-   Serial1.begin(115200);
-#if SGT
-   rcc_config(); // probably breaks some timers.
-   ecat_slv_init(&config);
-#endif
-   pinMode(PA6, OUTPUT);
-   pinMode(PA7, OUTPUT);
-   digitalWrite(PA6, HIGH);
-   digitalWrite(PA7, HIGH);
-   Step = new StepGen3;
 
-   HardwareTimer *MyTim = new HardwareTimer(TIM3);
-   MyTim->setOverflow(BASE_PERIOD, MICROSEC_FORMAT);
+   Serial1.begin(115200);
+
+   rcc_config(); // Needed by encoder, probably breaks some timers.
+   ecat_slv_init(&config);
+
+   pinMode(PA11, OUTPUT);
+   pinMode(PA12, OUTPUT);
+   digitalWrite(PA11, HIGH);
+   digitalWrite(PA12, HIGH);
+   pinMode(PC9, OUTPUT);
+   pinMode(PC10, OUTPUT);
+   digitalWrite(PC9, HIGH);
+   digitalWrite(PC10, HIGH);
+   // Step = new StepGen3;
+
+   HardwareTimer *MyTim = new HardwareTimer(TIM1); // The base period timer
+   MyTim->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
    MyTim->attachInterrupt(basePeriodCB);
-   MyTim->resume();
+   //  MyTim->resume();
 }
 
 double pos = 0;
 void loop(void)
 {
-   Step->test(pos);
-   pos += 1;
-   delay(1000);
-#if SGT
+   pinMode(PC9, OUTPUT);
+   digitalWrite(PC9, LOW);
+   delay(50);
+   digitalWrite(PC9, HIGH);
+   delay(50);
+
    uint64_t dTime;
    if (serveIRQ)
    {
@@ -158,9 +179,8 @@ void loop(void)
       ecat_slv_poll();
    }
    dTime = longTime.extendTime(micros()) - irqTime;
-   if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
-      ecat_slv_poll();
-#endif
+   //  if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
+   ecat_slv_poll();
 }
 
 void sync0Handler(void)
