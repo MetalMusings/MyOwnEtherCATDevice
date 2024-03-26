@@ -79,18 +79,19 @@ public:
 
     stepgen_t *stepgen_array = 0;
 
-    int num_chan = 0;  // number of step generators configured */
-    long periodns;     // makepulses function period in nanosec */
-    long old_periodns; // used to detect changes in periodns */
-    double periodfp;   // makepulses function period in seconds */
-    double freqscale;  // conv. factor from Hz to addval counts */
-    double accelscale; // conv. Hz/sec to addval cnts/period */
-    long old_dtns;     // update_freq funct period in nsec */
-    double dt;         // update_freq period in seconds */
-    double recip_dt;   // recprocal of period, avoids divides */
+    int num_chan = 0;          // number of step generators configured */
+    long periodns;             // makepulses function period in nanosec */
+    long old_periodns;         // used to detect changes in periodns */
+    double periodfp;           // makepulses function period in seconds */
+    double freqscale;          // conv. factor from Hz to addval counts */
+    double accelscale;         // conv. Hz/sec to addval cnts/period */
+    long old_dtns;             // update_freq funct period in nsec */
+    double dt;                 // update_freq period in seconds */
+    double recip_dt;           // recprocal of period, avoids divides */
+    volatile uint64_t cnt = 0; // Debug counter
 
     StepGen3(void);
-    void updateStepGen(double *pos_cmd);
+    void updateStepGen(double pos_cmd1, double pos_cmd2);
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
     void make_pulses(void *arg, long period);
@@ -143,11 +144,11 @@ private:
 };
 
 // For the example
-#define BASE_PERIOD 12000 // 12 is max
+#define BASE_PERIOD 20000 // 12 is max
 #define SERVO_PERIOD 1000000
-#define JOINT_X_STEPGEN_MAXACCEL 520.0
+#define JOINT_X_STEPGEN_MAXACCEL (1.2 * 520.0)
 #define JOINT_X_SCALE -200
-#define JOINT_Z_STEPGEN_MAXACCEL 520.0
+#define JOINT_Z_STEPGEN_MAXACCEL (1.2 * 520.0)
 #define JOINT_Z_SCALE -80
 
 #endif

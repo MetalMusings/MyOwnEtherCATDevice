@@ -10,6 +10,8 @@ _Objects Obj;
 HardwareSerial Serial1(PA10, PA9);
 
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
+HardwareTimer *myTim;         // The base period timer
+HardwareTimer *syncTimer;     // The timer that syncs "with linuxcnc cycle"
 
 #include "MyEncoder.h"
 void indexPulseEncoderCB1(void);
@@ -38,24 +40,53 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    // Step2.enable(1);
 }
 
+volatile double pos_cmd1, pos_cmd2;
+volatile uint64_t syncTime=0, oldSyncTime = 0;
+void syncWithLCNC()
+{
+   if (Step)
+      Step->updateStepGen(pos_cmd1, pos_cmd2);
+   syncTimer->pause();
+   syncTime = longTime.extendTime(micros());
+}
+
 uint16_t nLoops;
-uint64_t reallyNowTime = 0, reallyThenTime = 0;
-uint64_t timeDiff; // Timediff in nanoseconds
+uint64_t reallyNowTime = 0, reallyThenTime = 0; // Times in microseconds
+uint64_t timeDiff; // Timediff in microseconds
+int32_t delayT;
+
 void handleStepper(void)
 {
-#if 1
-   double pos[MAX_CHAN];
-   pos[0] = Obj.CommandedPosition1;
-   pos[1] = Obj.CommandedPosition2;
+   uint32_t t = micros();
+   reallyNowTime = longTime.extendTime(t);
+   timeDiff = reallyNowTime - reallyThenTime; // Time-diff in microseconds
+   nLoops = round(double(timeDiff) / 1000.0);
+   reallyThenTime = reallyNowTime;
+
+   pos_cmd1 = Obj.CommandedPosition1;
+   pos_cmd2 = Obj.CommandedPosition2;
+   // Obj.ActualPosition1 = Obj.CommandedPosition1;
+   // Obj.ActualPosition2 = Obj.CommandedPosition2;
    if (Step)
    {
       Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
       Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
-      Step->updateStepGen(pos);
+
       Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
       Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    }
-#endif
+   uint32_t diffT = longTime.extendTime(micros()) - irqTime;
+   delayT = 700 - diffT;
+   if (delayT > 0 && delayT < 900)
+   {
+      syncTimer->setOverflow(delayT, MICROSEC_FORMAT);
+      syncTimer->refresh();
+      syncTimer->resume();
+   }
+   else
+   {
+      syncWithLCNC();
+   }
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -65,8 +96,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    // Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    // Obj.IndexByte = Encoder1.getIndexState();
    float_t ap2 = Obj.ActualPosition2;
-#if 0
-   uint64_t dTim = nowTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
+#if 1
+   uint64_t dTim = irqTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint64_t max_Tim = 0, min_Tim = UINT64_MAX;
    for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
@@ -80,10 +111,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    thenTime = irqTime;
 #endif
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
-   Obj.D1 = 0;
-   Obj.D2 = 0;
-   Obj.D3 = abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
-   Obj.D4 = 0;
+   Obj.D1 = Step->cnt % INT16_MAX; //nLoops;
+   Obj.D2 = Step->stepgen_array[1].freq;
+   Obj.D3 = 100*Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D4 = 100*Obj.ActualPosition2;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -123,7 +154,7 @@ void basePeriodCB(void)
       {
          step = &(Step->stepgen_array[i]);
          digitalWrite(Step->dirPin[i], step->phase[DIR_PIN] ? LOW : HIGH);
-         digitalWrite(Step->stepPin[i], step->phase[STEP_PIN] ? LOW : HIGH);
+         digitalWrite(Step->stepPin[i], step->phase[STEP_PIN] ? HIGH : LOW);
       }
    }
 }
@@ -142,13 +173,15 @@ void setup(void)
    pinMode(PC10, OUTPUT);
    Step = new StepGen3;
 
-   HardwareTimer *MyTim = new HardwareTimer(TIM1); // The base period timer
-   MyTim->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
-   MyTim->attachInterrupt(basePeriodCB);
-   MyTim->resume();
+   myTim = new HardwareTimer(TIM1); // The base period timer
+   myTim->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
+   myTim->attachInterrupt(basePeriodCB);
+   myTim->resume();
+
+   syncTimer = new HardwareTimer(TIM2); // The base period timer
+   syncTimer->attachInterrupt(syncWithLCNC);
 }
 
-double pos = 0;
 void loop(void)
 {
    uint64_t dTime;
@@ -172,7 +205,7 @@ void loop(void)
 void sync0Handler(void)
 {
    ALEventIRQ = ESC_ALeventread();
-   // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
+   //if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       serveIRQ = 1;
       irqTime = longTime.extendTime(micros());

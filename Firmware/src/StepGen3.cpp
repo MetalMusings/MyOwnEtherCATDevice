@@ -349,6 +349,7 @@ void StepGen3::make_pulses(void *arg, long period)
     periodns = period;
     /* point to stepgen data structures */
     stepgen = (stepgen_t *)arg;
+    cnt++;
 
     for (n = 0; n < num_chan; n++)
     {
@@ -1101,13 +1102,14 @@ StepGen3::StepGen3(void)
     stepgen_array[0].enable = stepgen_array[1].enable = 1;
 }
 
-void StepGen3::updateStepGen(double *pos_cmd)
+void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2)
 {
+    stepgen_array[0].pos_cmd = pos_cmd1;
+    stepgen_array[1].pos_cmd = pos_cmd2;
     for (int i = 0; i < num_chan; i++)
     {
         stepgen_t *step;
         step = &(stepgen_array[i]);
-        step->pos_cmd = pos_cmd[i];
         update_pos(step, SERVO_PERIOD);
         update_freq(step, SERVO_PERIOD);
     }
