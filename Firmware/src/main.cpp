@@ -182,10 +182,10 @@ void setup(void)
    Step = new StepGen3;
 
    myTim = new HardwareTimer(TIM11); // The base period timer
-   // myTim->setPrescaleFactor(168); // 1 MHz
-   // myTim->setPreloadEnable(true);
-   // myTim->setOverflow(100); // 100 usecs
-   myTim->setOverflow(1000, HERTZ_FORMAT);
+   myTim->setPrescaleFactor(168);    // 1 MHz
+   myTim->setPreloadEnable(true);
+   myTim->setOverflow(10); // 100 usecs
+   // myTim->setOverflow(1000, HERTZ_FORMAT);
    myTim->attachInterrupt(basePeriodCB);
    myTim->refresh();
    myTim->resume();
