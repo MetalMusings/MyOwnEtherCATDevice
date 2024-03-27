@@ -29,6 +29,7 @@ StepGen3 *Step = 0;
 CircularBuffer<uint64_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
 extend32to64 longTime;
+volatile uint16_t isrTime = 0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -41,7 +42,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 }
 
 volatile double pos_cmd1, pos_cmd2;
-volatile uint64_t syncTime=0, oldSyncTime = 0;
+volatile uint64_t syncTime = 0, oldSyncTime = 0;
 void syncWithLCNC()
 {
    if (Step)
@@ -52,7 +53,7 @@ void syncWithLCNC()
 
 uint16_t nLoops;
 uint64_t reallyNowTime = 0, reallyThenTime = 0; // Times in microseconds
-uint64_t timeDiff; // Timediff in microseconds
+uint64_t timeDiff;                              // Timediff in microseconds
 int32_t delayT;
 
 void handleStepper(void)
@@ -65,8 +66,9 @@ void handleStepper(void)
 
    pos_cmd1 = Obj.CommandedPosition1;
    pos_cmd2 = Obj.CommandedPosition2;
-   // Obj.ActualPosition1 = Obj.CommandedPosition1;
-   // Obj.ActualPosition2 = Obj.CommandedPosition2;
+   Obj.ActualPosition1 = Obj.CommandedPosition1;
+   Obj.ActualPosition2 = Obj.CommandedPosition2;
+#if 0
    if (Step)
    {
       Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
@@ -87,8 +89,9 @@ void handleStepper(void)
    {
       syncWithLCNC();
    }
+#endif
 }
-
+uint16_t oldCnt = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    // Obj.IndexStatus = Encoder1.indexHappened();
@@ -111,10 +114,13 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    thenTime = irqTime;
 #endif
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
-   Obj.D1 = Step->cnt % INT16_MAX; //nLoops;
-   Obj.D2 = Step->stepgen_array[1].freq;
-   Obj.D3 = 100*Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
-   Obj.D4 = 100*Obj.ActualPosition2;
+   Obj.D1 = nLoops;
+   uint16_t newCnt = isrTime;
+   Obj.D1 = newCnt - oldCnt;
+   oldCnt = newCnt;
+   Obj.D2 = isrTime;                      // Step->stepgen_array[1].freq;
+   Obj.D3 = 100 * Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D4 = 100 * Obj.ActualPosition2;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -143,9 +149,10 @@ static esc_cfg_t config =
 };
 
 volatile byte serveIRQ = 0;
-
 void basePeriodCB(void)
 {
+   isrTime++;
+#if 0
    if (Step && Step->stepgen_array)
    {
       Step->make_pulses(Step->stepgen_array, BASE_PERIOD);
@@ -157,6 +164,7 @@ void basePeriodCB(void)
          digitalWrite(Step->stepPin[i], step->phase[STEP_PIN] ? HIGH : LOW);
       }
    }
+#endif
 }
 
 void setup(void)
@@ -164,7 +172,7 @@ void setup(void)
 
    Serial1.begin(115200);
 
-   rcc_config(); // Needed by encoder, probably breaks some timers.
+   // rcc_config(); // Needed by encoder, probably breaks some timers.
    ecat_slv_init(&config);
 
    pinMode(PA11, OUTPUT);
@@ -173,13 +181,18 @@ void setup(void)
    pinMode(PC10, OUTPUT);
    Step = new StepGen3;
 
-   myTim = new HardwareTimer(TIM1); // The base period timer
-   myTim->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
+   myTim = new HardwareTimer(TIM11); // The base period timer
+   // myTim->setPrescaleFactor(168); // 1 MHz
+   // myTim->setPreloadEnable(true);
+   // myTim->setOverflow(100); // 100 usecs
+   myTim->setOverflow(1000, HERTZ_FORMAT);
    myTim->attachInterrupt(basePeriodCB);
+   myTim->refresh();
    myTim->resume();
-
+#if 0
    syncTimer = new HardwareTimer(TIM2); // The base period timer
    syncTimer->attachInterrupt(syncWithLCNC);
+#endif
 }
 
 void loop(void)
@@ -205,7 +218,7 @@ void loop(void)
 void sync0Handler(void)
 {
    ALEventIRQ = ESC_ALeventread();
-   //if (ALEventIRQ & ESCREG_ALEVENT_SM2)
+   // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       serveIRQ = 1;
       irqTime = longTime.extendTime(micros());
