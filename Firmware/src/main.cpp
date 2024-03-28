@@ -29,7 +29,7 @@ StepGen3 *Step = 0;
 CircularBuffer<uint64_t, 200> Tim;
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
 extend32to64 longTime;
-volatile uint16_t isrTime = 0;
+volatile uint16_t isrTime = 0, isr2Time = 0;
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -68,7 +68,7 @@ void handleStepper(void)
    pos_cmd2 = Obj.CommandedPosition2;
    Obj.ActualPosition1 = Obj.CommandedPosition1;
    Obj.ActualPosition2 = Obj.CommandedPosition2;
-#if 0
+
    if (Step)
    {
       Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
@@ -77,6 +77,7 @@ void handleStepper(void)
       Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
       Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    }
+#if 0
    uint32_t diffT = longTime.extendTime(micros()) - irqTime;
    delayT = 700 - diffT;
    if (delayT > 0 && delayT < 900)
@@ -86,10 +87,11 @@ void handleStepper(void)
       syncTimer->resume();
    }
    else
+#endif
    {
       syncWithLCNC();
    }
-#endif
+   isr2Time = micros() - t;
 }
 uint16_t oldCnt = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -116,10 +118,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.D1 = nLoops;
    uint16_t newCnt = isrTime;
-   Obj.D1 = newCnt - oldCnt;
+   // Obj.D1 = newCnt - oldCnt;
    oldCnt = newCnt;
    Obj.D2 = isrTime;                      // Step->stepgen_array[1].freq;
-   Obj.D3 = 100 * Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D3 = isr2Time;//100 * Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
    Obj.D4 = 100 * Obj.ActualPosition2;
 }
 
@@ -151,20 +153,22 @@ static esc_cfg_t config =
 volatile byte serveIRQ = 0;
 void basePeriodCB(void)
 {
-   isrTime++;
-#if 0
+   uint32_t one = micros();
+
+#if 1
    if (Step && Step->stepgen_array)
    {
       Step->make_pulses(Step->stepgen_array, BASE_PERIOD);
-      stepgen_t *step;
+#if 1
       for (int i = 0; i < Step->num_chan; i++)
       {
-         step = &(Step->stepgen_array[i]);
-         digitalWrite(Step->dirPin[i], step->phase[DIR_PIN] ? LOW : HIGH);
-         digitalWrite(Step->stepPin[i], step->phase[STEP_PIN] ? HIGH : LOW);
+         digitalWrite(Step->dirPin[i], Step->stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
+         digitalWrite(Step->stepPin[i], Step->stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
       }
+#endif
    }
 #endif
+   isrTime = micros() - one;
 }
 
 void setup(void)
@@ -181,10 +185,10 @@ void setup(void)
    pinMode(PC10, OUTPUT);
    Step = new StepGen3;
 
-   myTim = new HardwareTimer(TIM11); // The base period timer
-   myTim->setPrescaleFactor(168);    // 1 MHz
+   myTim = new HardwareTimer(TIM11);  // The base period timer
+   myTim->setPrescaleFactor(168 / 8); // 1 MHz
    myTim->setPreloadEnable(true);
-   myTim->setOverflow(10); // 100 usecs
+   myTim->setOverflow(8 * BASE_PERIOD / 1200); // usecs 6 usec period is min with no load
    // myTim->setOverflow(1000, HERTZ_FORMAT);
    myTim->attachInterrupt(basePeriodCB);
    myTim->refresh();
