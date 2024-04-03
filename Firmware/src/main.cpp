@@ -118,10 +118,10 @@ void handleStepper(void)
    Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    uint32_t diffT = longTime.extendTime(micros()) - irqTime;
-   delayT = 500 - diffT;
+   delayT = maxCycleTime + 50 - diffT - jitterThisCycle; // Add 50 as some saftey margin
    if (delayT > 0 && delayT < 900)
    {
-      syncTimer->setOverflow(delayT, MICROSEC_FORMAT);
+      syncTimer->setOverflow(delayT, MICROSEC_FORMAT); // Work in flawed units, its ok
       syncTimer->refresh();
       syncTimer->resume();
    }
@@ -247,12 +247,8 @@ void sync0Handler(void)
 {
    irqTime = longTime.extendTime(micros());
    ALEventIRQ = ESC_ALeventread();
-   // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
-   {
-      serveIRQ = 1;
-
-      irqCnt++;
-   }
+   serveIRQ = 1;
+   irqCnt++;
 }
 
 // Enable SM2 interrupts
