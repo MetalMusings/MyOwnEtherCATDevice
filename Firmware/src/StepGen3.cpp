@@ -1096,9 +1096,9 @@ StepGen3::StepGen3(void)
     rtapi_app_main();
     stepgen_array[0].enable = 1;
     stepgen_array[0].pos_scale = JOINT_X_SCALE;
-    stepgen_array[0].maxaccel = JOINT_X_STEPGEN_MAXACCEL;
+    //stepgen_array[0].maxaccel = JOINT_X_STEPGEN_MAXACCEL;
     stepgen_array[1].pos_scale = JOINT_Z_SCALE;
-    stepgen_array[1].maxaccel = JOINT_Z_STEPGEN_MAXACCEL;
+    //stepgen_array[1].maxaccel = JOINT_Z_STEPGEN_MAXACCEL;
     stepgen_array[0].enable = stepgen_array[1].enable = 1;
 }
 
@@ -1180,4 +1180,16 @@ int StepGen3::rtapi_app_main()
         }
     }
     return 0;
+}
+extern volatile uint64_t makePulsesCnt;
+void StepGen3::makeAllPulses(void)
+{
+    makePulsesCnt++;
+
+    make_pulses(stepgen_array, BASE_PERIOD);
+    for (int i = 0; i < num_chan; i++)
+    {
+        digitalWrite(dirPin[i], stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
+        digitalWrite(stepPin[i], stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
+    }
 }

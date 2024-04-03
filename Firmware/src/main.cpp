@@ -10,7 +10,7 @@ _Objects Obj;
 HardwareSerial Serial1(PA10, PA9);
 
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
-HardwareTimer *myTim;         // The base period timer
+HardwareTimer *baseTimer;     // The base period timer
 HardwareTimer *syncTimer;     // The timer that syncs "with linuxcnc cycle"
 
 #include "MyEncoder.h"
@@ -27,9 +27,10 @@ StepGen3 *Step = 0;
 #include "extend32to64.h"
 
 CircularBuffer<uint64_t, 200> Tim;
-volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0;
+volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0, irqCnt = 0, prevSyncTime = 0, syncTime = 0, deltaSyncTime;
 extend32to64 longTime;
 volatile uint16_t isrTime = 0, isr2Time = 0;
+void setFrequencyAdjustedMicrosSeconds(HardwareTimer *timer, uint32_t usecs);
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
@@ -41,14 +42,39 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
    // Step2.enable(1);
 }
 
+volatile uint16_t basePeriodCnt;
+volatile uint64_t makePulsesCnt = 0, prevMakePulsesCnt = 0;
+volatile uint16_t deltaMakePulsesCnt;
+
 volatile double pos_cmd1, pos_cmd2;
-volatile uint64_t syncTime = 0, oldSyncTime = 0;
 void syncWithLCNC()
 {
-   if (Step)
-      Step->updateStepGen(pos_cmd1, pos_cmd2);
    syncTimer->pause();
+   prevSyncTime = syncTime;
    syncTime = longTime.extendTime(micros());
+   deltaSyncTime = syncTime - prevSyncTime;
+   deltaMakePulsesCnt = makePulsesCnt - prevMakePulsesCnt;
+   prevMakePulsesCnt = makePulsesCnt;
+   Step->updateStepGen(pos_cmd1, pos_cmd2); // Update positions
+   Step->makeAllPulses();                   // Make first step right here
+   basePeriodCnt = 1000000 / BASE_PERIOD;   //
+   baseTimer->setCount(0);
+   baseTimer->refresh(); //
+   baseTimer->resume();  // Make the other steps in ISR
+   // baseTimer->isRunning();
+}
+
+void basePeriodCB(void)
+{
+   uint32_t one = micros();
+
+   Step->makeAllPulses();
+
+   isrTime = micros() - one;
+   if (--basePeriodCnt <= 0) // Stop
+   {
+      baseTimer->pause();
+   }
 }
 
 uint16_t nLoops;
@@ -69,31 +95,28 @@ void handleStepper(void)
    Obj.ActualPosition1 = Obj.CommandedPosition1;
    Obj.ActualPosition2 = Obj.CommandedPosition2;
 
-   if (Step)
-   {
-      Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
-      Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
+   Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
+   Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
 
-      Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
-      Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
-   }
-#if 0
+   Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
+   Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    uint32_t diffT = longTime.extendTime(micros()) - irqTime;
-   delayT = 700 - diffT;
+   delayT = 500 - diffT;
    if (delayT > 0 && delayT < 900)
    {
-      syncTimer->setOverflow(delayT, MICROSEC_FORMAT);
+      setFrequencyAdjustedMicrosSeconds(syncTimer, delayT);
       syncTimer->refresh();
       syncTimer->resume();
    }
    else
-#endif
    {
       syncWithLCNC();
    }
    isr2Time = micros() - t;
 }
 uint16_t oldCnt = 0;
+uint64_t startTime = 0;
+uint16_t avgTime = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    // Obj.IndexStatus = Encoder1.indexHappened();
@@ -101,7 +124,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    // Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
    // Obj.IndexByte = Encoder1.getIndexState();
    float_t ap2 = Obj.ActualPosition2;
-#if 1
+#if 0
    uint64_t dTim = irqTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
    Tim.push(dTim);
    uint64_t max_Tim = 0, min_Tim = UINT64_MAX;
@@ -115,14 +138,19 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    }
    thenTime = irqTime;
 #endif
+   if (irqCnt == 1000)
+      startTime = irqTime;
+   if (irqCnt == 11000)
+      avgTime = (irqTime - startTime) / 1000;
+
    Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
-   Obj.D1 = nLoops;
    uint16_t newCnt = isrTime;
    // Obj.D1 = newCnt - oldCnt;
    oldCnt = newCnt;
-   Obj.D2 = isrTime;                      // Step->stepgen_array[1].freq;
-   Obj.D3 = isr2Time;//100 * Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
-   Obj.D4 = 100 * Obj.ActualPosition2;
+   Obj.D1 = 1000 * Obj.CommandedPosition2;        // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D2 = 1000 * Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
+   Obj.D3 = Step->stepgen_array[1].freq;
+   Obj.D4 = Step->stepgen_array[1].rawcount % UINT16_MAX;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -149,54 +177,35 @@ static esc_cfg_t config =
         .esc_hw_eep_handler = NULL,
         .esc_check_dc_handler = dc_checker,
 };
+void measureCrystalFrequency(void);
 
 volatile byte serveIRQ = 0;
-void basePeriodCB(void)
-{
-   uint32_t one = micros();
-
-#if 1
-   if (Step && Step->stepgen_array)
-   {
-      Step->make_pulses(Step->stepgen_array, BASE_PERIOD);
-#if 1
-      for (int i = 0; i < Step->num_chan; i++)
-      {
-         digitalWrite(Step->dirPin[i], Step->stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
-         digitalWrite(Step->stepPin[i], Step->stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
-      }
-#endif
-   }
-#endif
-   isrTime = micros() - one;
-}
 
 void setup(void)
 {
-
    Serial1.begin(115200);
-
+   delay(2000);
+   Serial1.printf("Hello world\n");
+#if 0
+   measureCrystalFrequency(); // Calibrate crystal frequency
+#endif
    // rcc_config(); // Needed by encoder, probably breaks some timers.
    ecat_slv_init(&config);
 
-   pinMode(PA11, OUTPUT);
-   pinMode(PA12, OUTPUT);
-   pinMode(PC9, OUTPUT);
-   pinMode(PC10, OUTPUT);
+   pinMode(PA11, OUTPUT); // Step X
+   pinMode(PA12, OUTPUT); // Dir X
+   pinMode(PC9, OUTPUT);  // Step Z
+   pinMode(PC10, OUTPUT); // Dir Z
+
    Step = new StepGen3;
 
-   myTim = new HardwareTimer(TIM11);  // The base period timer
-   myTim->setPrescaleFactor(168 / 8); // 1 MHz
-   myTim->setPreloadEnable(true);
-   myTim->setOverflow(8 * BASE_PERIOD / 1200); // usecs 6 usec period is min with no load
-   // myTim->setOverflow(1000, HERTZ_FORMAT);
-   myTim->attachInterrupt(basePeriodCB);
-   myTim->refresh();
-   myTim->resume();
-#if 0
-   syncTimer = new HardwareTimer(TIM2); // The base period timer
+   baseTimer = new HardwareTimer(TIM1); // The base period timer
+   uint32_t usecs = BASE_PERIOD/1000;
+   setFrequencyAdjustedMicrosSeconds(baseTimer, usecs);
+   baseTimer->attachInterrupt(basePeriodCB);
+
+   syncTimer = new HardwareTimer(TIM3); // The Linuxcnc servo period sync timer
    syncTimer->attachInterrupt(syncWithLCNC);
-#endif
 }
 
 void loop(void)
@@ -221,11 +230,13 @@ void loop(void)
 
 void sync0Handler(void)
 {
+   irqTime = longTime.extendTime(micros());
    ALEventIRQ = ESC_ALeventread();
    // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       serveIRQ = 1;
-      irqTime = longTime.extendTime(micros());
+
+      irqCnt++;
    }
 }
 
@@ -278,4 +289,61 @@ uint16_t dc_checker(void)
    ESCvar.dcsync = 1;
    // StepGen3::sync0CycleTime = ESC_SYNC0cycletime(); // nsecs
    return 0;
+}
+
+//
+// Code to calibrate the crystal.
+//
+
+#include <HardwareTimer.h>
+HardwareTimer *timer;
+volatile uint32_t cnt;
+
+void CB(void)
+{
+   if (cnt-- == 0)
+   {
+      timer->pause();
+   }
+}
+
+void setFrequencyAdjustedMicrosSeconds(HardwareTimer *timer, uint32_t usecs)
+{
+   const uint16_t calibrated1000 = 1042; // <- This is the factor to adjust to make 1 sec = 1 sec
+   uint32_t period_cyc = (usecs * (timer->getTimerClkFreq() / 1000)) / calibrated1000; // Avoid overflow during math
+   uint32_t Prescalerfactor = (period_cyc / 0x10000) + 1;
+   uint32_t PeriodTicks = period_cyc / Prescalerfactor;
+   timer->setPrescaleFactor(Prescalerfactor);
+   timer->setOverflow(PeriodTicks, TICK_FORMAT);
+  // Serial1.printf("Period_cyc=%u Prescalefactor =%u ticks = %u\n", period_cyc, Prescalerfactor, PeriodTicks);
+}
+
+void measureCrystalFrequency(void)
+{
+   timer = new HardwareTimer(TIM1);
+   Serial1.begin(115200);
+   delay(3000);
+   Serial1.printf("Clock freq = %u\n", timer->getTimerClkFreq());
+   setFrequencyAdjustedMicrosSeconds(timer, 1000);
+   timer->refresh();
+   timer->attachInterrupt(CB);
+   cnt = 10000;
+
+   Serial1.printf("\n");
+   uint32_t startT = micros();
+   timer->resume();
+
+   while (cnt != 0)
+      ;
+
+   uint32_t endT = micros();
+   uint32_t diffT = endT - startT;
+   Serial1.printf("\n");
+   Serial1.printf("diff = %u\n", diffT);
+
+   Serial1.printf("\n");
+   delay(10000);
+   Serial1.printf("\n");
+
+   exit(0);
 }

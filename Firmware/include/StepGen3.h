@@ -36,16 +36,17 @@ typedef struct
     unsigned int step_space;            /* parameter: min step pulse spacing */
     double old_pos_cmd;                 /* previous position command (counts) */
     int count;                          /* pin: captured feedback in counts */
-    double pos_scale;                   /* param: steps per position unit */
-    double old_scale;                   /* stored scale value */
-    double scale_recip;                 /* reciprocal value used for scaling */
-    double vel_cmd;                     /* pin: velocity command (pos units/sec) */
-    double pos_cmd;                     /* pin: position command (position units) */
-    double pos_fb;                      /* pin: position feedback (position units) */
-    double freq;                        /* param: frequency command */
-    double maxvel;                      /* param: max velocity, (pos units/sec) */
-    double maxaccel;                    /* param: max accel (pos units/sec^2) */
-    unsigned int old_step_len;          /* used to detect parameter changes */
+#define double float
+    double pos_scale;          /* param: steps per position unit */
+    double old_scale;          /* stored scale value */
+    double scale_recip;        /* reciprocal value used for scaling */
+    double vel_cmd;            /* pin: velocity command (pos units/sec) */
+    double pos_cmd;            /* pin: position command (position units) */
+    double pos_fb;             /* pin: position feedback (position units) */
+    double freq;               /* param: frequency command */
+    double maxvel;             /* param: max velocity, (pos units/sec) */
+    double maxaccel;           /* param: max accel (pos units/sec^2) */
+    unsigned int old_step_len; /* used to detect parameter changes */
     unsigned int old_step_space;
     unsigned int old_dir_hold_dly;
     unsigned int old_dir_setup;
@@ -89,9 +90,10 @@ public:
     double dt;                 // update_freq period in seconds */
     double recip_dt;           // recprocal of period, avoids divides */
     volatile uint64_t cnt = 0; // Debug counter
-
+#undef double
     StepGen3(void);
     void updateStepGen(double pos_cmd1, double pos_cmd2);
+    void makeAllPulses(void);
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
     void make_pulses(void *arg, long period);
@@ -144,11 +146,11 @@ private:
 };
 
 // For the example
-#define BASE_PERIOD 50000 // 12 is max
+#define BASE_PERIOD 40000 // 40000 is max
 #define SERVO_PERIOD 1000000
-#define JOINT_X_STEPGEN_MAXACCEL (1.2 * 520.0)
+#define JOINT_X_STEPGEN_MAXACCEL (52000.0)
+#define JOINT_Z_STEPGEN_MAXACCEL (52000.0)
 #define JOINT_X_SCALE -200
-#define JOINT_Z_STEPGEN_MAXACCEL (1.2 * 520.0)
 #define JOINT_Z_SCALE -80
 
 #endif
