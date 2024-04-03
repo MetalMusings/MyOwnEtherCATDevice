@@ -20,6 +20,8 @@ void indexPulseEncoderCB1(void)
 {
    Encoder1.indexPulse();
 }
+#include <RunningAverage.h>
+RunningAverage cycleTimes(1000); // To have a running average of the cycletime over the last second
 
 #include "StepGen3.h"
 StepGen3 *Step = 0;
@@ -27,9 +29,10 @@ StepGen3 *Step = 0;
 #include "extend32to64.h"
 
 CircularBuffer<uint64_t, 200> Tim;
+
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0, irqCnt = 0, prevSyncTime = 0, syncTime = 0, deltaSyncTime;
 extend32to64 longTime;
-volatile uint16_t isrTime = 0, isr2Time = 0;
+volatile uint16_t isrTime = 0;
 void setFrequencyAdjustedMicrosSeconds(HardwareTimer *timer, uint32_t usecs);
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
@@ -81,14 +84,28 @@ uint16_t nLoops;
 uint64_t reallyNowTime = 0, reallyThenTime = 0; // Times in microseconds
 uint64_t timeDiff;                              // Timediff in microseconds
 int32_t delayT;
+uint16_t avgCycleTime, thisCycleTime; // In usecs
+int16_t jitterThisCycle = 0, maxCycleTime = 0;
+
+volatile uint64_t oldIrqTime = 0;
 
 void handleStepper(void)
 {
-   uint32_t t = micros();
-   reallyNowTime = longTime.extendTime(t);
-   timeDiff = reallyNowTime - reallyThenTime; // Time-diff in microseconds
-   nLoops = round(double(timeDiff) / 1000.0);
-   reallyThenTime = reallyNowTime;
+   if (oldIrqTime != 0)
+   {
+      thisCycleTime = irqTime - oldIrqTime;
+      cycleTimes.add(thisCycleTime);
+   }
+   oldIrqTime = irqTime;
+
+   if (cycleTimes.bufferIsFull()) // Do max and jitter calcs, just waiting a second
+   {
+      avgCycleTime = cycleTimes.getFastAverage();
+      jitterThisCycle = irqTime - avgCycleTime;
+      uint16_t maxInBuffer = cycleTimes.getMaxInBuffer();
+      if (maxCycleTime < maxInBuffer)
+         maxCycleTime = maxInBuffer;
+   }
 
    pos_cmd1 = Obj.CommandedPosition1;
    pos_cmd2 = Obj.CommandedPosition2;
@@ -112,7 +129,6 @@ void handleStepper(void)
    {
       syncWithLCNC();
    }
-   isr2Time = micros() - t;
 }
 uint16_t oldCnt = 0;
 uint64_t startTime = 0;
