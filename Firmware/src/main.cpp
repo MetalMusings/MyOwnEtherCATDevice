@@ -104,7 +104,7 @@ void handleStepper(void)
    delayT = 500 - diffT;
    if (delayT > 0 && delayT < 900)
    {
-      setFrequencyAdjustedMicrosSeconds(syncTimer, delayT);
+      syncTimer->setOverflow(delayT, MICROSEC_FORMAT);
       syncTimer->refresh();
       syncTimer->resume();
    }
@@ -177,6 +177,7 @@ static esc_cfg_t config =
         .esc_hw_eep_handler = NULL,
         .esc_check_dc_handler = dc_checker,
 };
+
 void measureCrystalFrequency(void);
 
 volatile byte serveIRQ = 0;
@@ -184,8 +185,6 @@ volatile byte serveIRQ = 0;
 void setup(void)
 {
    Serial1.begin(115200);
-   delay(2000);
-   Serial1.printf("Hello world\n");
 #if 0
    measureCrystalFrequency(); // Calibrate crystal frequency
 #endif
@@ -200,7 +199,7 @@ void setup(void)
    Step = new StepGen3;
 
    baseTimer = new HardwareTimer(TIM1); // The base period timer
-   uint32_t usecs = BASE_PERIOD/1000;
+   uint32_t usecs = BASE_PERIOD / 1000;
    setFrequencyAdjustedMicrosSeconds(baseTimer, usecs);
    baseTimer->attachInterrupt(basePeriodCB);
 
@@ -309,13 +308,13 @@ void CB(void)
 
 void setFrequencyAdjustedMicrosSeconds(HardwareTimer *timer, uint32_t usecs)
 {
-   const uint16_t calibrated1000 = 1042; // <- This is the factor to adjust to make 1 sec = 1 sec
+   const uint16_t calibrated1000 = 1042;                                               // <- This is the factor to adjust to make 1 sec = 1 sec
    uint32_t period_cyc = (usecs * (timer->getTimerClkFreq() / 1000)) / calibrated1000; // Avoid overflow during math
    uint32_t Prescalerfactor = (period_cyc / 0x10000) + 1;
    uint32_t PeriodTicks = period_cyc / Prescalerfactor;
    timer->setPrescaleFactor(Prescalerfactor);
    timer->setOverflow(PeriodTicks, TICK_FORMAT);
-  // Serial1.printf("Period_cyc=%u Prescalefactor =%u ticks = %u\n", period_cyc, Prescalerfactor, PeriodTicks);
+   // Serial1.printf("Period_cyc=%u Prescalefactor =%u ticks = %u\n", period_cyc, Prescalerfactor, PeriodTicks);
 }
 
 void measureCrystalFrequency(void)
