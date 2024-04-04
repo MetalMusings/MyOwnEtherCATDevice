@@ -85,7 +85,7 @@ uint64_t reallyNowTime = 0, reallyThenTime = 0; // Times in microseconds
 uint64_t timeDiff;                              // Timediff in microseconds
 int32_t delayT;
 uint16_t avgCycleTime, thisCycleTime; // In usecs
-int16_t jitterThisCycle = 0, maxCycleTime = 0;
+int16_t maxCycleTime = 0;
 
 volatile uint64_t oldIrqTime = 0;
 
@@ -98,10 +98,9 @@ void handleStepper(void)
    }
    oldIrqTime = irqTime;
 
-   if (cycleTimes.bufferIsFull()) // Do max and jitter calcs, just waiting a second
+   if (cycleTimes.bufferIsFull()) // Do max calcs, just waiting a second
    {
       avgCycleTime = cycleTimes.getFastAverage();
-      jitterThisCycle = irqTime - avgCycleTime;
       uint16_t maxInBuffer = cycleTimes.getMaxInBuffer();
       if (maxCycleTime < maxInBuffer)
          maxCycleTime = maxInBuffer;
@@ -118,7 +117,7 @@ void handleStepper(void)
    Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    uint32_t diffT = longTime.extendTime(micros()) - irqTime;
-   delayT = maxCycleTime + 50 - diffT - jitterThisCycle; // Add 50 as some saftey margin
+   delayT = maxCycleTime + 50 - diffT; // Add 50 as some saftey margin
    if (delayT > 0 && delayT < 900)
    {
       syncTimer->setOverflow(delayT, MICROSEC_FORMAT); // Work in flawed units, its ok
