@@ -125,7 +125,7 @@ function objectlist_generator(form, od, indexes)
 				objd.items.slice(subindex).forEach(subitem => {
 					var subi = subindex_padded(subindex);
 					const value = objectlist_getItemValue(subitem, objd.dtype);
-					objectlist += `\n  {0x${subi}, DTYPE_${objd.dtype}, ${bitsize}, ${objectlist_objdFlags(objd)}, acName${index}_${subi}, ${value}, ${subitem.data || 'NULL'}},`;
+					objectlist += `\n  {${subi}, DTYPE_${objd.dtype}, ${bitsize}, ${objectlist_objdFlags(objd)}, acName${index}_${subi}, ${value}, ${subitem.data || 'NULL'}},`;
 					subindex++;
 				});
 				break;
@@ -138,7 +138,7 @@ function objectlist_generator(form, od, indexes)
 					const bitsize = dtype_bitsize[subitem.dtype];
 					const value = objectlist_getItemValue(subitem, subitem.dtype);
 					const atypeflag = objectlist_objdFlags(subitem);
-					objectlist += `\n  {0x${subi}, DTYPE_${subitem.dtype}, ${bitsize}, ${atypeflag}, acName${index}_${subi}, ${value}, ${subitem.data || 'NULL'}},`;
+					objectlist += `\n  {${subi}, DTYPE_${subitem.dtype}, ${bitsize}, ${atypeflag}, acName${index}_${subi}, ${value}, ${subitem.data || 'NULL'}},`;
 					subindex++;
 				});
 
