@@ -1096,9 +1096,9 @@ StepGen3::StepGen3(void)
     rtapi_app_main();
     stepgen_array[0].enable = 1;
     stepgen_array[0].pos_scale = JOINT_X_SCALE;
-    //stepgen_array[0].maxaccel = JOINT_X_STEPGEN_MAXACCEL;
+    stepgen_array[0].maxaccel = JOINT_X_STEPGEN_MAXACCEL;
     stepgen_array[1].pos_scale = JOINT_Z_SCALE;
-    //stepgen_array[1].maxaccel = JOINT_Z_STEPGEN_MAXACCEL;
+    stepgen_array[1].maxaccel = JOINT_Z_STEPGEN_MAXACCEL;
     stepgen_array[0].enable = stepgen_array[1].enable = 1;
 }
 
