@@ -7,7 +7,7 @@ extern "C"
 };
 _Objects Obj;
 
-#define NEEDED 0
+#define NEEDED 1
 
 HardwareSerial Serial1(PA10, PA9);
 
@@ -64,7 +64,7 @@ void syncWithLCNC()
    prevMakePulsesCnt = makePulsesCnt;
    Step->updateStepGen(pos_cmd1, pos_cmd2); // Update positions
    Step->makeAllPulses();                   // Make first step right here
-   basePeriodCnt = 1000000 / BASE_PERIOD;   //
+   basePeriodCnt = SERVO_PERIOD / BASE_PERIOD;   //
    baseTimer->refresh();                    //
    baseTimer->resume();                     // Make the other steps in ISR
    // baseTimer->isRunning();
@@ -115,9 +115,10 @@ void handleStepper(void)
    Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
    Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
 
-   Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
-   Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
+   // Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
+   // Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    uint32_t diffT = longTime.extendTime(micros()) - irqTime;
+   maxCycleTime = 600;
    delayT = maxCycleTime + 50 - diffT; // Add 50 as some saftey margin
    if (delayT > 0 && delayT < 900)
    {
@@ -134,6 +135,7 @@ void handleStepper(void)
 uint16_t oldCnt = 0;
 uint64_t startTime = 0;
 uint16_t avgTime = 0;
+float_t oldCommandedPosition = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
 // Obj.IndexStatus = Encoder1.indexHappened();
@@ -163,10 +165,11 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 
    // Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.DiffT = nLoops;
-   Obj.D1 = 1000 * Obj.CommandedPosition2; // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
-   Obj.D2 = 1000 * Obj.ActualPosition2;    // Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
-   Obj.D3 = nLoops;                        // Step->stepgen_array[1].freq;
-   Obj.D4 = 0;                             // deltaMakePulsesCnt;            // Step->stepgen_array[1].rawcount % UINT16_MAX;
+   Obj.D1 = 1000 * Obj.CommandedPosition2;                          // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D2 = 1000 * Obj.ActualPosition2;                             // Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
+   Obj.D3 = irqCnt % 256;                                           // Step->stepgen_array[1].freq;
+   Obj.D4 = 1000 * (Obj.CommandedPosition2 - oldCommandedPosition); // deltaMakePulsesCnt;            // Step->stepgen_array[1].rawcount % UINT16_MAX;
+   oldCommandedPosition = Obj.CommandedPosition2;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -217,7 +220,7 @@ void setup(void)
    baseTimer = new HardwareTimer(TIM11); // The base period timer
    uint32_t usecs = BASE_PERIOD / sync0CycleTime;
    // setFrequencyAdjustedMicrosSeconds(baseTimer, usecs);
-   baseTimer->setOverflow(20, MICROSEC_FORMAT);
+   baseTimer->setOverflow(35, MICROSEC_FORMAT);
    baseTimer->attachInterrupt(basePeriodCB);
 
    syncTimer = new HardwareTimer(TIM3); // The Linuxcnc servo period sync timer
@@ -248,7 +251,7 @@ void loop(void)
 void sync0Handler(void)
 {
    ALEventIRQ = ESC_ALeventread();
-   if (ALEventIRQ & ESCREG_ALEVENT_SM2)
+   // if (ALEventIRQ & ESCREG_ALEVENT_SM2)
    {
       irqTime = longTime.extendTime(micros());
       serveIRQ = 1;
