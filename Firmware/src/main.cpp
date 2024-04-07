@@ -22,28 +22,22 @@ void indexPulseEncoderCB1(void)
    Encoder1.indexPulse();
 }
 #include <RunningAverage.h>
-RunningAverage irqServeDelays(1000); // To have a running average of the irq serve delay over the last second
+RunningAverage irqServeDelays(1000); // To get the max delay of the irq serve time over the last second
 
 #include "StepGen3.h"
 StepGen3 *Step = 0;
 
-CircularBuffer<uint64_t, 200> Tim;
-
 #include "extend32to64.h"
 
-volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0, irqCnt = 0, prevSyncTime = 0, syncTime = 0, deltaSyncTime;
+volatile uint64_t irqTime = 0, irqCnt = 0;
 extend32to64 longTime;
 
 void setFrequencyAdjustedMicrosSeconds(HardwareTimer *timer, uint32_t usecs);
 
 void cb_set_outputs(void) // Master outputs gets here, slave inputs, first operation
 {
-   //  Encoder1.setLatch(Obj.IndexLatchEnable);
-   //  Encoder1.setScale(2000);
-
-   // Step2.reqPos(Obj.CommandedPosition2);
-   // Step2.setScale(Obj.StepsPerMM2);
-   // Step2.enable(1);
+   Encoder1.setLatch(Obj.IndexLatchEnable);
+   Encoder1.setScale(2000);
 }
 
 volatile uint16_t basePeriodCnt;
@@ -55,9 +49,6 @@ void syncWithLCNC()
 {
    syncTimer->pause();
    baseTimer->pause();
-   prevSyncTime = syncTime;
-   syncTime = longTime.extendTime(micros());
-   deltaSyncTime = syncTime - prevSyncTime;
    deltaMakePulsesCnt = makePulsesCnt - prevMakePulsesCnt;
    prevMakePulsesCnt = makePulsesCnt;
    Step->updateStepGen(pos_cmd1, pos_cmd2);    // Update positions
@@ -65,7 +56,6 @@ void syncWithLCNC()
    basePeriodCnt = SERVO_PERIOD / BASE_PERIOD; //
    baseTimer->refresh();                       //
    baseTimer->resume();                        // Make the other steps in ISR
-   // baseTimer->isRunning();
 }
 
 void basePeriodCB(void)
@@ -76,13 +66,12 @@ void basePeriodCB(void)
       baseTimer->pause();
 }
 
-uint64_t timeDiff; // Timediff in microseconds
 int32_t delayT;
-uint16_t avgCycleTime, thisCycleTime; // In usecs
+uint16_t thisCycleTime; // In usecs
 int16_t maxIrqServeTime = 0;
-
-volatile uint64_t oldIrqTime = 0;
+uint64_t oldIrqTime = 0;
 uint16_t nLoops;
+
 void handleStepper(void)
 {
    if (oldIrqTime != 0) // See if there is a delay in data, normally it *should* be nLoops=1, but sometimes it is more
@@ -113,7 +102,6 @@ void handleStepper(void)
    // Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    // Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
 
-   // maxIrqServeTime = 600;
    delayT = maxIrqServeTime - diffT; // Add 10 as some safety margin
    if (delayT > 0 && delayT < 900)
    {
@@ -126,38 +114,15 @@ void handleStepper(void)
       syncWithLCNC();
    }
 }
-uint16_t oldCnt = 0;
-uint64_t startTime = 0;
-uint16_t avgTime = 0;
+
 float_t oldCommandedPosition = 0;
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
-// Obj.IndexStatus = Encoder1.indexHappened();
-// Obj.EncPos = Encoder1.currentPos();
-// Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
-// Obj.IndexByte = Encoder1.getIndexState();
-#if 0
-   float_t ap2 = Obj.ActualPosition2;
+   Obj.IndexStatus = Encoder1.indexHappened();
+   Obj.EncPos = Encoder1.currentPos();
+   Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
+   Obj.IndexByte = Encoder1.getIndexState();
 
-   uint64_t dTim = irqTime - thenTime; // Debug. Getting jitter over the last 200 milliseconds
-   Tim.push(dTim);
-   uint64_t max_Tim = 0, min_Tim = UINT64_MAX;
-   for (decltype(Tim)::index_t i = 0; i < Tim.size(); i++)
-   {
-      uint32_t aTim = Tim[i];
-      if (aTim > max_Tim)
-         max_Tim = aTim;
-      if (aTim < min_Tim)
-         min_Tim = aTim;
-   }
-   thenTime = irqTime;
-#endif
-   if (irqCnt == 1000)
-      startTime = irqTime;
-   if (irqCnt == 11000)
-      avgTime = (irqTime - startTime) / 1000;
-
-   // Obj.DiffT = longTime.extendTime(micros()) - irqTime; // max_Tim - min_Tim; // Debug
    Obj.DiffT = nLoops;
    Obj.D1 = 1000 * Obj.CommandedPosition2;                          // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
    Obj.D2 = 1000 * Obj.ActualPosition2;                             // Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
@@ -201,7 +166,7 @@ void setup(void)
 #if 0
    measureCrystalFrequency(); // Calibrate crystal frequency
 #endif
-   // rcc_config(); // Needed by encoder, probably breaks some timers.
+   rcc_config(); // Needed by encoder, probably breaks some timers.
    ecat_slv_init(&config);
 
    pinMode(PA11, OUTPUT); // Step X
@@ -213,7 +178,7 @@ void setup(void)
 
    baseTimer = new HardwareTimer(TIM11); // The base period timer
    setFrequencyAdjustedMicrosSeconds(baseTimer, BASE_PERIOD / 1000);
-   // baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
+   // baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT); // Or the line above, This one is uncalibrated
    baseTimer->attachInterrupt(basePeriodCB);
 
    syncTimer = new HardwareTimer(TIM3); // The Linuxcnc servo period sync timer
@@ -225,10 +190,6 @@ void loop(void)
    uint64_t dTime;
    if (serveIRQ)
    {
-      nowTime = longTime.extendTime(micros());
-      /* Read local time from ESC*/
-      // ESC_read(ESCREG_LOCALTIME, (void *)&ESCvar.Time, sizeof(ESCvar.Time));
-      // ESCvar.Time = etohl(ESCvar.Time);
       DIG_process(ALEventIRQ, DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG |
                                   DIG_PROCESS_APP_HOOK_FLAG | DIG_PROCESS_INPUTS_FLAG);
       serveIRQ = 0;
@@ -248,7 +209,7 @@ void sync0Handler(void)
       irqTime = longTime.extendTime(micros());
       serveIRQ = 1;
    }
-   irqCnt++;
+   irqCnt++; // debug output
 }
 
 // Enable SM2 interrupts
