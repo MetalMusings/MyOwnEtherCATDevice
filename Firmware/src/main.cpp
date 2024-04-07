@@ -113,7 +113,7 @@ void handleStepper(void)
    // Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    // Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
 
-   //maxIrqServeTime = 600;
+   // maxIrqServeTime = 600;
    delayT = maxIrqServeTime - diffT; // Add 10 as some safety margin
    if (delayT > 0 && delayT < 900)
    {
@@ -212,9 +212,8 @@ void setup(void)
    Step = new StepGen3;
 
    baseTimer = new HardwareTimer(TIM11); // The base period timer
-   uint32_t usecs = BASE_PERIOD / sync0CycleTime;
-   // setFrequencyAdjustedMicrosSeconds(baseTimer, usecs);
-   baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
+   setFrequencyAdjustedMicrosSeconds(baseTimer, BASE_PERIOD / 1000);
+   // baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
    baseTimer->attachInterrupt(basePeriodCB);
 
    syncTimer = new HardwareTimer(TIM3); // The Linuxcnc servo period sync timer
