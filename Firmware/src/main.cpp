@@ -62,11 +62,11 @@ void syncWithLCNC()
    deltaSyncTime = syncTime - prevSyncTime;
    deltaMakePulsesCnt = makePulsesCnt - prevMakePulsesCnt;
    prevMakePulsesCnt = makePulsesCnt;
-   Step->updateStepGen(pos_cmd1, pos_cmd2); // Update positions
-   Step->makeAllPulses();                   // Make first step right here
-   basePeriodCnt = SERVO_PERIOD / BASE_PERIOD;   //
-   baseTimer->refresh();                    //
-   baseTimer->resume();                     // Make the other steps in ISR
+   Step->updateStepGen(pos_cmd1, pos_cmd2);    // Update positions
+   Step->makeAllPulses();                      // Make first step right here
+   basePeriodCnt = SERVO_PERIOD / BASE_PERIOD; //
+   baseTimer->refresh();                       //
+   baseTimer->resume();                        // Make the other steps in ISR
    // baseTimer->isRunning();
 }
 
@@ -220,7 +220,7 @@ void setup(void)
    baseTimer = new HardwareTimer(TIM11); // The base period timer
    uint32_t usecs = BASE_PERIOD / sync0CycleTime;
    // setFrequencyAdjustedMicrosSeconds(baseTimer, usecs);
-   baseTimer->setOverflow(35, MICROSEC_FORMAT);
+   baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT);
    baseTimer->attachInterrupt(basePeriodCB);
 
    syncTimer = new HardwareTimer(TIM3); // The Linuxcnc servo period sync timer
