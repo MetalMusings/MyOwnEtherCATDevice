@@ -1,0 +1,51 @@
+# Include your custom HAL commands here
+
+# Load the Huanyang VFD user component
+loadusr -Wn spindle-vfd hy_vfd -n spindle-vfd -d /dev/hy_vfd -r 19200 -p none -s 1 -b 8
+
+# motion.spindle-speed-in needs rev per second
+loadrt scale names=scale.0,scale.1,scale.2
+# scale.0  gearbox via M101-M106, M101 being lowest gear.
+# scale.1  Inverted gear ratio
+# scale.2  motion.spindle-speed.in in rev/sec
+loadrt limit2 names=spindlemax
+loadrt mult2  names=mult2.1
+addf scale.0  servo-thread
+addf scale.1  servo-thread
+addf scale.2  servo-thread
+addf mult2.1  servo-thread
+addf spindlemax servo-thread
+setp scale.0.gain 0.8846    # Start with fourth gear
+setp scale.1.gain 1.13045          
+setp scale.2.gain 0.0166666667
+setp mult2.1.in1     25.0
+unlinkp spindle.0.forward
+unlinkp spindle.0.reverse
+unlinkp spindle.0.on
+#unlinkp motion.spindle-at-speed
+net spindle-fwd          spindle.0.forward       => spindle-vfd.spindle-forward
+net spindle-reverse      spindle.0.reverse       => spindle-vfd.spindle-reverse
+net spindle-on           spindle.0.on            => spindle-vfd.spindle-on
+net spindle-at-speed     <= spindle-vfd.spindle-at-speed
+#net spindle-enable                                    => spindle-vfd.enable
+setp spindle-vfd.enable 1
+
+# Prepare max limit rpm for spindle
+net spindle-max-freq     spindle-vfd.max-freq	      => mult2.1.in0
+net spindle-max-rpm      mult2.1.out		      => spindlemax.max   # Max limit for motor rpm, like 67*25 = 1675
+
+# Give speed to vfd, limited to max possible
+unlinkp spindle.0.speed-out-abs
+net spindle-speed-scale          spindle.0.speed-out-abs => scale.1.in                 # Spindle rpm => Motor rpm
+net spindle-speed-cmd-unlimited  scale.1.out                  => spindlemax.in              # Limit spindle rpm
+net spindle-speed-cmd-limited    spindlemax.out               => spindle-vfd.speed-command  # Feed to vfd
+
+# Convert actual feed from rpm to rps, consider gear in use.
+unlinkp spindle.0.speed-in
+net spindle-speed-scale2 spindle-vfd.spindle-speed-fb => scale.2.in                 # Motor rpm => Motor rps
+net spindle-speed-gears  scale.2.out                  => scale.0.in                 # Motor rps => spindle rps
+net spindle-speed-in     scale.0.out                  => spindle.0.speed-in    
+
+# Gamepad
+loadusr -W hal_input -KRAL F310
+# Resten är i custom_postgui.hal
