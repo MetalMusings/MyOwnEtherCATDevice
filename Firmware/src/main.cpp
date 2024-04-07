@@ -22,7 +22,7 @@ void indexPulseEncoderCB1(void)
    Encoder1.indexPulse();
 }
 #include <RunningAverage.h>
-RunningAverage cycleTimes(1000); // To have a running average of the cycletime over the last second
+RunningAverage irqServeDelays(1000); // To have a running average of the irq serve delay over the last second
 
 #include "StepGen3.h"
 StepGen3 *Step = 0;
@@ -79,27 +79,26 @@ void basePeriodCB(void)
 uint64_t timeDiff; // Timediff in microseconds
 int32_t delayT;
 uint16_t avgCycleTime, thisCycleTime; // In usecs
-int16_t maxCycleTime = 0;
+int16_t maxIrqServeTime = 0;
 
 volatile uint64_t oldIrqTime = 0;
 uint16_t nLoops;
 void handleStepper(void)
 {
-
-   if (oldIrqTime != 0)
+   if (oldIrqTime != 0) // See if there is a delay in data, normally it *should* be nLoops=1, but sometimes it is more
    {
       thisCycleTime = irqTime - oldIrqTime;
-      cycleTimes.add(thisCycleTime);
       nLoops = round(float(thisCycleTime) / float(sync0CycleTime));
    }
    oldIrqTime = irqTime;
 
-   if (cycleTimes.bufferIsFull()) // Do max calcs, just waiting a second
+   uint32_t diffT = longTime.extendTime(micros()) - irqTime; // Time from interrupt was received by isr
+   irqServeDelays.add(diffT);
+   if (irqServeDelays.bufferIsFull()) // Do max calcs, just waiting a second
    {
-      avgCycleTime = cycleTimes.getFastAverage();
-      uint16_t maxInBuffer = cycleTimes.getMaxInBuffer();
-      if (maxCycleTime < maxInBuffer)
-         maxCycleTime = maxInBuffer;
+      uint16_t maxInBuffer = irqServeDelays.getMaxInBuffer();
+      if (maxIrqServeTime < maxInBuffer)
+         maxIrqServeTime = maxInBuffer;
    }
 
    pos_cmd1 = Obj.CommandedPosition1;
@@ -113,9 +112,9 @@ void handleStepper(void)
 
    // Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    // Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
-   uint32_t diffT = longTime.extendTime(micros()) - irqTime;
-   maxCycleTime = 600;
-   delayT = maxCycleTime + 50 - diffT; // Add 50 as some saftey margin
+
+   //maxIrqServeTime = 600;
+   delayT = maxIrqServeTime - diffT; // Add 10 as some safety margin
    if (delayT > 0 && delayT < 900)
    {
       syncTimer->setOverflow(delayT, MICROSEC_FORMAT); // Work in flawed units, its ok
