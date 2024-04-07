@@ -7,15 +7,13 @@ extern "C"
 };
 _Objects Obj;
 
-#define NEEDED 1
-
 HardwareSerial Serial1(PA10, PA9);
 
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 HardwareTimer *baseTimer;     // The base period timer
 HardwareTimer *syncTimer;     // The timer that syncs "with linuxcnc cycle"
 uint16_t sync0CycleTime;      // usecs
-#if NEEDED
+
 #include "MyEncoder.h"
 void indexPulseEncoderCB1(void);
 MyEncoder Encoder1(TIM2, PA2, indexPulseEncoderCB1);
@@ -30,7 +28,7 @@ RunningAverage cycleTimes(1000); // To have a running average of the cycletime o
 StepGen3 *Step = 0;
 
 CircularBuffer<uint64_t, 200> Tim;
-#endif
+
 #include "extend32to64.h"
 
 volatile uint64_t irqTime = 0, thenTime = 0, nowTime = 0, irqCnt = 0, prevSyncTime = 0, syncTime = 0, deltaSyncTime;
@@ -51,7 +49,7 @@ void cb_set_outputs(void) // Master outputs gets here, slave inputs, first opera
 volatile uint16_t basePeriodCnt;
 volatile uint64_t makePulsesCnt = 0, prevMakePulsesCnt = 0;
 volatile uint16_t deltaMakePulsesCnt;
-#if NEEDED
+
 volatile double pos_cmd1, pos_cmd2;
 void syncWithLCNC()
 {
@@ -77,7 +75,7 @@ void basePeriodCB(void)
    else
       baseTimer->pause();
 }
-#endif
+
 uint64_t timeDiff; // Timediff in microseconds
 int32_t delayT;
 uint16_t avgCycleTime, thisCycleTime; // In usecs
@@ -91,13 +89,11 @@ void handleStepper(void)
    if (oldIrqTime != 0)
    {
       thisCycleTime = irqTime - oldIrqTime;
-#if NEEDED
       cycleTimes.add(thisCycleTime);
-#endif
       nLoops = round(float(thisCycleTime) / float(sync0CycleTime));
    }
    oldIrqTime = irqTime;
-#if NEEDED
+
    if (cycleTimes.bufferIsFull()) // Do max calcs, just waiting a second
    {
       avgCycleTime = cycleTimes.getFastAverage();
@@ -108,10 +104,10 @@ void handleStepper(void)
 
    pos_cmd1 = Obj.CommandedPosition1;
    pos_cmd2 = Obj.CommandedPosition2;
-#endif
+
    Obj.ActualPosition1 = Obj.CommandedPosition1;
    Obj.ActualPosition2 = Obj.CommandedPosition2;
-#if NEEDED
+
    Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
    Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
 
@@ -130,7 +126,6 @@ void handleStepper(void)
    {
       syncWithLCNC();
    }
-#endif
 }
 uint16_t oldCnt = 0;
 uint64_t startTime = 0;
@@ -214,7 +209,7 @@ void setup(void)
    pinMode(PA12, OUTPUT); // Dir X
    pinMode(PC9, OUTPUT);  // Step Z
    pinMode(PC10, OUTPUT); // Dir Z
-#if NEEDED
+
    Step = new StepGen3;
 
    baseTimer = new HardwareTimer(TIM11); // The base period timer
@@ -225,7 +220,6 @@ void setup(void)
 
    syncTimer = new HardwareTimer(TIM3); // The Linuxcnc servo period sync timer
    syncTimer->attachInterrupt(syncWithLCNC);
-#endif
 }
 
 void loop(void)
