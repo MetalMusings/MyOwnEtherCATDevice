@@ -6,7 +6,30 @@ that I used during the creation of my own EtherCAT device.
 This job is documented in a series of Youtube videos, from my first attempts to understand
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
+## Make my own EtherCAT device 9. About time. Step generator
 
+This was something, I almost gave up. But here it is. A working step generator.
+Actually, not one but two step generators for the EaserCAT 2000 board.
+For a step generator it is all about timing, timing and timing.
+I'll walk you through what I had to do to get it to work.
+
+Biggest changes this time are in the [Firmware folder](Firmware).
+The [Documentation folder](Documentation) has details on the second step generator.
+A small but fatal bug was fixed in the EEPROM_generator.
+For all details, read the git log. Too much to mention all.
+
+[![Watch the video](https://img.youtube.com/vi/boanv6ihYtI/default.jpg)](https://youtu.be/boanv6ihYtI)
+
+## Make my own EtherCAT device 8. EaserCAT 3000
+
+Introducing the new **EaserCAT 3000** board. It's an evolution of the EaserCAT 2000
+and intended to be used in my plasma cutter. It features four stepper driver outputs,
+input for a THCAD arc voltage card, an encoder, an analog output (for spindle +- 10V),
+eigth digital inputs, four digital outputs, plus some 12 I/O for any possible extension.
+
+The KiCAD files are in the [KiCAD folder](Kicad/Ax58100-stm32-ethercat)
+
+[![Watch the video](https://img.youtube.com/vi/boanv6ihYtI/default.jpg)](https://youtu.be/boanv6ihYtI)
 
 
 ## Make my own EtherCAT device 7. Turning in the lathe
