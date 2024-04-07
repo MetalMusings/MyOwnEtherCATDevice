@@ -12,9 +12,10 @@ This was something, I almost gave up. But here it is. A working step generator.
 Actually, not one but two step generators for the EaserCAT 2000 board.
 For a step generator it is all about timing, timing and timing.
 I'll walk you through what I had to do to get it to work.
+It can give some general insight into how EtherCAT for linuxcnc works.
 
 Biggest changes this time are in the [Firmware folder](Firmware).
-The [Documentation folder](Documentation) has details on the second step generator.
+The [Documentation folder](Documentation) has design details on the second step generator.
 A small but fatal bug was fixed in the EEPROM_generator.
 For all details, read the git log. Too much to mention all.
 
