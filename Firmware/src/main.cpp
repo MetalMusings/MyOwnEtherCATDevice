@@ -88,6 +88,8 @@ void handleStepper(void)
    if (irqServeDelays.bufferIsFull()) // Do max calcs, just waiting a second
    {
       uint16_t maxInBuffer = irqServeDelays.getMaxInBuffer();
+      if (maxIrqServeTime > maxInBuffer)  // Reduce by one, slowly eating up excess time
+         maxIrqServeTime--;
       if (maxIrqServeTime < maxInBuffer)
          maxIrqServeTime = maxInBuffer;
    }
