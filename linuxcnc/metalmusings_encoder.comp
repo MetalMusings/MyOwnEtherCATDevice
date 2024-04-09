@@ -10,5 +10,12 @@ license "GPL";
 //main function
 FUNCTION(_) {
     index_latch_enable = index_c_enable;
-    index_c_enable = index_status;
+    if (index_latch_enable) {
+        if (index_status) {
+            index_c_enable = 0;
+	}
+	     // else wait for index-status
+    } else {
+       index_c_enable = index_status;
+    }
 }

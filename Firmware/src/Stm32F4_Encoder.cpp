@@ -263,7 +263,7 @@ void GPIO_PinAF(GPIO_TypeDef *GPIOx, uint16_t GPIO_PinSource, uint8_t GPIO_AF)
     GPIOx->AFR[GPIO_PinSource >> 0x03] = temp_2;
 }
 
-void rcc_config()
+void encoder_config()
 {
     RCC->AHB1ENR |= 0x1;  // GPIOA
     RCC->AHB1ENR |= 0x4;  // GPIOC
@@ -271,13 +271,13 @@ void rcc_config()
     RCC->AHB1ENR |= 0x10; // GPIOE
 
     RCC->APB1ENR |= 0x20000000; // ENABLE DAC
-  //  RCC->APB2ENR |= 0x00000002; // APB2 TIM8
+                                //  RCC->APB2ENR |= 0x00000002; // APB2 TIM8
     RCC->APB1ENR |= 0x00000004; // APB1 TIM4
     RCC->APB1ENR |= 0x00000001; // APB1 TIM2
- //   RCC->APB1ENR |= 0x00000002; // APB1 TIM3
+                                //   RCC->APB1ENR |= 0x00000002; // APB1 TIM3
 
     GpioConfigPortA(GPIOA);
- //   GpioConfigPortC(GPIOC);
+    //   GpioConfigPortC(GPIOC);
     GpioConfigPortD(GPIOD);
 #if 0 // Skipping since TIM8 is step generator and TIM3, chan4 is smae as TIM8, chan4
     GPIO_PinAF(GPIOA, GPIO_PinSource6, GPIO_AF_TIM3);
@@ -325,5 +325,67 @@ void rcc_config()
     TIM_Cmd(TIM3, ENABLE);
 
     TIM3->CNT = 0;
+#endif
+}
+
+void encoder2_config()
+{
+#if 0
+#include "mbed.h"
+#include "stm32f4xx.h"
+#include "stm32f4xx_hal_tim_ex.h"
+
+    TIM_HandleTypeDef timer;
+    TIM_Encoder_InitTypeDef encoder;
+
+    // direction to PA_9 -- step pulse to PA_8
+
+    int main()
+    {
+
+     GPIO_InitTypeDef GPIO_InitStruct;
+        __TIM1_CLK_ENABLE();
+        __GPIOA_CLK_ENABLE();
+        GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+        GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    timer.Instance = TIM1;
+    timer.Init.Period = 0xffff;
+    timer.Init.Prescaler = 0;
+    timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    timer.Init.CounterMode = TIM_COUNTERMODE_UP;
+
+    encoder.EncoderMode = TIM_ENCODERMODE_TI12; 
+    encoder.IC1Filter = 0x0f;
+    encoder.IC1Polarity = TIM_INPUTCHANNELPOLARITY_RISING; 
+    encoder.IC1Prescaler = TIM_ICPSC_DIV4;
+    encoder.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+
+    encoder.IC2Filter = 0x0f;
+    encoder.IC2Polarity = TIM_INPUTCHANNELPOLARITY_FALLING;    
+    encoder.IC2Prescaler = TIM_ICPSC_DIV4;
+    encoder.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+
+    HAL_TIM_Encoder_Init(&timer, &encoder);
+    HAL_TIM_Encoder_Start(&timer,TIM_CHANNEL_1);   
+
+
+    TIM1->EGR = 1;           // Generate an update event
+    TIM1->CR1 = 1;           // Enable the counter
+
+
+ while (1) {
+        int16_t count1; 
+        count1=TIM1->CNT; 
+
+        printf("%d\r\n", count1);
+        wait(1.0);
+
+ };
+}
 #endif
 }

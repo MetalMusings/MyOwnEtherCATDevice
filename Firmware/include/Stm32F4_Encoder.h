@@ -641,7 +641,8 @@ public:
   uint16_t GetCount();
 };
 
-void rcc_config();
+void encoder_config();
+void encoder2_config(); // Experimental
 void GpioConfigPortA(GPIO_TypeDef *GPIOx);
 void GpioConfigPortC(GPIO_TypeDef *GPIOx);
 void GpioConfigPortD(GPIO_TypeDef *GPIOx);

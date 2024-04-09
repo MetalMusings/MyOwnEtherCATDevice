@@ -2,7 +2,7 @@
 #define MYENCODER
 #include "Stm32F4_Encoder.h"
 #include <CircularBuffer.hpp>
-#define RINGBUFFERLEN 101
+#define RINGBUFFERLEN 11
 
 class MyEncoder
 {
@@ -30,6 +30,7 @@ private:
     CircularBuffer<double_t, RINGBUFFERLEN> Pos;
     CircularBuffer<uint32_t, RINGBUFFERLEN> TDelta;
     double curPos;
+    double oldFrequency;
 
     TIM_TypeDef *tim_base;
 };

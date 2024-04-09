@@ -15,10 +15,12 @@ HardwareTimer *syncTimer;     // The timer that syncs "with linuxcnc cycle"
 uint16_t sync0CycleTime;      // usecs
 
 #include "MyEncoder.h"
+volatile uint16_t encCnt = 0;
 void indexPulseEncoderCB1(void);
 MyEncoder Encoder1(TIM2, PA2, indexPulseEncoderCB1);
 void indexPulseEncoderCB1(void)
 {
+   encCnt++;
    Encoder1.indexPulse();
 }
 #include <RunningAverage.h>
@@ -120,13 +122,13 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    Obj.IndexStatus = Encoder1.indexHappened();
    Obj.EncPos = Encoder1.currentPos();
-   Obj.EncFrequency = Encoder1.frequency(ESCvar.Time);
+   Obj.EncFrequency = Encoder1.frequency(longTime.extendTime(micros()));
    Obj.IndexByte = Encoder1.getIndexState();
 
    Obj.DiffT = nLoops;
    Obj.D1 = 1000 * Obj.CommandedPosition2;                          // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
    Obj.D2 = 1000 * Obj.ActualPosition2;                             // Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
-   Obj.D3 = irqCnt % 256;                                           // Step->stepgen_array[1].freq;
+   Obj.D3 = encCnt % 256;                                           // Step->stepgen_array[1].freq;
    Obj.D4 = 1000 * (Obj.CommandedPosition2 - oldCommandedPosition); // deltaMakePulsesCnt;            // Step->stepgen_array[1].rawcount % UINT16_MAX;
    oldCommandedPosition = Obj.CommandedPosition2;
 }
@@ -166,7 +168,9 @@ void setup(void)
 #if 0
    measureCrystalFrequency(); // Calibrate crystal frequency
 #endif
-   rcc_config(); // Needed by encoder, probably breaks some timers.
+   Step = new StepGen3;
+
+   encoder_config(); // Needed by encoder, probably breaks some timers.
    ecat_slv_init(&config);
 
    pinMode(PA11, OUTPUT); // Step X
@@ -174,7 +178,7 @@ void setup(void)
    pinMode(PC9, OUTPUT);  // Step Z
    pinMode(PC10, OUTPUT); // Dir Z
 
-   Step = new StepGen3;
+
 
    baseTimer = new HardwareTimer(TIM11); // The base period timer
    setFrequencyAdjustedMicrosSeconds(baseTimer, BASE_PERIOD / 1000);

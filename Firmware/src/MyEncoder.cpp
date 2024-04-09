@@ -61,14 +61,19 @@ double MyEncoder::frequency(uint64_t time)
 
     double diffT = 0;
     double diffPos = 0;
+    double frequency;
     TDelta.push(time); // Running average over the length of the circular buffer
     Pos.push(curPos);
-    if (Pos.size() >= 2)
+    if (Pos.size() == RINGBUFFERLEN)
     {
-        diffT = 1.0e-9 * (TDelta.last() - TDelta.first()); // Time is in nanoseconds
+        diffT = 1.0e-6 * (TDelta.last() - TDelta.first()); // Time is in microseconds
         diffPos = fabs(Pos.last() - Pos.first());
+        frequency = diffPos / diffT;
+        oldFrequency = frequency;
+        return frequency; // Revolutions per second
     }
-    return diffT != 0 ? diffPos / diffT : 0.0; // Revolutions per second
+    else
+        return oldFrequency;
 }
 uint8_t MyEncoder::getIndexState()
 {
