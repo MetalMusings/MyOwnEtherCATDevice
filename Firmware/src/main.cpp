@@ -23,8 +23,9 @@ void indexPulseEncoderCB1(void)
    encCnt++;
    Encoder1.indexPulse();
 }
-#include <RunningAverage.h>
-RunningAverage irqServeDelays(1000); // To get the max delay of the irq serve time over the last second
+// #include <RunningAverage.h>
+// RunningAverage irqServeDelays(1000); // To get the max delay of the irq serve time over the last second
+CircularBuffer<uint16_t, 1000> irqServeDelays;
 
 #include "StepGen3.h"
 StepGen3 *Step = 0;
@@ -84,11 +85,17 @@ void handleStepper(void)
    oldIrqTime = irqTime;
 
    uint32_t diffT = longTime.extendTime(micros()) - irqTime; // Time from interrupt was received by isr
-   irqServeDelays.add(diffT);
-   if (irqServeDelays.bufferIsFull()) // Do max calcs, just waiting a second
+   irqServeDelays.push(diffT);
+   if (irqServeDelays.isFull()) // Do max calcs, just waiting a second
    {
-      uint16_t maxInBuffer = irqServeDelays.getMaxInBuffer();
-      if (maxIrqServeTime > maxInBuffer)  // Reduce by one, slowly eating up excess time
+      uint16_t maxInBuffer = 0;
+      using index_t = decltype(irqServeDelays)::index_t;
+      for (index_t i = 0; i < irqServeDelays.size(); i++)
+      {
+         if (maxInBuffer < irqServeDelays[i])
+            maxInBuffer = irqServeDelays[i];
+      }
+      if (maxIrqServeTime > maxInBuffer) // Reduce by one, slowly eating up excess time
          maxIrqServeTime--;
       if (maxIrqServeTime < maxInBuffer)
          maxIrqServeTime = maxInBuffer;
@@ -179,8 +186,6 @@ void setup(void)
    pinMode(PA12, OUTPUT); // Dir X
    pinMode(PC9, OUTPUT);  // Step Z
    pinMode(PC10, OUTPUT); // Dir Z
-
-
 
    baseTimer = new HardwareTimer(TIM11); // The base period timer
    setFrequencyAdjustedMicrosSeconds(baseTimer, BASE_PERIOD / 1000);
