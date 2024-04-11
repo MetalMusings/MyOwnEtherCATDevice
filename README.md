@@ -16,10 +16,10 @@ It can give some general insight into how EtherCAT for linuxcnc works.
 
 Biggest changes this time are in the [Firmware folder](Firmware).
 The [Documentation folder](Documentation) has design details on the second step generator.
-A small but fatal bug was fixed in the EEPROM_generator.
+A small but fatal indexing bug was fixed in the EEPROM_generator.
 For all details, read the git log. Too much to mention all.
 
-[![Watch the video](https://img.youtube.com/vi/boanv6ihYtI/default.jpg)](https://youtu.be/boanv6ihYtI)
+[![Watch the video](https://img.youtube.com/vi/lBDBcseFki8/default.jpg)](https://youtu.be/lBDBcseFki8)
 
 ## Make my own EtherCAT device 8. EaserCAT 3000
 
