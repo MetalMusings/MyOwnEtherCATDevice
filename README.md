@@ -6,6 +6,8 @@ that I used during the creation of my own EtherCAT device.
 This job is documented in a series of Youtube videos, from my first attempts to understand
 how EtherCAT works, to making my own pcb, program it and testing it in LinuxCNC.
 
+=======
+
 ## Make my own EtherCAT device 9. About time. Step generator
 
 This was something, I almost gave up. But here it is. A working step generator.
@@ -31,7 +33,6 @@ eigth digital inputs, four digital outputs, plus some 12 I/O for any possible ex
 The KiCAD files are in the [KiCAD folder](Kicad/Ax58100-stm32-ethercat)
 
 [![Watch the video](https://img.youtube.com/vi/boanv6ihYtI/default.jpg)](https://youtu.be/boanv6ihYtI)
-
 
 ## Make my own EtherCAT device 7. Turning in the lathe
 
@@ -83,8 +84,6 @@ Testing the SPI connection between the MCU and the LAN9252 chip. Get into state 
 My first tries with the LAN9252 chip. Getting accustomed to some tools.
 
 [![Watch the video](https://img.youtube.com/vi/IGmXsXSSA4s/default.jpg)](https://youtu.be/IGmXsXSSA4s)
-
-
 
 # EtherCAT PCB based on LAN9252 and STM34F407
 
