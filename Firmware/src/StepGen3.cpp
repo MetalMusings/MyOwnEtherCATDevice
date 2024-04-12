@@ -1102,7 +1102,7 @@ StepGen3::StepGen3(void)
     stepgen_array[0].enable = stepgen_array[1].enable = 1;
 }
 
-void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2)
+void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2, uint32_t servoPeriod)
 {
     stepgen_array[0].pos_cmd = pos_cmd1;
     stepgen_array[1].pos_cmd = pos_cmd2;
@@ -1110,8 +1110,8 @@ void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2)
     {
         stepgen_t *step;
         step = &(stepgen_array[i]);
-        update_pos(step, SERVO_PERIOD);
-        update_freq(step, SERVO_PERIOD);
+        update_pos(step, servoPeriod); // servoPeriod is in nanosecs
+        update_freq(step, servoPeriod);
     }
 }
 

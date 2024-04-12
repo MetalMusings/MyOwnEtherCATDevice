@@ -12,7 +12,7 @@ HardwareSerial Serial1(PA10, PA9);
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 HardwareTimer *baseTimer;     // The base period timer
 HardwareTimer *syncTimer;     // The timer that syncs "with linuxcnc cycle"
-uint16_t sync0CycleTime;      // usecs
+uint32_t sync0CycleTime;      // nanosecs, often 1000000 ( 1 ms )
 
 #include "MyEncoder.h"
 volatile uint16_t encCnt = 0;
@@ -47,18 +47,21 @@ volatile uint16_t basePeriodCnt;
 volatile uint64_t makePulsesCnt = 0, prevMakePulsesCnt = 0;
 volatile uint16_t deltaMakePulsesCnt;
 
-volatile double pos_cmd1, pos_cmd2;
+double posCmd1, posCmd2;
+double oldPosCmd1, oldPosCmd2;
+double deltaPosCmd1, deltaPosCmd2;
+
 void syncWithLCNC()
 {
    syncTimer->pause();
    baseTimer->pause();
    deltaMakePulsesCnt = makePulsesCnt - prevMakePulsesCnt;
    prevMakePulsesCnt = makePulsesCnt;
-   Step->updateStepGen(pos_cmd1, pos_cmd2);    // Update positions
-   Step->makeAllPulses();                      // Make first step right here
-   basePeriodCnt = SERVO_PERIOD / BASE_PERIOD; //
-   baseTimer->refresh();                       //
-   baseTimer->resume();                        // Make the other steps in ISR
+   Step->updateStepGen(posCmd1, posCmd2, sync0CycleTime); // Update positions
+   Step->makeAllPulses();                                 // Make first step right here
+   basePeriodCnt = sync0CycleTime / BASE_PERIOD;          //
+   baseTimer->refresh();                                  //
+   baseTimer->resume();                                   // Make the other steps in ISR
 }
 
 void basePeriodCB(void)
@@ -74,6 +77,7 @@ uint16_t thisCycleTime; // In usecs
 int16_t maxIrqServeTime = 0;
 uint64_t oldIrqTime = 0;
 uint16_t nLoops;
+uint16_t failedSM2s = 0;
 
 void handleStepper(void)
 {
@@ -100,18 +104,33 @@ void handleStepper(void)
       if (maxIrqServeTime < maxInBuffer)
          maxIrqServeTime = maxInBuffer;
    }
+   if (ALEventIRQ & ESCREG_ALEVENT_SM2)
+   {                                    // The normal case, position update every cycle
+      posCmd1 = Obj.CommandedPosition1; // The position update
+      posCmd2 = Obj.CommandedPosition2;
+      deltaPosCmd1 = posCmd1 - oldPosCmd1; // Needed for extrapolation in the other case
+      deltaPosCmd2 = posCmd2 - oldPosCmd2;
+      failedSM2s = 0;
+   }
+   else
+   {                              // Not normal, we didn't get a position update. Extrapolate from previous updates
+      if (failedSM2s++ < 10)      // Do max 10 such extrapolations, should be plenty
+      {                           //
+         posCmd1 += deltaPosCmd1; // Continue with the same speed
+         posCmd2 += deltaPosCmd2;
+      }
+   }
+   oldPosCmd1 = posCmd1;
+   oldPosCmd2 = posCmd2;
 
-   pos_cmd1 = Obj.CommandedPosition1;
-   pos_cmd2 = Obj.CommandedPosition2;
-
-   Obj.ActualPosition1 = Obj.CommandedPosition1;
-   Obj.ActualPosition2 = Obj.CommandedPosition2;
+   // Obj.ActualPosition1 = Obj.CommandedPosition1;
+   // Obj.ActualPosition2 = Obj.CommandedPosition2;
 
    Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1;
    Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
 
-   // Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
-   // Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
+   Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
+   Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
 
    delayT = maxIrqServeTime - diffT; // Add 10 as some safety margin
    if (delayT > 0 && delayT < 900)
@@ -270,7 +289,7 @@ uint16_t dc_checker(void)
 {
    // Indicate we run DC
    ESCvar.dcsync = 1;
-   sync0CycleTime = ESC_SYNC0cycletime() / 1000; // usecs
+   sync0CycleTime = ESC_SYNC0cycletime(); // nanosecs
    return 0;
 }
 
