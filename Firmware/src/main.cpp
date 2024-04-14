@@ -47,7 +47,7 @@ volatile uint16_t basePeriodCnt;
 volatile uint64_t makePulsesCnt = 0, prevMakePulsesCnt = 0;
 volatile uint16_t deltaMakePulsesCnt;
 
-double posCmd1, posCmd2;
+volatile double posCmd1, posCmd2;
 double oldPosCmd1, oldPosCmd2;
 double deltaPosCmd1, deltaPosCmd2;
 
@@ -78,13 +78,16 @@ int16_t maxIrqServeTime = 0;
 uint64_t oldIrqTime = 0;
 uint16_t nLoops;
 uint16_t failedSM2s = 0;
+uint16_t totalFailedSM2s = 0;
+uint16_t nLoopsAboveNorm = 0;
 
 void handleStepper(void)
 {
    if (oldIrqTime != 0) // See if there is a delay in data, normally it *should* be nLoops=1, but sometimes it is more
    {
       thisCycleTime = irqTime - oldIrqTime;
-      nLoops = round(float(thisCycleTime) / float(sync0CycleTime));
+      nLoops = round(float(thisCycleTime) / float(sync0CycleTime / 1000));
+      nLoopsAboveNorm += nLoops - 1;
    }
    oldIrqTime = irqTime;
 
@@ -114,11 +117,12 @@ void handleStepper(void)
    }
    else
    {                              // Not normal, we didn't get a position update. Extrapolate from previous updates
-      if (failedSM2s++ < 10)      // Do max 10 such extrapolations, should be plenty
+      if (failedSM2s++ < 100)      // Do max 10 such extrapolations, should be plenty
       {                           //
          posCmd1 += deltaPosCmd1; // Continue with the same speed
          posCmd2 += deltaPosCmd2;
       }
+      totalFailedSM2s++;
    }
    oldPosCmd1 = posCmd1;
    oldPosCmd2 = posCmd2;
@@ -154,10 +158,10 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.IndexByte = Encoder1.getIndexState();
 
    Obj.DiffT = nLoops;
-   Obj.D1 = 1000 * Obj.CommandedPosition2;                          // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
-   Obj.D2 = 1000 * Obj.ActualPosition2;                             // Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
-   Obj.D3 = encCnt % 256;                                           // Step->stepgen_array[1].freq;
-   Obj.D4 = 1000 * (Obj.CommandedPosition2 - oldCommandedPosition); // deltaMakePulsesCnt;            // Step->stepgen_array[1].rawcount % UINT16_MAX;
+   Obj.D1 = 1000 * deltaPosCmd2;           // abs(1000 * (ap2 - Obj.CommandedPosition2)); // Step2.actPos();
+   Obj.D2 = totalFailedSM2s;               // Step->stepgen_array[1].pos_fb; // Step->stepgen_array[1].rawcount % INT16_MAX;                          // Step->stepgen_array[1].freq;
+   Obj.D3 = 1000 * Obj.CommandedPosition2; // Step->stepgen_array[1].freq;
+   Obj.D4 = 1000 * posCmd2;                // Step->stepgen_array[1].rawcount % UINT16_MAX;
    oldCommandedPosition = Obj.CommandedPosition2;
 }
 
