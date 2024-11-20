@@ -1,0 +1,4 @@
+
+/usr/bin/xinit: XFree86_VT property unexpectedly has 0 items instead of 1
+(EE) Failed to open authorization file "/tmp/.xas268255516136.AzWqmP": No such file or directory
+xterm: fatal IO error 11 (Resursen tillfälligt otillgänglig) or KillClient on X server ":20"

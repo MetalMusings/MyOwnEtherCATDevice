@@ -1,0 +1,351 @@
+{
+  "form": {
+    "VendorName": "MetalMusings",
+    "VendorID": "0xaaa",
+    "ProductCode": "0xcadcae",
+    "ProfileNo": "5002",
+    "RevisionNumber": "0x001",
+    "SerialNumber": "0x001",
+    "HWversion": "0.0.1",
+    "SWversion": "0.0.1",
+    "EEPROMsize": "2048",
+    "RxMailboxOffset": "0x1000",
+    "TxMailboxOffset": "0x1200",
+    "MailboxSize": "512",
+    "SM2Offset": "0x1600",
+    "SM3Offset": "0x1A00",
+    "TextGroupType": "MachineControl",
+    "TextGroupName5": "Plasma torch reader",
+    "ImageName": "IMGCBY",
+    "TextDeviceType": "THCAD Reader ax58100",
+    "TextDeviceName": "MetalMusings EaserCAT 3000 test plasma torch reader",
+    "Port0Physical": "Y",
+    "Port1Physical": "Y",
+    "Port2Physical": " ",
+    "Port3Physical": " ",
+    "ESC": "AX58100",
+    "SPImode": "3",
+    "CoeDetailsEnableSDO": "EnableSDO",
+    "CoeDetailsEnableSDOInfo": "EnableSDOInfo",
+    "CoeDetailsEnablePDOAssign": "EnablePDOAssign",
+    "CoeDetailsEnablePDOConfiguration": "EnablePDOConfiguration",
+    "CoeDetailsEnableUploadAtStartup": "EnableUploadAtStartup",
+    "CoeDetailsEnableSDOCompleteAccess": "EnableSDOCompleteAccess"
+  },
+  "od": {
+    "sdo": {
+      "A": {
+        "otype": "RECORD",
+        "name": "Error Settings",
+        "access": "RO",
+        "items": [
+          {
+            "name": "Max SubIndex"
+          },
+          {
+            "name": "New record subitem",
+            "dtype": "UNSIGNED8"
+          }
+        ]
+      }
+    },
+    "txpdo": {
+      "600": {
+        "otype": "VAR",
+        "name": "EncFrequency",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.EncFrequency"
+      },
+      "6000": {
+        "otype": "VAR",
+        "name": "Velocity",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.Velocity"
+      },
+      "6001": {
+        "otype": "ARRAY",
+        "name": "Inputs",
+        "access": "RO",
+        "items": [
+          {
+            "name": "Max SubIndex"
+          },
+          {
+            "name": "IN1",
+            "data": "&Obj.Inputs[0]",
+            "value": "0"
+          },
+          {
+            "name": "IN2",
+            "value": "0",
+            "data": "&Obj.Inputs[1]"
+          },
+          {
+            "name": "IN3",
+            "value": "0",
+            "data": "&Obj.Inputs[2]"
+          },
+          {
+            "name": "IN4",
+            "value": "0",
+            "data": "&Obj.Inputs[3]"
+          },
+          {
+            "name": "IN5",
+            "value": "0",
+            "data": "&Obj.Inputs[4]"
+          },
+          {
+            "name": "IN6",
+            "value": "0",
+            "data": "&Obj.Inputs[5]"
+          },
+          {
+            "name": "IN7",
+            "value": "0",
+            "data": "&Obj.Inputs[6]"
+          },
+          {
+            "name": "IN8",
+            "value": "0",
+            "data": "&Obj.Inputs[7]"
+          }
+        ],
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED8"
+      },
+      "6002": {
+        "otype": "VAR",
+        "name": "Frequency",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.Frequency"
+      },
+      "6003": {
+        "otype": "VAR",
+        "name": "ActualPosition1",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.ActualPosition1"
+      },
+      "6004": {
+        "otype": "VAR",
+        "name": "ActualPosition2",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.ActualPosition2"
+      },
+      "6005": {
+        "otype": "VAR",
+        "name": "ActualPosition3",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.ActualPosition3"
+      },
+      "6006": {
+        "otype": "VAR",
+        "name": "ActualPosition4",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.ActualPosition4"
+      }
+    },
+    "rxpdo": {
+      "7000": {
+        "otype": "VAR",
+        "name": "Scale",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.Scale"
+      },
+      "7001": {
+        "otype": "ARRAY",
+        "name": "Outputs",
+        "access": "RO",
+        "items": [
+          {
+            "name": "Max SubIndex"
+          },
+          {
+            "name": "OUT1",
+            "data": "&Obj.Outputs[0]",
+            "value": "0"
+          },
+          {
+            "name": "OUT2",
+            "value": "0",
+            "data": "&Obj.Outputs[1]"
+          },
+          {
+            "name": "OUT3",
+            "value": "0",
+            "data": "&Obj.Outputs[2]"
+          },
+          {
+            "name": "OUT4",
+            "value": "0",
+            "data": "&Obj.Outputs[3]"
+          }
+        ],
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8"
+      },
+      "7002": {
+        "otype": "VAR",
+        "name": "CommandedPosition1",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition1"
+      },
+      "7003": {
+        "otype": "VAR",
+        "name": "CommandedPosition2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition2"
+      },
+      "7004": {
+        "otype": "VAR",
+        "name": "CommandedPosition3",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition3"
+      },
+      "7005": {
+        "otype": "VAR",
+        "name": "CommandedPosition4",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition4"
+      },
+      "7006": {
+        "otype": "VAR",
+        "name": "StepsPerMM1",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.StepsPerMM1"
+      },
+      "7007": {
+        "otype": "VAR",
+        "name": "StepsPerMM2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.StepsPerMM2"
+      },
+      "7008": {
+        "otype": "VAR",
+        "name": "StepsPerMM3",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.StepsPerMM3"
+      },
+      "7009": {
+        "otype": "VAR",
+        "name": "StepsPerMM4",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0",
+        "data": "&Obj.StepsPerMM4"
+      },
+      "60664": {
+        "otype": "VAR",
+        "name": "ActualPosition",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "INTEGER32",
+        "value": "0"
+      }
+    }
+  },
+  "dc": [
+    {
+      "Name": "SM-Synchron",
+      "Description": "SM-Synchron",
+      "AssignActivate": "#x000",
+      "Sync0cycleTime": "0",
+      "Sync0shiftTime": "0",
+      "Sync1cycleTime": "0",
+      "Sync1shiftTime": "0"
+    },
+    {
+      "Name": "DC",
+      "Description": "DC-Synchron",
+      "AssignActivate": "#x300",
+      "Sync0cycleTime": "0",
+      "Sync0shiftTime": "0",
+      "Sync1cycleTime": "0",
+      "Sync1shiftTime": "0"
+    }
+  ]
+}
