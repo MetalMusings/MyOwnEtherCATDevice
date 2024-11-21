@@ -6,7 +6,7 @@ Everything should be here:
 - Schematics, PCB layouts, and what is needed to build the boards.
 - Software tools to create an ESI-file and program the ESC eeprom. 
 - Software tools to create the application running on a STM32F407VG.
-- A big learning curve hidden is in here as well
+- A big learning curve is hidden in here as well
 
 I have (so far) used two different ESC ICs: LAN9252 and Ax58100. 
 Both work, I can't really see a difference. 
