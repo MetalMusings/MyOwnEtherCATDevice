@@ -1,4 +1,4 @@
-#include "MyENcoder.h"
+#include "MyEncoder.h"
 
 MyEncoder::MyEncoder(TIM_TypeDef *_tim_base, uint8_t _indexPin, void irq(void))
 {

@@ -65,7 +65,7 @@ The THCAD board reads the voltage between
 the plasma torch and the workpiece which is around 100V. Highly isolated, and with 
 a voltage to frequency converter it delivers a differential pwm signal. 
 The frequency of this signal can be related to the voltage.\
-That's what is needed for linuxcnc torch height control.\
+That's what is needed for linuxcnc torch height control.
 
 In the tests on the bench this can read at least up to 200 kHz, but its's better to be below 100 kHz.
 The THCAD has a frequency divider one can set to make the frequency range nicely match this.
