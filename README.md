@@ -20,8 +20,6 @@ More info on the videos, which now more are of historical intereste, but also a 
 by following [this link](Videos.md)
 
 
-=======
-
 ## EaserCAT 2000 - a testbench for ESC+MCU, SOES, stepper generator, linuxcnc
 
 This was the first card that got used in Linuxcnc. Follow [link here](Cards/EaserCAT-2000/)

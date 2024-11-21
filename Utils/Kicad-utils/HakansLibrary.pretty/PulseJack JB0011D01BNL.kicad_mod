@@ -492,7 +492,7 @@
 			(xyz -90 0 180)
 		)
 	)
-	(model "${KIPRJMOD}/Models/J0011D01BNL_3D.STEP"
+	(model "../../../Utils/Kicad-utils/3d-Models/J0011D01BNL_3D.STEP"
 		(offset
 			(xyz -4.4 16.9 6.8)
 		)
