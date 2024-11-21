@@ -15,11 +15,18 @@ On paper the Ax58100 has more builtin functionality like stepper motor drivers,
 but the documentation is lacking. Or my understanding of the documentation is lacking.
 The LAN9252 is the true and tested IC of the two. If you don't know, go for the LAN9252.
 
+The EtherCAT cards, which I call EaserCAT cards, often use an EtherCAT chip and a normal MCU.
+I have used the STM32F407VGT6. The EaserCAT chip does the network talk and other 
+EtherCAT things. The STM32 does the application things, like reading and setting pins high or low,
+reading encoder inputs, generate stepper motor pulses and other interesting applications one can think of.
+There is a narrow interface between the two: SPI and a couple of lines for synchronization.
+Any decent MCU can do that, it doesn't have to be a STM32F407VGT6. I have tested with a esp32 with success.
+Feel free to experiment with other processors.
+
 I learned most of what I know about EtherCAT through a number of Youtube Videos I made.
 There are accompanying git branches. For example, for video 8 you can check out the
 Video8 branch to get the software tree in the state at the video.
 More info on the videos, which are now more of historical interest, but also a bit of learning by following [this link](Videos.md)
-
 
 ## EaserCAT 2000 - a testbench for ESC+MCU, SOES, stepper generator, linuxcnc
 
@@ -30,7 +37,6 @@ I think I got it working pretty well in the end. There was, and still is, an iss
 synchronization between the linuxcnc servo-loop and the ESC DC loop.
 I don't remember the status of it anymore, it was some time ago I worked with it.
 The main thing was that it lacked optocouplers and isolation for the external signals.
-
 
 ## EaserCAT 3000 - All in one board with Ax58100
 
