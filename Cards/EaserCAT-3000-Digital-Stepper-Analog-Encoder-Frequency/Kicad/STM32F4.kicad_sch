@@ -4007,10 +4007,6 @@
 		(uuid "2ac1107c-3492-4156-b764-95061a55cc8a")
 	)
 	(no_connect
-		(at 168.91 100.33)
-		(uuid "2b0b0e90-aee1-490e-8bba-e74afa86d3e9")
-	)
-	(no_connect
 		(at 168.91 118.11)
 		(uuid "2c1a5f6b-c4d2-4e66-ad2e-de2f10bac69b")
 	)
@@ -4029,6 +4025,10 @@
 	(no_connect
 		(at 123.19 125.73)
 		(uuid "366e36af-9577-4e69-81bb-5c20a12c044f")
+	)
+	(no_connect
+		(at 123.19 26.67)
+		(uuid "3de49d44-90b4-44fc-a091-649556075e0f")
 	)
 	(no_connect
 		(at 123.19 118.11)
@@ -4437,6 +4437,16 @@
 			(type default)
 		)
 		(uuid "2e30b077-95f0-485c-84da-dd6bd634eda9")
+	)
+	(wire
+		(pts
+			(xy 168.91 100.33) (xy 195.58 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "313dfeb1-ba77-48ab-8442-6dc815c4fa98")
 	)
 	(wire
 		(pts
@@ -5979,6 +5989,28 @@
 			)
 		)
 	)
+	(global_label "RESET_MCU"
+		(shape input)
+		(at 195.58 100.33 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "88c96a5b-a6ca-4914-bec0-ea988c0cfc01")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 209.3298 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "IO6"
 		(shape input)
 		(at 114.3 72.39 180)
@@ -5992,28 +6024,6 @@
 		(uuid "8de66c14-e981-4a71-8ebb-9af751938208")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 108.17 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "RST_MCU"
-		(shape input)
-		(at 123.19 26.67 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "90177805-c803-429b-81cb-644bb911b780")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 111.7382 26.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
