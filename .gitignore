@@ -12,4 +12,5 @@ Octave
 .pio
 
 logs
-
+*.bak
+*~
