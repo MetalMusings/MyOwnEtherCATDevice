@@ -1,3 +1,5 @@
 fp-info-cache
 Ethercat-stm32-backup*
 *.lck
+Gerbers/
+Gerbers/*

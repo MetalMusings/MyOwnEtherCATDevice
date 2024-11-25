@@ -32,5 +32,6 @@ fp-info-cache
 
 # Gerber outputs
 Gerbers\*
+Gerbers/
 *.zip
 
