@@ -1,0 +1,32 @@
+<masters>
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="5">
+    <slave idx="5" type="generic" vid="00aaa" pid="0x00cadcae" configPdos="true">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1600">
+          <pdoEntry idx="7000" subIdx="00" bitLen="32" halPin="enc-pos-scale" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1601">
+          <pdoEntry idx="7001" subIdx="01" bitLen="8" halPin="DO1" halType="u32"/>
+          <pdoEntry idx="7001" subIdx="02" bitLen="8" halPin="DO2" halType="u32"/>
+          <pdoEntry idx="7001" subIdx="03" bitLen="8" halPin="DO3" halType="u32"/>
+          <pdoEntry idx="7001" subIdx="04" bitLen="8" halPin="DO4" halType="u32"/>
+        </pdo>
+        <pdo idx="1602">
+          <pdoEntry idx="7002" subIdx="00" bitLen="32" halPin="commanded-position1" halType="float-ieee"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a01">
+          <pdoEntry idx="6001" subIdx="01" bitLen="8" halPin="DI1" halType="u32"/>
+          <pdoEntry idx="6001" subIdx="02" bitLen="8" halPin="DI2" halType="u32"/>
+          <pdoEntry idx="6001" subIdx="03" bitLen="8" halPin="DI3" halType="u32"/>
+          <pdoEntry idx="6001" subIdx="04" bitLen="8" halPin="DI4" halType="u32"/>
+        </pdo>
+        <pdo idx="1a03">
+          <pdoEntry idx="6003" subIdx="00" bitLen="32" halPin="actual-position1" halType="float-ieee"/>
+        </pdo>
+      </syncManager> 
+    </slave>
+  </master>
+</masters>
