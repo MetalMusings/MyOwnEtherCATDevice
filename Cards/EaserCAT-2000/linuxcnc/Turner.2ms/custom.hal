@@ -1,0 +1,4 @@
+
+# Gamepad
+loadusr -W hal_input -KRAL F310
+# Resten är i custom_postgui.hal
