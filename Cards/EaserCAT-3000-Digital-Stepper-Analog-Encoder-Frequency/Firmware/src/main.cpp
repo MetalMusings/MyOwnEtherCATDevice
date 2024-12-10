@@ -38,7 +38,7 @@ void basePeriodCB(void);
 #include "MyEncoder.h"
 volatile uint16_t encCnt = 0;
 void indexPulseEncoderCB1(void);
-MyEncoder Encoder1(TIM2, PA2, indexPulseEncoderCB1);
+MyEncoder Encoder1(TIM2, PA3, indexPulseEncoderCB1);
 void indexPulseEncoderCB1(void)
 {
    encCnt++;
@@ -76,7 +76,7 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
    for (int i = 0; i < min(sizeof(Obj.Outputs), sizeof(OUTPUTS)); i++)
       digitalWrite(OUTPUTS[i], Obj.Outputs[i] == 1 ? HIGH : LOW);
    // analogWrite(DAC1_pin, Obj.Voltage);
-   // Encoder1.setLatch(Obj.IndexLatchEnable);
+   //Encoder1.setLatch(Obj.IndexLatchEnable);
    // Encoder1.setScale(2000);
 
    Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1; // Scale perhaps changed
@@ -198,6 +198,8 @@ void setup(void)
    FrequencyTimer->resume();
    // Compute this scale factor only once
    input_freq = FrequencyTimer->getTimerClkFreq() / FrequencyTimer->getPrescaleFactor();
+
+   encoder_config(); // Needed by encoder, possibly breaks some timers.
 
    ecat_slv_init(&config);
    attachInterrupt(digitalPinToInterrupt(PC0), globalInt, RISING); // For testing, should go into Enable_interrupt later on
