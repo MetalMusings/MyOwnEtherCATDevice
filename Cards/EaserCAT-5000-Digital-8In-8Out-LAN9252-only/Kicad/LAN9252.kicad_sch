@@ -4824,7 +4824,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "527342f8-3b36-4995-977d-bb6e42d198f7")
-		(property "Reference" "R3"
+		(property "Reference" "R4"
 			(at 76.2 107.95 90)
 			(effects
 				(font
@@ -4876,7 +4876,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/a120273a-c1ae-42b3-935d-01f789f654a3"
-					(reference "R3")
+					(reference "R4")
 					(unit 1)
 				)
 			)
@@ -6411,7 +6411,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "e9beb2de-d6cd-4c39-a2a5-fb0e2c9e8bb2")
-		(property "Reference" "R8"
+		(property "Reference" "R10"
 			(at 66.04 59.69 90)
 			(effects
 				(font
@@ -6463,7 +6463,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/a120273a-c1ae-42b3-935d-01f789f654a3"
-					(reference "R8")
+					(reference "R10")
 					(unit 1)
 				)
 			)
@@ -6547,7 +6547,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "f641674f-b47a-4f95-9006-71601f0b261d")
-		(property "Reference" "C5"
+		(property "Reference" "C6"
 			(at 67.31 88.9 90)
 			(effects
 				(font
@@ -6599,7 +6599,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/a120273a-c1ae-42b3-935d-01f789f654a3"
-					(reference "C5")
+					(reference "C6")
 					(unit 1)
 				)
 			)

@@ -3828,6 +3828,12 @@
 		(uuid "cc15d197-0876-42d4-b265-d38b9a7ffe6c")
 	)
 	(junction
+		(at 208.28 81.28)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e8b85c67-fb42-4877-96c0-f45009490f8c")
+	)
+	(junction
 		(at 67.31 173.99)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3844,6 +3850,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f2ed47cf-5701-4bf0-9dee-783caffab6b6")
+	)
+	(junction
+		(at 208.28 83.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f3d9494a-bf1c-47b2-9ac5-1f6cd0543f90")
 	)
 	(junction
 		(at 43.18 132.08)
@@ -3993,7 +4005,7 @@
 	)
 	(wire
 		(pts
-			(xy 208.28 78.74) (xy 208.28 86.36)
+			(xy 208.28 78.74) (xy 208.28 81.28)
 		)
 		(stroke
 			(width 0)
@@ -4050,6 +4062,16 @@
 			(type default)
 		)
 		(uuid "12613d92-3b11-4ecb-9b51-d2a3eb702bc1")
+	)
+	(wire
+		(pts
+			(xy 187.96 83.82) (xy 193.04 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "136228d0-b01f-45e3-9b79-490f8cb41708")
 	)
 	(wire
 		(pts
@@ -5133,6 +5155,16 @@
 	)
 	(wire
 		(pts
+			(xy 208.28 83.82) (xy 208.28 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8b7f2956-7086-4401-8fa3-d7a68d8f0ace")
+	)
+	(wire
+		(pts
 			(xy 177.8 57.15) (xy 177.8 59.69)
 		)
 		(stroke
@@ -5150,6 +5182,16 @@
 			(type default)
 		)
 		(uuid "9305096a-f33b-4757-a89a-e42accae6114")
+	)
+	(wire
+		(pts
+			(xy 208.28 81.28) (xy 208.28 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95a7b703-9085-4258-9123-46ce99649f24")
 	)
 	(wire
 		(pts
@@ -5783,6 +5825,16 @@
 	)
 	(wire
 		(pts
+			(xy 200.66 81.28) (xy 208.28 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d72be13f-7093-4259-89e1-2135b60075db")
+	)
+	(wire
+		(pts
 			(xy 208.28 73.66) (xy 208.28 76.2)
 		)
 		(stroke
@@ -5810,6 +5862,16 @@
 			(type default)
 		)
 		(uuid "da383222-985e-482c-ae26-c9a00f724ba6")
+	)
+	(wire
+		(pts
+			(xy 187.96 81.28) (xy 193.04 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "da388717-814a-4120-9bdb-b63c67201b2b")
 	)
 	(wire
 		(pts
@@ -5910,6 +5972,16 @@
 			(type default)
 		)
 		(uuid "e958721d-753e-4135-a086-eb784d5728e6")
+	)
+	(wire
+		(pts
+			(xy 200.66 83.82) (xy 208.28 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e9df6182-f7bf-4d71-a998-3ea2281fdc12")
 	)
 	(wire
 		(pts
@@ -6143,6 +6215,28 @@
 			)
 		)
 	)
+	(global_label "LINKACTLED0"
+		(shape input)
+		(at 187.96 81.28 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "3f1d48d2-40cf-439d-bb01-f31076709cb7")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 172.7586 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "TXNB"
 		(shape input)
 		(at 33.02 109.22 180)
@@ -6156,6 +6250,28 @@
 		(uuid "610b6089-046f-4fd5-8203-0c19fbe92193")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 25.2572 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "LINKACTLED1"
+		(shape input)
+		(at 187.96 83.82 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7131d0d7-9985-4d58-a579-ec8f209ff4fe")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 172.7586 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6902,7 +7018,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "233f9937-596c-4c8b-9c2f-b9e6a448e42a")
-		(property "Reference" "R12"
+		(property "Reference" "R14"
 			(at 214.63 49.53 90)
 			(effects
 				(font
@@ -6954,7 +7070,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R12")
+					(reference "R14")
 					(unit 1)
 				)
 			)
@@ -7211,7 +7327,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "38a7223f-1ffa-42bd-908d-59e29134387b")
-		(property "Reference" "R6"
+		(property "Reference" "R8"
 			(at 196.85 73.66 90)
 			(effects
 				(font
@@ -7263,7 +7379,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R6")
+					(reference "R8")
 					(unit 1)
 				)
 			)
@@ -7699,7 +7815,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "46a78547-2247-4f61-8e9d-7641ca556e27")
-		(property "Reference" "R7"
+		(property "Reference" "R9"
 			(at 196.85 76.2 90)
 			(effects
 				(font
@@ -7751,7 +7867,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R7")
+					(reference "R9")
 					(unit 1)
 				)
 			)
@@ -7766,7 +7882,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "4868a7c8-f26e-48d4-8781-7440b012ae6f")
-		(property "Reference" "R4"
+		(property "Reference" "R6"
 			(at 129.54 106.68 90)
 			(effects
 				(font
@@ -7818,7 +7934,7 @@
 		(instances
 			(project "8In-8Out-LAN9252-only"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R4")
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -7886,6 +8002,73 @@
 			(project "8In-8Out-LAN9252-only"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
 					(reference "C19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 196.85 81.28 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4dd9d33e-ec35-4d09-82b3-25434acc9d3e")
+		(property "Reference" "R2"
+			(at 196.85 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 201.93 80.01 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 196.85 83.058 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 196.85 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 196.85 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0cec7566-7f2a-4bc8-bc31-214cf814f89f")
+		)
+		(pin "2"
+			(uuid "9e6a74eb-bd71-4be0-b8b9-8d8ac7ec161a")
+		)
+		(instances
+			(project "8In-8Out-LAN9252-only"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
+					(reference "R2")
 					(unit 1)
 				)
 			)
@@ -8232,7 +8415,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "60aa7804-a6ed-455d-925a-40b56678f5e7")
-		(property "Reference" "R9"
+		(property "Reference" "R11"
 			(at 214.63 46.99 90)
 			(effects
 				(font
@@ -8284,7 +8467,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R9")
+					(reference "R11")
 					(unit 1)
 				)
 			)
@@ -8352,6 +8535,73 @@
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
 					(reference "C17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 196.85 83.82 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "62ba0b1a-c259-4ec1-b8e2-c512848def16")
+		(property "Reference" "R5"
+			(at 196.85 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 201.93 82.55 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 196.85 85.598 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 196.85 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 196.85 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e9666972-11ca-417b-9b7e-96ab62cfc87d")
+		)
+		(pin "2"
+			(uuid "16934ba7-2d41-42bb-96bd-a730e92d2f18")
+		)
+		(instances
+			(project "8In-8Out-LAN9252-only"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -8432,7 +8682,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "690186e1-2f4d-43ec-ad44-2a21badd2ca9")
-		(property "Reference" "R10"
+		(property "Reference" "R12"
 			(at 203.2 39.37 90)
 			(effects
 				(font
@@ -8484,7 +8734,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R10")
+					(reference "R12")
 					(unit 1)
 				)
 			)
@@ -8831,7 +9081,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "73ae30a3-2099-4443-93b3-68e1dd0b0150")
-		(property "Reference" "R5"
+		(property "Reference" "R7"
 			(at 196.85 78.74 90)
 			(effects
 				(font
@@ -8883,7 +9133,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R5")
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -9032,7 +9282,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "7d172f56-9f57-4a01-a5d4-1a1478772585")
-		(property "Reference" "R2"
+		(property "Reference" "R3"
 			(at 129.54 49.53 90)
 			(effects
 				(font
@@ -9084,7 +9334,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R2")
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -10193,7 +10443,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "bb31229c-ce51-4122-874c-0e1faf8be9f2")
-		(property "Reference" "R11"
+		(property "Reference" "R13"
 			(at 208.28 39.37 90)
 			(effects
 				(font
@@ -10245,7 +10495,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R11")
+					(reference "R13")
 					(unit 1)
 				)
 			)
@@ -10525,7 +10775,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c49a3871-d3ce-43ec-920a-21b341123067")
-		(property "Reference" "C6"
+		(property "Reference" "C5"
 			(at 278.13 24.13 90)
 			(effects
 				(font
@@ -10577,7 +10827,7 @@
 		(instances
 			(project "THCAD-reader"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "C6")
+					(reference "C5")
 					(unit 1)
 				)
 			)
@@ -10812,7 +11062,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "d19ffbe9-1456-48c3-86da-eb42283cea5b")
-		(property "Reference" "R13"
+		(property "Reference" "R15"
 			(at 111.76 160.02 90)
 			(effects
 				(font
@@ -10864,7 +11114,7 @@
 		(instances
 			(project "8In-8Out-LAN9252-only"
 				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1/650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03"
-					(reference "R13")
+					(reference "R15")
 					(unit 1)
 				)
 			)
