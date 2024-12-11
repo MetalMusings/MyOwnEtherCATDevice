@@ -82,9 +82,8 @@ If time and interests are in phase with the moon, I might look at PWM_INPUT agai
 
 A card, just doing Digital Input and Digital Output. The intentions are to read 
 limit switches and some other switches around the plasma torch. And to switch on the plasma torch.
-
 It's a single LAN9252, configured for local IO. Optocouplers are attached to IO pins for isolation.
-At point of writing it has not been run yet. Still waiting for parts.
+It has been tested on the bench. And there it works.
 [Link here](Cards/EaserCAT-5000-Digital-8In-8Out-LAN9252-only/)
 
 ### License
