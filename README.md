@@ -83,7 +83,20 @@ If time and interests are in phase with the moon, I might look at PWM_INPUT agai
 A card, just doing Digital Input and Digital Output. The intentions are to read 
 limit switches and some other switches around the plasma torch. And to switch on the plasma torch.
 It's a single LAN9252, configured for local IO. Optocouplers are attached to IO pins for isolation.
-It has been tested on the bench. And there it works.
+It has been tested on the bench, it works with TwinCAT.
+
+HOWEVER, it doesn't work, and will not work, with linuxcnc. As I learned,
+the IgH EtherCAT master needs a CoE client (CANopen over EtherCAT).
+The LAN9252 in DIO mode is only an EtherCAT client and can't be turned
+into a CoE client. And the IgH EtherCAT application interface for real-time
+communication can not be downgraded to wotk with puer EtherCAT client,
+it requires an CoE client.
+
+To add CoE functionality means to add number of objects at certain positions
+in the client and that can not be done to the LAN9252. It is what it is.
+In a setup with LAN9252 with MCU, those objects are created in the firmware,
+so there it works.
+
 [Link here](Cards/EaserCAT-5000-Digital-8In-8Out-LAN9252-only/)
 
 ### License
