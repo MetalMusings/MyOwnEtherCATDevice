@@ -89,8 +89,8 @@ HOWEVER, it doesn't work, and will not work, with linuxcnc. As I learned,
 the IgH EtherCAT master needs a CoE client (CANopen over EtherCAT).
 The LAN9252 in DIO mode is only an EtherCAT client and can't be turned
 into a CoE client. And the IgH EtherCAT application interface for real-time
-communication can not be downgraded to wotk with puer EtherCAT client,
-it requires an CoE client.
+communication can not be downgraded to work with a pure EtherCAT client,
+it requires a CoE client.
 
 To add CoE functionality means to add number of objects at certain positions
 in the client and that can not be done to the LAN9252. It is what it is.
