@@ -8473,7 +8473,7 @@
 				)
 			)
 		)
-		(property "Value" "2k"
+		(property "Value" "4k7"
 			(at 95.25 163.83 90)
 			(effects
 				(font

@@ -471,7 +471,7 @@
       "plot": "Gerbers/",
       "pos_files": "",
       "specctra_dsn": "THCAD-reader+Digital-IO.dsn",
-      "step": "",
+      "step": "THCAD-reader+Digital-IO.step",
       "svg": "",
       "vrml": ""
     },
