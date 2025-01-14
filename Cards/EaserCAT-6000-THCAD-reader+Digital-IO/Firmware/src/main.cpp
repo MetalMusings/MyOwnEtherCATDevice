@@ -32,23 +32,29 @@ HardwareTimer *EncoderTimer;
 void InputCapture_IT_callback(void);
 void Rollover_IT_callback(void);
 
+#define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
+#define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
+#define bitflip(byte, nbit) ((byte) ^= (1 << (nbit)))
+#define bitcheck(byte, nbit) ((byte) & (1 << (nbit)))
+
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 
 void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 {
    // Update digital pins
    for (int i = 0; i < sizeof(outputPin); i++)
-   {
-      digitalWrite(outputPin[i], Obj.Output[i]);
-   }
+      digitalWrite(outputPin[i], bitcheck(Obj.Output4, i) ? HIGH : LOW);
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    for (int i = 0; i < sizeof(inputPin); i++)
-      Obj.Input[i] = digitalRead(inputPin[i]);
-
-   Obj.Velocity = Obj.VelocityScale * FrequencyMeasured;
+      Obj.Input12 = digitalRead(inputPin[i]) == HIGH ? bitset(Obj.Input12, i) : bitclear(Obj.Input12, i);
+   float scale = Obj.VelocityScale;
+   if (scale == 0.0)
+      scale = 1.0;
+   Obj.Velocity = scale * FrequencyMeasured;
+   Obj.Frequency = FrequencyMeasured;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -95,6 +101,14 @@ void setup(void)
       pinMode(outputPin[i], OUTPUT);
       digitalWrite(outputPin[i], LOW);
    }
+   pinMode(PB4, OUTPUT);
+   pinMode(PB5, OUTPUT);
+   pinMode(PB6, OUTPUT);
+   pinMode(PB7, OUTPUT);
+   digitalWrite(PB4, HIGH);
+   digitalWrite(PB5, HIGH);
+   digitalWrite(PB6, HIGH);
+   digitalWrite(PB7, HIGH);
 
    // Automatically retrieve TIM instance and channel associated to pin
    // This is used to be compatible with all STM32 series automatically.
@@ -112,6 +126,8 @@ void setup(void)
    // To reduce minimum frequency, it is possible to increase prescaler. But this is at a cost of precision.
    // The maximum frequency depends on processing of the interruption and thus depend on board used
    // Example on Nucleo_L476RG with systemClock at 80MHz the interruption processing is around 4,5 microseconds and thus Max frequency is around 220kHz
+
+   // A 16 bit timer is ok (but I use a 32-bit). Can measure down to 2.8 kHz, which is lower than 0 Volt on my card (3.8 kHz)
    uint32_t PrescalerFactor = 1;
    EncoderTimer->setPrescaleFactor(PrescalerFactor);
    EncoderTimer->setOverflow(0xFFFFFFF0); // Max Period value to have the largest possible time to detect rising edge and avoid timer rollover
@@ -128,7 +144,6 @@ void setup(void)
 
 void loop(void)
 {
-#if 0 // Sync 0 mode
    uint64_t dTime;
    if (serveIRQ)
    {
@@ -139,12 +154,8 @@ void loop(void)
       ecat_slv_poll();
    }
    dTime = longTime.extendTime(micros()) - irqTime;
-   if (dTime > 5000) // Don't run ecat_slv_poll when expecting to serve interrupt
-      ecat_slv_poll();
-#else // Freerun mode
-   ecat_slv();
-
-#endif
+   if (dTime > 5000) // Not doing interrupts - handle free-run
+      ecat_slv();
 }
 
 void sync0Handler(void)

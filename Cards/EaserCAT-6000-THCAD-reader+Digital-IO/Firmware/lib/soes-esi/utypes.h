@@ -13,12 +13,13 @@ typedef struct
 
    /* Inputs */
 
-   uint8_t Input[12];
+   int32_t Input12;
    float Velocity;
+   uint32_t Frequency;
 
    /* Outputs */
 
-   uint8_t Output[4];
+   uint8_t Output4;
 
    /* Parameters */
 
