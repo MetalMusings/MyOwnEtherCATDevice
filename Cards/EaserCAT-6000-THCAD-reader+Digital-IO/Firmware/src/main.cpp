@@ -17,9 +17,12 @@ uint8_t inputPin[] = {PD15, PD14, PD13, PD12, PD11, PD10, PD9, PD8, PB15, PB14, 
 uint8_t outputPin[] = {PE10, PE9, PE8, PE7};
 
 #include "HardwareTimer.h"
-// NOTE This mod in the beginning of HardwareTimer.cpp for 32-bit precision
+// NOTE 1. Optional optional, not needed. This mod in the beginning of HardwareTimer.cpp for 32-bit precision
 ////// //#define MAX_RELOAD ((1 << 16) - 1) // Currently even 32b timers are used as 16b to have generic behavior
 ////// #define MAX_RELOAD 0xFFFFFFFF
+// Note 2. This is optional. A 16-bit timer is enough to capture the THCAD frequency.
+// Lowest freq on my THCAD card is 3.8 kHz at 0 V and then faster for higher voltage
+// Lowest freq possible with 16-bit timer is 168000000/65535 = 2.5 kHz.
 
 #define THCAD_PIN PA0
 // PA0 is connected to Timer 2, a 32-bit timer
@@ -41,7 +44,7 @@ volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
 
 void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 {
-   // Update digital pins
+   // Update digital output pins
    for (int i = 0; i < sizeof(outputPin); i++)
       digitalWrite(outputPin[i], bitcheck(Obj.Output4, i) ? HIGH : LOW);
 }
@@ -84,12 +87,6 @@ static esc_cfg_t config =
 
 volatile byte serveIRQ = 0;
 
-volatile uint32_t globalIRQ = 0;
-void globalInt(void)
-{
-   globalIRQ++;
-}
-
 void setup(void)
 {
    Serial1.begin(115200);
@@ -101,6 +98,8 @@ void setup(void)
       pinMode(outputPin[i], OUTPUT);
       digitalWrite(outputPin[i], LOW);
    }
+#if 0
+   // Debug leds
    pinMode(PB4, OUTPUT);
    pinMode(PB5, OUTPUT);
    pinMode(PB6, OUTPUT);
@@ -109,6 +108,7 @@ void setup(void)
    digitalWrite(PB5, HIGH);
    digitalWrite(PB6, HIGH);
    digitalWrite(PB7, HIGH);
+#endif
 
    // Automatically retrieve TIM instance and channel associated to pin
    // This is used to be compatible with all STM32 series automatically.
@@ -127,7 +127,8 @@ void setup(void)
    // The maximum frequency depends on processing of the interruption and thus depend on board used
    // Example on Nucleo_L476RG with systemClock at 80MHz the interruption processing is around 4,5 microseconds and thus Max frequency is around 220kHz
 
-   // A 16 bit timer is ok (but I use a 32-bit). Can measure down to 2.8 kHz, which is lower than 0 Volt on my card (3.8 kHz)
+   // A 16 bit timer is ok. Can measure down to 2.6 kHz, which is lower than 0 Volt on my card (3.8 kHz)
+   // But I have 32-bit timer for historical reasons
    uint32_t PrescalerFactor = 1;
    EncoderTimer->setPrescaleFactor(PrescalerFactor);
    EncoderTimer->setOverflow(0xFFFFFFF0); // Max Period value to have the largest possible time to detect rising edge and avoid timer rollover
@@ -139,7 +140,6 @@ void setup(void)
    input_freq = EncoderTimer->getTimerClkFreq() / EncoderTimer->getPrescaleFactor();
 
    ecat_slv_init(&config);
-   attachInterrupt(digitalPinToInterrupt(PC0), globalInt, RISING);
 }
 
 void loop(void)
