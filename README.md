@@ -13,6 +13,8 @@ Both work, I can't really see a difference.
 The Ax58100 has a leg spacing of 0.4 mm, 0.5 mm for the LAN9252, if that matters.
 On paper the Ax58100 has more builtin functionality like stepper motor drivers,
 but the documentation is lacking. Or my understanding of the documentation is lacking.
+The Ax58100 supposedly has more efficient access to registers and data.
+The indirection scheme is the main objection to using LAN9252, I have read.
 The LAN9252 is the true and tested IC of the two. If you don't know, go for the LAN9252.
 
 The EtherCAT cards, which I call EaserCAT cards, often use an EtherCAT chip and a normal MCU.
@@ -52,6 +54,7 @@ Struggling with the documentation for the Ax58100, which formed my negative opin
 I gave up and let it sit for over half a year. It was first when someone came and asked 
 questions around it I had another look. I built a new board, and it all started to work.
 At time of writing it all seems to work.
+
 [Link here](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/)
 
 ## EaserCAT 4000 - THCAD reader
@@ -74,22 +77,25 @@ Implementation is with interrupts. \
 A better option would have been to use TIM2's PWM_INPUT function, which can work with several MHz frequency. 
 I tried the PWM_INPUT method a lot but couldn't get it to work. The current method still works, though.
 If time and interests are in phase with the moon, I might look at PWM_INPUT again.
+
+This board is now relegated to history, replaced by the EaserCAT-6000.
+
 [Link here](Cards/EaserCAT-4000-THCAD-Reader/)
 
 ## EaserCAT 5000 - Digital IO without MCU
 
 ![Picture of EaserCAT 5000 board](Utils/Pictures/EaserCAT-5000.png)
 
-A card, just doing Digital Input and Digital Output. The intentions are to read 
+A card just doing Digital Input and Digital Output. The intentions were to read 
 limit switches and some other switches around the plasma torch. And to switch on the plasma torch.
 It's a single LAN9252, configured for local IO. Optocouplers are attached to IO pins for isolation.
 It has been tested on the bench, it works with TwinCAT.
 
-HOWEVER, it doesn't work, and will not work, with linuxcnc. As I learned,
+HOWEVER, it doesn't work, and will not work, with linuxcnc. As I've learned,
 the IgH EtherCAT master needs a CoE client (CANopen over EtherCAT).
 The LAN9252 in DIO mode is only an EtherCAT client and can't be turned
 into a CoE client. And the IgH EtherCAT application interface for real-time
-communication can not be downgraded to wotk with puer EtherCAT client,
+communication can not be downgraded to wotk with pure EtherCAT client,
 it requires an CoE client.
 
 To add CoE functionality means to add number of objects at certain positions
@@ -97,7 +103,28 @@ in the client and that can not be done to the LAN9252. It is what it is.
 In a setup with LAN9252 with MCU, those objects are created in the firmware,
 so there it works.
 
-[Link here](Cards/EaserCAT-5000-Digital-8In-8Out-LAN9252-only/)
+This board is now relegated to history, replaced by the EaserCAT-6000.
+
+## EaserCAT 6000 - Digital IO and frequency input
+
+![Picture of EaserCAT 6000 board](Utils/Pictures/EaserCAT-6000.png)
+
+Finally, a card that's actually used in a real system. This card is used in my plasma cutter. 
+It has 12 digital inputs, 4 digital outputs and a frequency counter to get
+the input from Mesa's THCAD (reader of voltage between plasma nozzle and workpiece).\
+All digital IOs are opto-isolated and the frequency input uses a RS-485 receiver.
+
+In the plasma cutter, it does the job. There are three ECT60 stepper motor drivers.
+And the EaserCAT-6000 card. It handles limit switches for X, Y and Z, floating switch,
+break-away switch, and plasma Arc OK signal. There is room for e-stop and other switches.\
+The plasma torch is switched on using one of the digital outputs.\
+THCAD is an older model with full voltage input. Frequency divider is set to 1/32.
+
+This board replaces EaserCAT-4000 and EaserCAT-5000. 
+
+![Inside the cabinet](Utils/Pictures/EaserCAT-6000-in-cabinet.png)
+
+[Link here](Cards/EaserCAT-6000-THCAD-reader+Digital-IO/)
 
 ### License
 
