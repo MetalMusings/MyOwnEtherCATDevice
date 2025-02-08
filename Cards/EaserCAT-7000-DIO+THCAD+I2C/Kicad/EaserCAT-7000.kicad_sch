@@ -1,0 +1,206 @@
+(kicad_sch
+	(version 20231120)
+	(generator "eeschema")
+	(generator_version "8.0")
+	(uuid "5597aedc-b607-407f-bbfd-31b3b298ecb1")
+	(paper "A4")
+	(title_block
+		(title "THCAD reader")
+	)
+	(lib_symbols)
+	(sheet
+		(at 40.64 59.055)
+		(size 82.55 17.78)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "650f1ee4-2ce7-4e9d-a70d-f9d8defa5d03")
+		(property "Sheetname" "LAN9252 network etc"
+			(at 40.64 58.3434 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "LAN9252_diverse.kicad_sch"
+			(at 40.64 77.4196 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "EaserCAT-7000"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 138.43 59.69)
+		(size 76.835 17.78)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "6bc8268b-123e-4904-80e9-de4fbe627e3b")
+		(property "Sheetname" "I2C"
+			(at 138.43 58.9784 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "I2C.kicad_sch"
+			(at 138.43 78.0546 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "EaserCAT-7000"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1"
+					(page "7")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 137.16 33.655)
+		(size 71.12 16.51)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "b6f9794d-a1ac-41d9-a609-de182b88f0f8")
+		(property "Sheetname" "Digital IOs"
+			(at 137.16 32.9434 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "peripherals.kicad_sch"
+			(at 137.16 50.7496 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "EaserCAT-7000"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1"
+					(page "6")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 40.005 33.655)
+		(size 82.55 17.78)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "bb884533-7795-46fd-b0b1-55ff193103ce")
+		(property "Sheetname" "LAN9252 SPI"
+			(at 40.005 32.9434 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "LAN9252_DIO_SPI.kicad_sch"
+			(at 40.005 52.0196 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "EaserCAT-7000"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 42.545 89.535)
+		(size 80.645 19.685)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "d564400f-40ba-4aca-9c2a-14ec52a8353b")
+		(property "Sheetname" "STM32F407VGT6"
+			(at 42.545 88.8234 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "STM32F4.kicad_sch"
+			(at 42.545 109.8046 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "EaserCAT-7000"
+				(path "/5597aedc-b607-407f-bbfd-31b3b298ecb1"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+)
