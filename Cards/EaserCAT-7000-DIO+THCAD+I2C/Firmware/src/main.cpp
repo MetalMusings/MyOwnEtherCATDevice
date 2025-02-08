@@ -45,8 +45,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    if (scale == 0.0)
       scale = 1.0;
    float ADCvoltage = ADS.toVoltage(ADS.getValue());
-   Obj.ArcVoltage = scale*ADCvoltage;   // * ADCvoltage; // Scaled voltage, to give Plasma arc voltage
-   Obj.Voltage = ADCvoltage; // Raw voltage, read by ADC
+   Obj.ArcVoltage = scale * ADCvoltage; // * ADCvoltage; // Scaled voltage, to give Plasma arc voltage
+   Obj.Voltage = ADCvoltage;            // Raw voltage, read by ADC
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -68,10 +68,10 @@ static esc_cfg_t config =
         .post_object_download_hook = NULL,
         .rxpdo_override = NULL,
         .txpdo_override = NULL,
-        .esc_hw_interrupt_enable = NULL,  // ESC_interrupt_enable,
-        .esc_hw_interrupt_disable = NULL, // ESC_interrupt_disable,
+        .esc_hw_interrupt_enable = ESC_interrupt_enable,
+        .esc_hw_interrupt_disable = ESC_interrupt_disable,
         .esc_hw_eep_handler = NULL,
-        .esc_check_dc_handler = NULL, // dc_checker,
+        .esc_check_dc_handler = dc_checker,
 };
 
 volatile byte serveIRQ = 0;
