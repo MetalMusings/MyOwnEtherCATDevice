@@ -19,12 +19,12 @@ static const char acName1600_01[] = "Output4";
 static const char acName1A00[] = "Input12";
 static const char acName1A00_00[] = "Max SubIndex";
 static const char acName1A00_01[] = "Input12";
-static const char acName1A01[] = "Velocity";
+static const char acName1A01[] = "ArcVoltage";
 static const char acName1A01_00[] = "Max SubIndex";
-static const char acName1A01_01[] = "Velocity";
-static const char acName1A02[] = "Frequency";
+static const char acName1A01_01[] = "ArcVoltage";
+static const char acName1A02[] = "Voltage";
 static const char acName1A02_00[] = "Max SubIndex";
-static const char acName1A02_01[] = "Frequency";
+static const char acName1A02_01[] = "Voltage";
 static const char acName1C00[] = "Sync Manager Communication Type";
 static const char acName1C00_00[] = "Max SubIndex";
 static const char acName1C00_01[] = "Communications Type SM0";
@@ -39,10 +39,10 @@ static const char acName1C13_00[] = "Max SubIndex";
 static const char acName1C13_01[] = "PDO Mapping";
 static const char acName1C13_02[] = "PDO Mapping";
 static const char acName1C13_03[] = "PDO Mapping";
-static const char acName2000[] = "VelocityScale";
+static const char acName2000[] = "VoltageScale";
 static const char acName6000[] = "Input12";
-static const char acName6001[] = "Velocity";
-static const char acName6002[] = "Frequency";
+static const char acName6001[] = "ArcVoltage";
+static const char acName6002[] = "Voltage";
 static const char acName7000[] = "Output4";
 
 const _objd SDO1000[] =
@@ -51,7 +51,7 @@ const _objd SDO1000[] =
 };
 const _objd SDO1008[] =
 {
-  {0x0, DTYPE_VISIBLE_STRING, 208, ATYPE_RO, acName1008, 0, "MetalMusings EaserCAT 6000"},
+  {0x0, DTYPE_VISIBLE_STRING, 208, ATYPE_RO, acName1008, 0, "MetalMusings EaserCAT 7000"},
 };
 const _objd SDO1009[] =
 {
@@ -64,8 +64,8 @@ const _objd SDO100A[] =
 const _objd SDO1018[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1018_00, 4, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_01, 2730, NULL},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_02, 24576, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_01, 3502166480, NULL},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_02, 28672, NULL},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_03, 2, NULL},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1018_04, 1, &Obj.serial},
 };
@@ -111,7 +111,7 @@ const _objd SDO1C13[] =
 };
 const _objd SDO2000[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO, acName2000, 0x00000000, &Obj.VelocityScale},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO, acName2000, 0x3f800000, &Obj.VoltageScale},
 };
 const _objd SDO6000[] =
 {
@@ -119,11 +119,11 @@ const _objd SDO6000[] =
 };
 const _objd SDO6001[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6001, 0x00000000, &Obj.Velocity},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6001, 0x00000000, &Obj.ArcVoltage},
 };
 const _objd SDO6002[] =
 {
-  {0x0, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName6002, 0, &Obj.Frequency},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6002, 0x00000000, &Obj.Voltage},
 };
 const _objd SDO7000[] =
 {

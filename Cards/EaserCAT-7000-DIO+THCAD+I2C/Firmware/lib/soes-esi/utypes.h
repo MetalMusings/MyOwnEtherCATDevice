@@ -14,8 +14,8 @@ typedef struct
    /* Inputs */
 
    int32_t Input12;
-   float Velocity;
-   uint32_t Frequency;
+   float ArcVoltage;
+   float Voltage;
 
    /* Outputs */
 
@@ -23,7 +23,7 @@ typedef struct
 
    /* Parameters */
 
-   float VelocityScale;
+   float VoltageScale;
 } _Objects;
 
 extern _Objects Obj;

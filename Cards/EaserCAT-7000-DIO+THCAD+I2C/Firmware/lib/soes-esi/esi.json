@@ -1,8 +1,8 @@
 {
   "form": {
     "VendorName": "MetalMusings",
-    "VendorID": "0xaaa",
-    "ProductCode": "0x6000",
+    "VendorID": "0xd0bed1d0",
+    "ProductCode": "0x7000",
     "ProfileNo": "5001",
     "RevisionNumber": "0x002",
     "SerialNumber": "0x001",
@@ -17,8 +17,8 @@
     "TextGroupType": "MachineControl",
     "TextGroupName5": "Plasma cutter",
     "ImageName": "IMGCBY",
-    "TextDeviceType": "EaserCAT 6000",
-    "TextDeviceName": "MetalMusings EaserCAT 6000",
+    "TextDeviceType": "EaserCAT 7000",
+    "TextDeviceName": "MetalMusings EaserCAT 7000",
     "Port0Physical": "Y",
     "Port1Physical": "Y",
     "Port2Physical": " ",
@@ -36,12 +36,12 @@
     "sdo": {
       "2000": {
         "otype": "VAR",
-        "name": "VelocityScale",
+        "name": "VoltageScale",
         "access": "RO",
         "dtype": "REAL32",
-        "value": "0",
+        "value": "1",
         "isSDOitem": true,
-        "data": "&Obj.VelocityScale"
+        "data": "&Obj.VoltageScale"
       },
       "A": {
         "otype": "RECORD",
@@ -83,25 +83,25 @@
       },
       "6001": {
         "otype": "VAR",
-        "name": "Velocity",
+        "name": "ArcVoltage",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
         "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.Velocity"
+        "data": "&Obj.ArcVoltage"
       },
       "6002": {
         "otype": "VAR",
-        "name": "Frequency",
+        "name": "Voltage",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "UNSIGNED32",
+        "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.Frequency"
+        "data": "&Obj.Voltage"
       }
     },
     "rxpdo": {
