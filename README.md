@@ -30,6 +30,8 @@ There are accompanying git branches. For example, for video 8 you can check out 
 Video8 branch to get the software tree in the state at the video.
 More info on the videos, which are now more of historical interest, but also a bit of learning by following [this link](Videos.md)
 
+Here is the start of [building instructions](Build.md)
+
 ## EaserCAT 2000 - a testbench for ESC+MCU, SOES, stepper generator, linuxcnc
 
 ![Picture of EaserCAT 2000 board](Utils/Pictures/EaserCAT-2000.png)
