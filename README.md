@@ -128,6 +128,8 @@ This board replaces EaserCAT-4000 and EaserCAT-5000.
 
 [Link here](Cards/EaserCAT-6000-THCAD-reader+Digital-IO/)
 
+A few weeks later and I've used this card in the plasma cutter for quite a bit of cutting and it hasn't missed a beat. Works so well. THC follows the sheet surface up and down. Awesome.
+
 ### License
 
 Don't violate the original licenses. No warranties. Use it any way you like.\
