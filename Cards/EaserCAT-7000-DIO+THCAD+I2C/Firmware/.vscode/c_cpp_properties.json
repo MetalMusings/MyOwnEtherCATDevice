@@ -12,6 +12,7 @@
                 "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/src",
                 "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/lib/soes-esi",
                 "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/lib/soes",
+                "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/.pio/libdeps/genericSTM32F407VGT6/MCP3X21",
                 "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/.pio/libdeps/genericSTM32F407VGT6/ADS1X15",
                 "C:/Users/Hakan/.platformio/packages/framework-arduinoststm32/libraries/Wire/src",
                 "C:/Users/Hakan/.platformio/packages/framework-arduinoststm32/libraries/SPI/src",
@@ -59,6 +60,7 @@
                     "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/src",
                     "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/lib/soes-esi",
                     "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/lib/soes",
+                    "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/.pio/libdeps/genericSTM32F407VGT6/MCP3X21",
                     "Z:/src/MyOwnEtherCATDevice/Cards/EaserCAT-7000-DIO+THCAD+I2C/Firmware/.pio/libdeps/genericSTM32F407VGT6/ADS1X15",
                     "C:/Users/Hakan/.platformio/packages/framework-arduinoststm32/libraries/Wire/src",
                     "C:/Users/Hakan/.platformio/packages/framework-arduinoststm32/libraries/SPI/src",
@@ -101,10 +103,10 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=60116",
+                "PLATFORMIO=60117",
                 "STM32F407xx",
                 "STM32F4",
-                "ECAT",
+                "NOECAT",
                 "STM32F4xx",
                 "ARDUINO=10808",
                 "ARDUINO_ARCH_STM32",
