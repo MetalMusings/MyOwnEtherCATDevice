@@ -30,6 +30,8 @@ There are accompanying git branches. For example, for video 8 you can check out 
 Video8 branch to get the software tree in the state at the video.
 More info on the videos, which are now more of historical interest, but also a bit of learning by following [this link](Videos.md)
 
+Here is the start of [building instructions](Build.md)
+
 ## EaserCAT 2000 - a testbench for ESC+MCU, SOES, stepper generator, linuxcnc
 
 ![Picture of EaserCAT 2000 board](Utils/Pictures/EaserCAT-2000.png)
@@ -125,6 +127,8 @@ This board replaces EaserCAT-4000 and EaserCAT-5000.
 ![Inside the cabinet](Utils/Pictures/EaserCAT-6000-in-cabinet.png)
 
 [Link here](Cards/EaserCAT-6000-THCAD-reader+Digital-IO/)
+
+A few weeks later and I've used this card in the plasma cutter for quite a bit of cutting and it hasn't missed a beat. Works so well. THC follows the sheet surface up and down. Awesome.
 
 ### License
 
