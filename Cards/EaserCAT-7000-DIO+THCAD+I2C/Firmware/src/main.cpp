@@ -98,7 +98,24 @@ void setup(void)
    digitalWrite(PB6, HIGH);
    digitalWrite(PB7, HIGH);
 #endif
+#if 1
+   // SPDX-FileCopyrightText: 2023 Carter Nelson for Adafruit Industries
+   //
+   // SPDX-License-Identifier: MIT
+   // --------------------------------------
+   // i2c_scanner
+   //
+   // Modified from https://playground.arduino.cc/Main/I2cScanner/
+   // --------------------------------------
 
+   Wire2.begin();
+
+   Serial1.begin(115200);
+   while (!Serial)
+      delay(10);
+   Serial1.println("\nI2C Scanner");
+
+#else
    Wire2.begin();
 
    ADS.begin();
@@ -107,7 +124,7 @@ void setup(void)
    ADS.setMode(0);             //  continuous mode
    ADS.setWireClock(400000UL); // 400 kHz
    ADS.readADC(0);             //  first read to trigger settings
-
+#endif
 #ifdef ECAT
    ecat_slv_init(&config);
 #endif
@@ -129,6 +146,47 @@ void loop(void)
    if (dTime > 5000) // Not doing interrupts - handle free-run
       ecat_slv();
 #else
+#if 1
+   byte error, address;
+   int nDevices;
+
+   Serial1.println("Scanning...");
+
+   nDevices = 0;
+   for (address = 1; address < 127; address++)
+   {
+      // The i2c_scanner uses the return value of
+      // the Write.endTransmisstion to see if
+      // a device did acknowledge to the address.
+      Wire2.beginTransmission(address);
+      error = Wire2.endTransmission();
+
+      if (error == 0)
+      {
+         Serial1.print("I2C device found at address 0x");
+         if (address < 16)
+            Serial1.print("0");
+         Serial1.print(address, HEX);
+         Serial1.println("  !");
+
+         nDevices++;
+      }
+      else if (error == 4)
+      {
+         Serial1.print("Unknown error at address 0x");
+         if (address < 16)
+            Serial1.print("0");
+         Serial1.println(address, HEX);
+      }
+   }
+   if (nDevices == 0)
+      Serial1.println("No I2C devices found\n");
+   else
+      Serial1.println("done\n");
+
+   delay(5000); // wait 5 seconds for next scan
+
+#else
    Serial1.print("TIC ");
    int tot = 0;
    uint32_t before = millis();
@@ -143,6 +201,7 @@ void loop(void)
    float fval = ADS.toVoltage(value);
    Serial1.printf("Time för 10000=%d värdet=", after - before);
    Serial1.println(fval);
+#endif
 #endif
 }
 
@@ -204,4 +263,3 @@ uint16_t dc_checker(void)
    ESCvar.dcsync = 1;
    return 0;
 }
-
