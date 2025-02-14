@@ -36,12 +36,21 @@
     "sdo": {
       "2000": {
         "otype": "VAR",
-        "name": "VoltageScale",
+        "name": "Scale",
         "access": "RO",
         "dtype": "REAL32",
         "value": "1",
         "isSDOitem": true,
-        "data": "&Obj.VoltageScale"
+        "data": "&Obj.Scale"
+      },
+      "2001": {
+        "otype": "VAR",
+        "name": "Offset",
+        "access": "RO",
+        "dtype": "REAL32",
+        "value": "0",
+        "isSDOitem": true,
+        "data": "&Obj.Offset"
       },
       "A": {
         "otype": "RECORD",
@@ -83,25 +92,36 @@
       },
       "6001": {
         "otype": "VAR",
-        "name": "ArcVoltage",
+        "name": "RawData",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
-        "dtype": "REAL32",
+        "dtype": "INTEGER32",
         "value": "0",
-        "data": "&Obj.ArcVoltage"
+        "data": "&Obj.RawData"
       },
       "6002": {
         "otype": "VAR",
-        "name": "Voltage",
+        "name": "CalculatedVoltage",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
         "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.Voltage"
+        "data": "&Obj.CalculatedVoltage"
+      },
+      "6003": {
+        "otype": "VAR",
+        "name": "Status",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Status"
       }
     },
     "rxpdo": {

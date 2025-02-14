@@ -19,8 +19,9 @@ uint8_t outputPin[] = {PE10, PE9, PE8, PE7};
 #include "Wire.h"
 TwoWire Wire2(PB11, PB10);
 
-#include "ADS1X15.h"
-ADS1115 ADS(0x48, &Wire2);
+#include "MyMCP3221.h"
+MyMCP3221 mcp3221_0(0x48, &Wire2);
+MyMCP3221 mcp3221_7(0x4f, &Wire2);
 
 #define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
 #define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
@@ -38,15 +39,27 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
+   static float validData0 = 0.0, validVoltage0 = 0.0;
    for (int i = 0; i < sizeof(inputPin); i++)
       Obj.Input12 = digitalRead(inputPin[i]) == HIGH ? bitset(Obj.Input12, i) : bitclear(Obj.Input12, i);
 
-   float scale = Obj.VoltageScale;
+   float scale = Obj.Scale;
    if (scale == 0.0)
       scale = 1.0;
-   float ADCvoltage = ADS.toVoltage(ADS.getValue());
-   Obj.ArcVoltage = scale * ADCvoltage; // * ADCvoltage; // Scaled voltage, to give Plasma arc voltage
-   Obj.Voltage = ADCvoltage;            // Raw voltage, read by ADC
+   int data0 = mcp3221_0.getData();
+   if ((Obj.Status = mcp3221_0.ping()) == 0)
+   {                                                      // Read good value
+      Obj.CalculatedVoltage = scale * data0 + Obj.Offset; //
+      Obj.RawData = data0;                                // Raw voltage, read by ADC
+      validVoltage0 = Obj.CalculatedVoltage;
+      validData0 = data0;
+   }
+   else
+   {                                         // Didn't read a good value. Return a hopefully useful value and restart the I2C bus
+      Obj.CalculatedVoltage = validVoltage0; // Use value from previous call
+      Obj.RawData = validData0;
+      // Reset wire here
+   }
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -98,33 +111,10 @@ void setup(void)
    digitalWrite(PB6, HIGH);
    digitalWrite(PB7, HIGH);
 #endif
-#if 1
-   // SPDX-FileCopyrightText: 2023 Carter Nelson for Adafruit Industries
-   //
-   // SPDX-License-Identifier: MIT
-   // --------------------------------------
-   // i2c_scanner
-   //
-   // Modified from https://playground.arduino.cc/Main/I2cScanner/
-   // --------------------------------------
 
    Wire2.begin();
+   Wire2.setClock(400000);
 
-   Serial1.begin(115200);
-   while (!Serial)
-      delay(10);
-   Serial1.println("\nI2C Scanner");
-
-#else
-   Wire2.begin();
-
-   ADS.begin();
-   ADS.setGain(0);             //  0 = 6.144 volt, 1 = 4.096 V
-   ADS.setDataRate(7);         //  0 = slow   4 = medium   7 = fast
-   ADS.setMode(0);             //  continuous mode
-   ADS.setWireClock(400000UL); // 400 kHz
-   ADS.readADC(0);             //  first read to trigger settings
-#endif
 #ifdef ECAT
    ecat_slv_init(&config);
 #endif
@@ -146,63 +136,16 @@ void loop(void)
    if (dTime > 5000) // Not doing interrupts - handle free-run
       ecat_slv();
 #else
-#if 1
-   byte error, address;
-   int nDevices;
 
-   Serial1.println("Scanning...");
-
-   nDevices = 0;
-   for (address = 1; address < 127; address++)
-   {
-      // The i2c_scanner uses the return value of
-      // the Write.endTransmisstion to see if
-      // a device did acknowledge to the address.
-      Wire2.beginTransmission(address);
-      error = Wire2.endTransmission();
-
-      if (error == 0)
-      {
-         Serial1.print("I2C device found at address 0x");
-         if (address < 16)
-            Serial1.print("0");
-         Serial1.print(address, HEX);
-         Serial1.println("  !");
-
-         nDevices++;
-      }
-      else if (error == 4)
-      {
-         Serial1.print("Unknown error at address 0x");
-         if (address < 16)
-            Serial1.print("0");
-         Serial1.println(address, HEX);
-      }
-   }
-   if (nDevices == 0)
-      Serial1.println("No I2C devices found\n");
-   else
-      Serial1.println("done\n");
-
-   delay(5000); // wait 5 seconds for next scan
-
-#else
-   Serial1.print("TIC ");
-   int tot = 0;
-   uint32_t before = millis();
-   for (int i = 0; i < 10000; i++)
-   {
-      int16_t raw = ADS.getValue();
-      tot += raw;
-   }
-   uint32_t after = millis();
-
-   int16_t value = ADS.getValue();
-   float fval = ADS.toVoltage(value);
-   Serial1.printf("Time för 10000=%d värdet=", after - before);
-   Serial1.println(fval);
+   Serial1.println("\nI2C Scanner");
+   Serial1.printf("Ping0=%d\n", mcp3221_0.ping());
+   Serial1.printf("Ping7=%d\n", mcp3221_7.ping());
+   int16_t res0 = mcp3221_0.getData();
+   int16_t v0 = (res0 * 5027 * 39) / 4096;
+   Serial1.printf("Voltage_0: %d Voltage_7: %d\n", v0, res0);
+   delay(1000);
 #endif
-#endif
+
 }
 
 void sync0Handler(void)

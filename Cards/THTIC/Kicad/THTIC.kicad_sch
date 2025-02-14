@@ -4087,7 +4087,7 @@
 		)
 		(uuid "df56f7ac-826c-40a4-abc7-ebd3b2b28cb4")
 	)
-	(text "Typisk Varc=100V\nMätområde 0-200V\nOp-amp in 0-5V\nR1=(200/2.5-1)*R0\nR1=79*R0\nFinns inte så gott om\nmotstånd som tål över 200V,\nvälj 100k 2512 som tål 500V.\nR0 = 100k/79 = 1k266\nvälj 1k27"
+	(text "Typisk Varc=100V\nMätområde 0-200V\nOp-amp in 0-5V\nR1=(100/2.5-1)*R0\nR1=39*R0\nFinns inte så gott om\nmotstånd som tål över 200V,\nvälj 100k 2512 som tål 500V.\nR0 = 100k/39 = 2.56\nvälj 2k7"
 		(exclude_from_sim no)
 		(at 17.018 41.148 0)
 		(effects
@@ -4203,7 +4203,7 @@
 				)
 			)
 		)
-		(property "Value" "1k27"
+		(property "Value" "2k7"
 			(at 52.324 82.296 90)
 			(effects
 				(font
@@ -4408,7 +4408,7 @@
 				)
 			)
 		)
-		(property "Value" "1k27"
+		(property "Value" "2k7"
 			(at 51.054 126.746 90)
 			(effects
 				(font

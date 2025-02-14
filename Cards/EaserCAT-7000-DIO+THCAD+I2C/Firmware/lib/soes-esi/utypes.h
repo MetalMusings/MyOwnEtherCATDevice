@@ -14,8 +14,9 @@ typedef struct
    /* Inputs */
 
    int32_t Input12;
-   float ArcVoltage;
-   float Voltage;
+   int32_t RawData;
+   float CalculatedVoltage;
+   uint8_t Status;
 
    /* Outputs */
 
@@ -23,7 +24,8 @@ typedef struct
 
    /* Parameters */
 
-   float VoltageScale;
+   float Scale;
+   float Offset;
 } _Objects;
 
 extern _Objects Obj;

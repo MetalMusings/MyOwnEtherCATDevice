@@ -138,7 +138,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>ArcVoltage</Name>
+                  <Name>RawData</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -162,7 +162,31 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>Voltage</Name>
+                  <Name>CalculatedVoltage</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1A03</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Status</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -238,15 +262,15 @@
               <DataType>
                 <Name>DT1C13ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>48</BitSize>
+                <BitSize>64</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>3</Elements>
+                  <Elements>4</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C13</Name>
-                <BitSize>64</BitSize>
+                <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -260,7 +284,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C13ARR</Type>
-                  <BitSize>48</BitSize>
+                  <BitSize>64</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -436,7 +460,7 @@
               </Object>
               <Object>
                 <Index>#x1A01</Index>
-                <Name>ArcVoltage</Name>
+                <Name>RawData</Name>
                 <Type>DT1A01</Type>
                 <BitSize>48</BitSize>
                 <Info>
@@ -447,7 +471,7 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>ArcVoltage</Name>
+                    <Name>RawData</Name>
                     <Info>
                       <DefaultValue>#x60010020</DefaultValue>
                     </Info>
@@ -459,7 +483,7 @@
               </Object>
               <Object>
                 <Index>#x1A02</Index>
-                <Name>Voltage</Name>
+                <Name>CalculatedVoltage</Name>
                 <Type>DT1A02</Type>
                 <BitSize>48</BitSize>
                 <Info>
@@ -470,9 +494,32 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>Voltage</Name>
+                    <Name>CalculatedVoltage</Name>
                     <Info>
                       <DefaultValue>#x60020020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1A03</Index>
+                <Name>Status</Name>
+                <Type>DT1A03</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Status</Name>
+                    <Info>
+                      <DefaultValue>#x60030008</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -548,12 +595,12 @@
                 <Index>#x1C13</Index>
                 <Name>Sync Manager 3 PDO Assignment</Name>
                 <Type>DT1C13</Type>
-                <BitSize>64</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>3</DefaultValue>
+                      <DefaultValue>4</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -574,6 +621,12 @@
                       <DefaultValue>#x1A02</DefaultValue>
                     </Info>
                   </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1A03</DefaultValue>
+                    </Info>
+                  </SubItem>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
@@ -581,11 +634,23 @@
               </Object>
               <Object>
                 <Index>#x2000</Index>
-                <Name>VoltageScale</Name>
+                <Name>Scale</Name>
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>1</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2001</Index>
+                <Name>Offset</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
@@ -606,8 +671,8 @@
               </Object>
               <Object>
                 <Index>#x6001</Index>
-                <Name>ArcVoltage</Name>
-                <Type>REAL</Type>
+                <Name>RawData</Name>
+                <Type>DINT</Type>
                 <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
@@ -619,9 +684,22 @@
               </Object>
               <Object>
                 <Index>#x6002</Index>
-                <Name>Voltage</Name>
+                <Name>CalculatedVoltage</Name>
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x6003</Index>
+                <Name>Status</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -677,24 +755,35 @@
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A01</Index>
-          <Name>ArcVoltage</Name>
+          <Name>RawData</Name>
           <Entry>
             <Index>#x6001</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>32</BitLen>
-            <Name>ArcVoltage</Name>
-            <DataType>REAL</DataType>
+            <Name>RawData</Name>
+            <DataType>DINT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A02</Index>
-          <Name>Voltage</Name>
+          <Name>CalculatedVoltage</Name>
           <Entry>
             <Index>#x6002</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>32</BitLen>
-            <Name>Voltage</Name>
+            <Name>CalculatedVoltage</Name>
             <DataType>REAL</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Mandatory="true" Sm="3">
+          <Index>#x1A03</Index>
+          <Name>Status</Name>
+          <Entry>
+            <Index>#x6003</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>Status</Name>
+            <DataType>USINT</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">
