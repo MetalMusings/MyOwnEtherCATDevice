@@ -43,13 +43,13 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    for (int i = 0; i < sizeof(inputPin); i++)
       Obj.Input12 = digitalRead(inputPin[i]) == HIGH ? bitset(Obj.Input12, i) : bitclear(Obj.Input12, i);
 
-   float scale = Obj.Scale;
+   float scale = Obj.VoltageScale;
    if (scale == 0.0)
       scale = 1.0;
    int data0 = mcp3221_0.getData();
    if ((Obj.Status = mcp3221_0.ping()) == 0)
    {                                                      // Read good value
-      Obj.CalculatedVoltage = scale * data0 + Obj.Offset; //
+      Obj.CalculatedVoltage = scale * data0 + Obj.VoltageOffset; //
       Obj.RawData = data0;                                // Raw voltage, read by ADC
       validVoltage0 = Obj.CalculatedVoltage;
       validData0 = data0;
@@ -100,7 +100,7 @@ void setup(void)
       pinMode(outputPin[i], OUTPUT);
       digitalWrite(outputPin[i], LOW);
    }
-#if 0
+#if 1
    // Debug leds
    pinMode(PB4, OUTPUT);
    pinMode(PB5, OUTPUT);
@@ -110,6 +110,14 @@ void setup(void)
    digitalWrite(PB5, HIGH);
    digitalWrite(PB6, HIGH);
    digitalWrite(PB7, HIGH);
+   digitalWrite(PB4, LOW);
+   digitalWrite(PB5, LOW);
+   digitalWrite(PB6, LOW);
+   digitalWrite(PB7, LOW);
+   digitalWrite(outputPin[0], HIGH);
+   digitalWrite(outputPin[1], HIGH);
+   digitalWrite(outputPin[2], HIGH);
+   digitalWrite(outputPin[3], HIGH);
 #endif
 
    Wire2.begin();

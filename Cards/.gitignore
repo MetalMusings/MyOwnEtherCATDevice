@@ -34,3 +34,4 @@ fp-info-cache
 *.csv
 *.step
 *.stp
+.~lock.*

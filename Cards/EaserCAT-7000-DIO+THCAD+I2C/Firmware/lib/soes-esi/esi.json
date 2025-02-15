@@ -39,7 +39,7 @@
         "name": "Scale",
         "access": "RO",
         "dtype": "REAL32",
-        "value": "1",
+        "value": "0",
         "isSDOitem": true,
         "data": "&Obj.Scale"
       },
@@ -135,6 +135,28 @@
         "dtype": "UNSIGNED8",
         "value": "0",
         "data": "&Obj.Output4"
+      },
+      "7001": {
+        "otype": "VAR",
+        "name": "VoltageScale",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.VoltageScale"
+      },
+      "7002": {
+        "otype": "VAR",
+        "name": "VoltageOffset",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.VoltageOffset"
       },
       "60664": {
         "otype": "VAR",

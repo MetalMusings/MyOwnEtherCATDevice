@@ -100,6 +100,54 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT1601</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>VoltageScale</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1602</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>VoltageOffset</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT1A00</Name>
                 <BitSize>48</BitSize>
                 <SubItem>
@@ -230,15 +278,15 @@
               <DataType>
                 <Name>DT1C12ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>16</BitSize>
+                <BitSize>48</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>1</Elements>
+                  <Elements>3</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C12</Name>
-                <BitSize>32</BitSize>
+                <BitSize>64</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -252,7 +300,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C12ARR</Type>
-                  <BitSize>16</BitSize>
+                  <BitSize>48</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -436,6 +484,52 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x1601</Index>
+                <Name>VoltageScale</Name>
+                <Type>DT1601</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>VoltageScale</Name>
+                    <Info>
+                      <DefaultValue>#x70010020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1602</Index>
+                <Name>VoltageOffset</Name>
+                <Type>DT1602</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>VoltageOffset</Name>
+                    <Info>
+                      <DefaultValue>#x70020020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x1A00</Index>
                 <Name>Input12</Name>
                 <Type>DT1A00</Type>
@@ -572,18 +666,30 @@
                 <Index>#x1C12</Index>
                 <Name>Sync Manager 2 PDO Assignment</Name>
                 <Type>DT1C12</Type>
-                <BitSize>32</BitSize>
+                <BitSize>64</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>1</DefaultValue>
+                      <DefaultValue>3</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
                     <Name>PDO Mapping</Name>
                     <Info>
                       <DefaultValue>#x1600</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1601</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1602</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -638,7 +744,7 @@
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
-                  <DefaultValue>1</DefaultValue>
+                  <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
@@ -721,6 +827,32 @@
                   <PdoMapping>R</PdoMapping>
                 </Flags>
               </Object>
+              <Object>
+                <Index>#x7001</Index>
+                <Name>VoltageScale</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7002</Index>
+                <Name>VoltageOffset</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
             </Objects>
           </Dictionary>
         </Profile>
@@ -740,6 +872,28 @@
             <BitLen>8</BitLen>
             <Name>Output4</Name>
             <DataType>USINT</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1601</Index>
+          <Name>VoltageScale</Name>
+          <Entry>
+            <Index>#x7001</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>VoltageScale</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1602</Index>
+          <Name>VoltageOffset</Name>
+          <Entry>
+            <Index>#x7002</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>VoltageOffset</Name>
+            <DataType>REAL</DataType>
           </Entry>
         </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">

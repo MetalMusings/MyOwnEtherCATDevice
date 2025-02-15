@@ -431,7 +431,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "THCIC.kicad_pro",
+    "filename": "THTIC.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -469,7 +469,7 @@
       "plot": "Gerbers/",
       "pos_files": "",
       "specctra_dsn": "THCIC.dsn",
-      "step": "",
+      "step": "THTIC.step",
       "svg": "",
       "vrml": ""
     },

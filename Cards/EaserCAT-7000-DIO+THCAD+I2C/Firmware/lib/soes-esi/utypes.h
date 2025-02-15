@@ -21,6 +21,8 @@ typedef struct
    /* Outputs */
 
    uint8_t Output4;
+   float VoltageScale;
+   float VoltageOffset;
 
    /* Parameters */
 
