@@ -109,6 +109,14 @@ void setup(void)
    digitalWrite(PB5, LOW);
    digitalWrite(PB6, LOW);
    digitalWrite(PB7, LOW);
+
+   Wire2.begin();
+   Wire2.setClock(400000);
+
+#ifdef ECAT
+   ecat_slv_init(&config);
+#endif
+
 #if 0 // Uncomment for commissioning tests
    digitalWrite(outputPin[0], HIGH); // All four output leds should go high
    digitalWrite(outputPin[1], HIGH);
@@ -116,18 +124,13 @@ void setup(void)
    digitalWrite(outputPin[3], HIGH);
    while (1) // Apply voltage over the inputs 0-11 and see response in terminal
    {
+      Serial1.printf("I2C status=%d rawdata=%d ", mcp3221_0.ping(), mcp3221_0.getData());
       for (int i = 0; i < 12; i++)
          Serial1.printf("%u", digitalRead(inputPin[i]));
       Serial1.println();
       delay(100);
+
    }
-#endif
-
-   Wire2.begin();
-   Wire2.setClock(400000);
-
-#ifdef ECAT
-   ecat_slv_init(&config);
 #endif
 }
 
