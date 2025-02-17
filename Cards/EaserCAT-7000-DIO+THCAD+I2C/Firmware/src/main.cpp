@@ -16,6 +16,9 @@ HardwareSerial Serial1(PA10, PA9);
 uint8_t inputPin[] = {PD15, PD14, PD13, PD12, PD11, PD10, PD9, PD8, PB15, PB14, PB13, PB12};
 uint8_t outputPin[] = {PE10, PE9, PE8, PE7};
 
+const uint32_t I2C_BUS_SPEED = 100000;
+uint32_t I2C_restarts = 0;
+
 #include "Wire.h"
 TwoWire Wire2(PB11, PB10);
 
@@ -47,7 +50,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    if (scale == 0.0)
       scale = 1.0;
    int data0 = mcp3221_0.getData();
-   if ((Obj.Status = mcp3221_0.ping()) == 0)
+   int stat;
+   if ((stat = mcp3221_0.ping()) == 0)
    {                                                             // Read good value
       Obj.CalculatedVoltage = scale * data0 + Obj.VoltageOffset; //
       Obj.RawData = data0;                                       // Raw voltage, read by ADC
@@ -59,7 +63,12 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       Obj.CalculatedVoltage = validVoltage0; // Use value from previous call
       Obj.RawData = validData0;
       // Reset wire here
+      Wire2.end();
+      Wire2.begin();
+      Wire2.setClock(I2C_BUS_SPEED);
+      I2C_restarts++;
    }
+   Obj.Status = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -111,7 +120,7 @@ void setup(void)
    digitalWrite(PB7, LOW);
 
    Wire2.begin();
-   Wire2.setClock(400000);
+   Wire2.setClock(I2C_BUS_SPEED);
 
 #ifdef ECAT
    ecat_slv_init(&config);
