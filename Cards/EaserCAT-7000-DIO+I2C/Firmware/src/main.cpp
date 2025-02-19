@@ -22,9 +22,15 @@ uint32_t I2C_restarts = 0;
 #include "Wire.h"
 TwoWire Wire2(PB11, PB10);
 
+#ifdef MCP3221
 #include "MyMCP3221.h"
 MyMCP3221 mcp3221_0(0x48, &Wire2);
 MyMCP3221 mcp3221_7(0x4f, &Wire2);
+#endif
+#ifdef ADS1xxx
+#include "ADS1X15.h"
+ADS1115 ads1115(0x48, &Wire2);
+#endif
 
 #define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
 #define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
@@ -49,9 +55,15 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    float scale = Obj.VoltageScale;
    if (scale == 0.0)
       scale = 1.0;
+#ifdef MCP3221
    int data0 = mcp3221_0.getData();
-   int stat;
-   if ((stat = mcp3221_0.ping()) == 0)
+   int stat = mcp3221_0.ping();
+#endif
+#ifdef ADS1xxx
+   int data0 = ads1115.readADC_Differential_0_1();
+   int stat = ads1115.isConnected();
+#endif
+   if (stat == 0)
    {                                                             // Read good value
       Obj.CalculatedVoltage = scale * data0 + Obj.VoltageOffset; //
       Obj.RawData = data0;                                       // Raw voltage, read by ADC
@@ -121,24 +133,46 @@ void setup(void)
 
    Wire2.begin();
    Wire2.setClock(I2C_BUS_SPEED);
+#ifdef ADS1xxx
+   ads1115.begin();
+   ads1115.setGain(1); // 4.096V
+   ads1115.setMode(1); // Single
+   ads1115.setDataRate(7);
+#endif
 
 #ifdef ECAT
    ecat_slv_init(&config);
 #endif
 
-#if 0 // Uncomment for commissioning tests
+#if 1                                // Uncomment for commissioning tests
    digitalWrite(outputPin[0], HIGH); // All four output leds should go high
    digitalWrite(outputPin[1], HIGH);
    digitalWrite(outputPin[2], HIGH);
    digitalWrite(outputPin[3], HIGH);
    while (1) // Apply voltage over the inputs 0-11 and see response in terminal
    {
+      int nDevices = 0;
+      for (int i2caddr = 0; i2caddr < 127; i2caddr++)
+      {
+         Wire2.beginTransmission(i2caddr);
+         int stat = Wire2.endTransmission();
+         if (stat == 0)
+         {
+            Serial1.printf("I2C device found at address 0x%2x\b", i2caddr);
+            nDevices++;
+         }
+      }
+      Serial1.printf("Found %d devices\n", nDevices);
+#ifdef MCP3221
       Serial1.printf("I2C status=%d rawdata=%d ", mcp3221_0.ping(), mcp3221_0.getData());
+#endif
+#ifdef ADS1xxx
+      Serial1.printf("I2C status=%d rawdata=%d ", ads1115.isConnected() ? 0 : -1, ads1115.readADC_Differential_0_1());
+#endif
       for (int i = 0; i < 12; i++)
          Serial1.printf("%u", digitalRead(inputPin[i]));
       Serial1.println();
       delay(100);
-
    }
 #endif
 }
