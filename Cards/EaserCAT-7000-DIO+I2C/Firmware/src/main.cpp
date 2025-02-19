@@ -16,7 +16,7 @@ HardwareSerial Serial1(PA10, PA9);
 uint8_t inputPin[] = {PD15, PD14, PD13, PD12, PD11, PD10, PD9, PD8, PB15, PB14, PB13, PB12};
 uint8_t outputPin[] = {PE10, PE9, PE8, PE7};
 
-const uint32_t I2C_BUS_SPEED = 100000;
+const uint32_t I2C_BUS_SPEED = 400000;
 uint32_t I2C_restarts = 0;
 
 #include "Wire.h"
@@ -29,7 +29,16 @@ MyMCP3221 mcp3221_7(0x4f, &Wire2);
 #endif
 #ifdef ADS1xxx
 #include "ADS1X15.h"
-ADS1115 ads1115(0x48, &Wire2);
+ADS1115 ads1014(0x48, &Wire2);
+void ads1014_reset()
+{
+   ads1014.reset();
+   ads1014.begin();
+   ads1014.setGain(1);                 // 1=4.096V
+   ads1014.setMode(0);                 // 0 continuous
+   ads1014.setDataRate(6);             // Max for ads101x
+   ads1014.readADC_Differential_0_1(); // This is the value we are interested in
+}
 #endif
 
 #define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
@@ -60,8 +69,8 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    int stat = mcp3221_0.ping();
 #endif
 #ifdef ADS1xxx
-   int data0 = ads1115.readADC_Differential_0_1();
-   int stat = ads1115.isConnected();
+   int data0 = ads1014.getValue();
+   int stat = ads1014.isConnected();
 #endif
    if (stat == 0)
    {                                                             // Read good value
@@ -79,6 +88,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       Wire2.begin();
       Wire2.setClock(I2C_BUS_SPEED);
       I2C_restarts++;
+#ifdef ADS1xxx
+      ads1014_reset();
+#endif
    }
    Obj.Status = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
 }
@@ -134,10 +146,7 @@ void setup(void)
    Wire2.begin();
    Wire2.setClock(I2C_BUS_SPEED);
 #ifdef ADS1xxx
-   ads1115.begin();
-   ads1115.setGain(1); // 4.096V
-   ads1115.setMode(1); // Single
-   ads1115.setDataRate(7);
+   ads1014_reset();
 #endif
 
 #ifdef ECAT
@@ -152,27 +161,37 @@ void setup(void)
    while (1) // Apply voltage over the inputs 0-11 and see response in terminal
    {
       int nDevices = 0;
-      for (int i2caddr = 0; i2caddr < 127; i2caddr++)
+      for (int i2caddr = 1; i2caddr < 127; i2caddr++)
       {
          Wire2.beginTransmission(i2caddr);
          int stat = Wire2.endTransmission();
          if (stat == 0)
          {
-            Serial1.printf("I2C device found at address 0x%2x\b", i2caddr);
+            Serial1.printf("I2C device found at address 0x%02x\n", i2caddr);
             nDevices++;
          }
       }
-      Serial1.printf("Found %d devices\n", nDevices);
+      if (!nDevices)
+         Serial1.printf("No devices\n");
 #ifdef MCP3221
       Serial1.printf("I2C status=%d rawdata=%d ", mcp3221_0.ping(), mcp3221_0.getData());
 #endif
 #ifdef ADS1xxx
-      Serial1.printf("I2C status=%d rawdata=%d ", ads1115.isConnected() ? 0 : -1, ads1115.readADC_Differential_0_1());
+      //     else Serial1.printf("I2C status=%d rawdata=%d pin0=%d pin1=%d\n", ads1014.isConnected() ? 0 : -1, ads1014.readADC_Differential_0_1(), ads1014.readADC(0), ads1014.readADC(1));
+      //    Serial1.println(ads1014.toVoltage(ads1014.readADC_Differential_0_1()), 5);
+      for (int i = 0; i < 10; i++)
+         Serial1.println(ads1014.getValue());
+      int dummy = 0;
+      uint32_t then = micros();
+      for (int i = 0; i < 1000; i++)
+         dummy += ads1014.getValue();
+      uint32_t now = micros();
+      Serial1.printf("1000 I2C readings take %d microseconds\n", now - then);
 #endif
       for (int i = 0; i < 12; i++)
          Serial1.printf("%u", digitalRead(inputPin[i]));
       Serial1.println();
-      delay(100);
+      delay(1000);
    }
 #endif
 }
