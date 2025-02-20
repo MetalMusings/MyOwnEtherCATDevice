@@ -152,8 +152,13 @@ function esi_generator(form, od, indexes, dc)
 			result += addDictionaryObjectSubitems(objd.items);
 		}
 	
-		var flags = `\n                  <Access>ro</Access>`;
-		if (objd.otype == OTYPE.VAR) {
+	    var flags = ``;
+	    if (objd.otype == OTYPE.VAR) {
+		        let access = `ro`;
+			if (objd.access) {
+				access = objd.access.slice(0,2).toLowerCase();
+			}
+			flags += `\n                  <Access>${access}</Access>`; 
 			flags += getPdoMappingFlags(objd);
 		}
 		if (SDO_category[index]) { 
