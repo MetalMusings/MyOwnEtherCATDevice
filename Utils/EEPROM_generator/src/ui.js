@@ -361,6 +361,8 @@ function onEditObjectSubmit(modalform) {
 			} else {
 				objd.value = modalform.InitalValue.value;
 			}
+	                objd.access = odModal.form.Access.value;
+
 			break;
 		case OTYPE.ARRAY:
 			objd.dtype = modalform.DTYPE.value;
