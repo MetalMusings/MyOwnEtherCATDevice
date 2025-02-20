@@ -26,8 +26,8 @@ typedef struct
 
    /* Parameters */
 
-   float Scale;
-   float Offset;
+   uint8_t I2C_devicetype;
+   uint8_t I2C_address;
 } _Objects;
 
 extern _Objects Obj;

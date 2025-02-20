@@ -360,11 +360,11 @@
                 <BitSize>16</BitSize>
               </DataType>
               <DataType>
-                <Name>REAL</Name>
+                <Name>DINT</Name>
                 <BitSize>32</BitSize>
               </DataType>
               <DataType>
-                <Name>DINT</Name>
+                <Name>REAL</Name>
                 <BitSize>32</BitSize>
               </DataType>
             </DataTypes>
@@ -457,7 +457,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -480,7 +479,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -503,7 +501,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -526,7 +523,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -549,7 +545,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -572,7 +567,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -595,7 +589,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -618,7 +611,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -659,7 +651,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -694,7 +685,6 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
@@ -735,31 +725,30 @@
                   </SubItem>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
                 </Flags>
               </Object>
               <Object>
                 <Index>#x2000</Index>
-                <Name>Scale</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
+                <Name>I2C_devicetype</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
+                  <Access>rw</Access>
                 </Flags>
               </Object>
               <Object>
                 <Index>#x2001</Index>
-                <Name>Offset</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
+                <Name>I2C_address</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
-                  <Access>ro</Access>
+                  <Access>rw</Access>
                 </Flags>
               </Object>
               <Object>

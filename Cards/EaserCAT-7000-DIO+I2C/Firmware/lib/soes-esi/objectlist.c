@@ -51,8 +51,8 @@ static const char acName1C13_01[] = "PDO Mapping";
 static const char acName1C13_02[] = "PDO Mapping";
 static const char acName1C13_03[] = "PDO Mapping";
 static const char acName1C13_04[] = "PDO Mapping";
-static const char acName2000[] = "Scale";
-static const char acName2001[] = "Offset";
+static const char acName2000[] = "I2C_devicetype";
+static const char acName2001[] = "I2C_address";
 static const char acName6000[] = "Input12";
 static const char acName6001[] = "RawData";
 static const char acName6002[] = "CalculatedVoltage";
@@ -145,11 +145,11 @@ const _objd SDO1C13[] =
 };
 const _objd SDO2000[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO, acName2000, 0x00000000, &Obj.Scale},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2000, 0, &Obj.I2C_devicetype},
 };
 const _objd SDO2001[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO, acName2001, 0x00000000, &Obj.Offset},
+  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2001, 0, &Obj.I2C_address},
 };
 const _objd SDO6000[] =
 {

@@ -22,10 +22,10 @@ uint32_t I2C_restarts = 0;
 #include "Wire.h"
 TwoWire Wire2(PB11, PB10);
 
-#ifdef MCP3221
+#ifdef ADC_MCP3221
 #include "MyMCP3221.h"
 MyMCP3221 mcp3221_0(0x48, &Wire2);
-MyMCP3221 mcp3221_7(0x4f, &Wire2);
+//MyMCP3221 mcp3221_7(0x4f, &Wire2);
 #endif
 #ifdef ADS1xxx
 #include "ADS1X15.h"
@@ -64,7 +64,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    float scale = Obj.VoltageScale;
    if (scale == 0.0)
       scale = 1.0;
-#ifdef MCP3221
+#ifdef ADC_MCP3221
    int data0 = mcp3221_0.getData();
    int stat = mcp3221_0.ping();
 #endif
@@ -93,6 +93,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 #endif
    }
    Obj.Status = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
+   Obj.Status = Obj.I2C_devicetype + Obj.I2C_address;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -153,7 +154,7 @@ void setup(void)
    ecat_slv_init(&config);
 #endif
 
-#if 1                                // Uncomment for commissioning tests
+#if 0                                // Uncomment for commissioning tests
    digitalWrite(outputPin[0], HIGH); // All four output leds should go high
    digitalWrite(outputPin[1], HIGH);
    digitalWrite(outputPin[2], HIGH);
@@ -173,7 +174,7 @@ void setup(void)
       }
       if (!nDevices)
          Serial1.printf("No devices\n");
-#ifdef MCP3221
+#ifdef ADC_MCP3221
       Serial1.printf("I2C status=%d rawdata=%d ", mcp3221_0.ping(), mcp3221_0.getData());
 #endif
 #ifdef ADS1xxx

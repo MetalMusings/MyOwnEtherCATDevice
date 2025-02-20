@@ -36,21 +36,21 @@
     "sdo": {
       "2000": {
         "otype": "VAR",
-        "name": "Scale",
-        "access": "RO",
-        "dtype": "REAL32",
+        "name": "I2C_devicetype",
+        "access": "RW",
+        "dtype": "UNSIGNED8",
         "value": "0",
         "isSDOitem": true,
-        "data": "&Obj.Scale"
+        "data": "&Obj.I2C_devicetype"
       },
       "2001": {
         "otype": "VAR",
-        "name": "Offset",
-        "access": "RO",
-        "dtype": "REAL32",
+        "name": "I2C_address",
+        "access": "RW",
+        "dtype": "UNSIGNED8",
         "value": "0",
         "isSDOitem": true,
-        "data": "&Obj.Offset"
+        "data": "&Obj.I2C_address"
       },
       "A": {
         "otype": "RECORD",
