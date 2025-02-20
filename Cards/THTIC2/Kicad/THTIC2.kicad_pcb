@@ -6652,7 +6652,7 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "5V\n\nSDA\n\nSDL\n\nGND"
+	(gr_text "5V\n\nSDA\n\nSCL\n\nGND"
 		(at 191.262 105.029 0)
 		(layer "B.SilkS")
 		(uuid "ad1f442b-3b14-48be-b93e-a19d7bc01d23")
