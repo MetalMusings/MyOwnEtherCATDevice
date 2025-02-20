@@ -1,4 +1,4 @@
-# Building a EaserCAT board
+# Building an EaserCAT board
 
 ## Parts
 
@@ -20,7 +20,7 @@ The pcb needs to be ordered. Consider using a solder stencil - but hey it's up t
 
 ## EEPROM
 
-You need to fill the EEPROM with valid contents before putting it on the pcb. It  is actually a must, the EtherCAT IC will not start with an empty EEPROM, or with a non-valid content. It doesn't have to be for a real EtherCAT slave, because the first thing you will do when the card works is to upload the correct contents using TwinCAT. Any valid EEPROM content.
+You need to fill the EEPROM with valid contents before putting it on the pcb. It  is actually mandatory, the EtherCAT IC will not start with an empty EEPROM, or with a non-valid content. It doesn't have to be for a real EtherCAT slave, because the first thing you will do when the card works is to upload the correct contents using TwinCAT. Any valid EEPROM content.
 
 There is a small Arduino program [Link here](Utils/EEPROM_store_valid/) that helps to fill the empty EEPROM. Follow the link.
 
@@ -30,7 +30,7 @@ Enjoy!
 
 ## Soldering
 
-I have put the pcb in the soldering oven. Hand soldering should work, although the pin spacing is only 0.4 m on the Ax58100 IC and can be a challenge.
+I have put the pcb in the soldering oven. Hand soldering should work, although the pin spacing is only 0.4 m on the Ax58100 IC and can be a challenge. I usually get some solder bridges on the EtherCAT IC or the STM32 chip. A magnifyng device definitely helps.
 
 ## Powering up
 
