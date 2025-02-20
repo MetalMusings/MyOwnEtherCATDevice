@@ -63,7 +63,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    float scale = Obj.VoltageScale;
    if (scale == 0.0)
       scale = 1.0;
-   int stat, data0;
+   int stat = 1, data0;
    switch (Obj.I2C_devicetype)
    {
    case 0: // Not configured.
@@ -93,25 +93,28 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       stat = mcp3221->ping();
       break;
    case ADS1014_TYPE:
-      if (ads1014)
+      if (old_I2Cdevice != Obj.I2C_devicetype) // Initilize and make ready
       {
-         delete ads1014;
-         ads1014 = 0;
-      }
-      if (mcp3221)
-      {
-         delete mcp3221;
-         mcp3221 = 0;
-      }
+         if (ads1014)
+         {
+            delete ads1014;
+            ads1014 = 0;
+         }
+         if (mcp3221)
+         {
+            delete mcp3221;
+            mcp3221 = 0;
+         }
 
-      Wire2.end();
-      Wire2.begin();
-      Wire2.setClock(I2C_BUS_SPEED);
-      ads1014 = new ADS1014(Obj.I2C_address, &Wire2);
-      ads1014_reset();
-      old_I2Cdevice = ads1014 ? ADS1014_TYPE : -1;
+         Wire2.end();
+         Wire2.begin();
+         Wire2.setClock(I2C_BUS_SPEED);
+         ads1014 = new ADS1014(Obj.I2C_address, &Wire2);
+         ads1014_reset();
+         old_I2Cdevice = ADS1014_TYPE;
+      }
       data0 = ads1014->getValue();
-      stat = ads1014->isConnected();
+      stat = ads1014->isConnected() == 1 ? 0 : 1;
       break;
    default: // Not supported
       break;
@@ -135,10 +138,9 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       I2C_restarts++;
       if (Obj.I2C_devicetype == ADS1014_TYPE)
          ads1014_reset();
-         // mcp3221 has no reset, reset the I2C bus is the best we can do
+      // mcp3221 has no reset, reset the I2C bus is the best we can do
    }
    Obj.Status = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
-   Obj.Status = Obj.I2C_devicetype + Obj.I2C_address;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -191,21 +193,23 @@ void setup(void)
 
    Wire2.begin();
    Wire2.setClock(I2C_BUS_SPEED);
-#ifdef ADS1xxx
-   ads1014_reset();
-#endif
 
 #ifdef ECAT
    ecat_slv_init(&config);
 #endif
 
 #if 0 // Uncomment for commissioning tests
+#define ADS1xxx
    digitalWrite(outputPin[0], HIGH); // All four output leds should go high
    digitalWrite(outputPin[1], HIGH);
    digitalWrite(outputPin[2], HIGH);
    digitalWrite(outputPin[3], HIGH);
 #ifdef ADC_MCP3221
    mcp3221 = new MyMCP3221(0x48, &Wire2);
+#endif
+#ifdef ADS1xxx
+   ads1014 = new ADS1014(0x48, &Wire2);
+   ads1014_reset();
 #endif
    while (1) // Apply voltage over the inputs 0-11 and see response in terminal
    {
@@ -229,13 +233,14 @@ void setup(void)
       //     else Serial1.printf("I2C status=%d rawdata=%d pin0=%d pin1=%d\n", ads1014.isConnected() ? 0 : -1, ads1014.readADC_Differential_0_1(), ads1014.readADC(0), ads1014.readADC(1));
       //    Serial1.println(ads1014.toVoltage(ads1014.readADC_Differential_0_1()), 5);
       for (int i = 0; i < 10; i++)
-         Serial1.println(ads1014.getValue());
+         Serial1.println(ads1014->getValue());
       int dummy = 0;
       uint32_t then = micros();
       for (int i = 0; i < 1000; i++)
-         dummy += ads1014.getValue();
+         dummy += ads1014->getValue();
       uint32_t now = micros();
       Serial1.printf("1000 I2C readings take %d microseconds\n", now - then);
+      Serial1.println(ads1014->toVoltage(ads1014->getValue()),4);
 #endif
       for (int i = 0; i < 12; i++)
          Serial1.printf("%u", digitalRead(inputPin[i]));
