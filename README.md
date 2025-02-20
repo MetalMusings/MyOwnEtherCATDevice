@@ -164,6 +164,8 @@ Configuration of the I2C device is done with the two SDOs 0x2000:0 and 0x2001:0.
 The I2C device type is set to 0 by default. A zero means no I2C ADC. Entering a 1 in 0x2000:0 selects the MCP3221, and a 2 in 0x2000:0 selects the ADS1014.\
 The I2C address for the ADC is written into SDO 0x2001:0. The address for the MCP3221 is selected when it is purchased - there are 8 different models each with a different I2C address 0x48-0x4f. The ADS1014 has a way to select the address, but the THTIC2 board has it fixed at 0x48.
 
+Pay attention to the polarity of when connecting the THTIC and THTIC2. Varc+ must have higher voltage potential the Varc- (as one would expect). The voltage divisor may need to be adjusted, there is now one 100 kOhm resistor and a 2.2 kOhm resistor, which brings down 100 V to around 2 V. Adjust as needed. For high voltage, pay attention to the max allowed voltage of the resistor.
+
 The experience with these cards has been very good so far. I have used the THTIC the most, cutting for at least an hour of cutting time, with THC enabled and active. A status variable shows that it has been working the whole time, no stops or resets. The THTIC2 has been used much less, but it behaves the same as the THTIC card, meaning it just works.
 
 ### License
