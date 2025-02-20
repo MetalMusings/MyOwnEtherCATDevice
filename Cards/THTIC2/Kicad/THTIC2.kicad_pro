@@ -469,7 +469,7 @@
       "plot": "Gerbers/",
       "pos_files": "",
       "specctra_dsn": "THCIC.dsn",
-      "step": "",
+      "step": "THTIC2.step",
       "svg": "",
       "vrml": ""
     },

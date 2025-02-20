@@ -14,16 +14,20 @@ typedef struct
    /* Inputs */
 
    int32_t Input12;
-   float ArcVoltage;
-   float Voltage;
+   int32_t RawData;
+   float CalculatedVoltage;
+   uint8_t Status;
 
    /* Outputs */
 
    uint8_t Output4;
+   float VoltageScale;
+   float VoltageOffset;
 
    /* Parameters */
 
-   float VoltageScale;
+   uint8_t I2C_devicetype;
+   uint8_t I2C_address;
 } _Objects;
 
 extern _Objects Obj;

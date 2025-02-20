@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "ecat_slv.h": "c",
+        "compare": "cpp",
+        "*.tpp": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "system_error": "cpp",
+        "numeric": "cpp",
+        "ostream": "cpp",
+        "cmath": "cpp",
+        "cstddef": "cpp",
+        "array": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+    "cmake.configureOnOpen": false
+}

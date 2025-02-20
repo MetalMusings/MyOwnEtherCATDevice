@@ -16,11 +16,30 @@ HardwareSerial Serial1(PA10, PA9);
 uint8_t inputPin[] = {PD15, PD14, PD13, PD12, PD11, PD10, PD9, PD8, PB15, PB14, PB13, PB12};
 uint8_t outputPin[] = {PE10, PE9, PE8, PE7};
 
+const uint32_t I2C_BUS_SPEED = 400000;
+uint32_t I2C_restarts = 0;
+
 #include "Wire.h"
 TwoWire Wire2(PB11, PB10);
 
+#ifdef ADC_MCP3221
+#include "MyMCP3221.h"
+MyMCP3221 mcp3221_0(0x48, &Wire2);
+//MyMCP3221 mcp3221_7(0x4f, &Wire2);
+#endif
+#ifdef ADS1xxx
 #include "ADS1X15.h"
-ADS1115 ADS(0x48, &Wire2);
+ADS1115 ads1014(0x48, &Wire2);
+void ads1014_reset()
+{
+   ads1014.reset();
+   ads1014.begin();
+   ads1014.setGain(1);                 // 1=4.096V
+   ads1014.setMode(0);                 // 0 continuous
+   ads1014.setDataRate(6);             // Max for ads101x
+   ads1014.readADC_Differential_0_1(); // This is the value we are interested in
+}
+#endif
 
 #define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
 #define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
@@ -38,15 +57,43 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
+   static float validData0 = 0.0, validVoltage0 = 0.0;
    for (int i = 0; i < sizeof(inputPin); i++)
       Obj.Input12 = digitalRead(inputPin[i]) == HIGH ? bitset(Obj.Input12, i) : bitclear(Obj.Input12, i);
 
    float scale = Obj.VoltageScale;
    if (scale == 0.0)
       scale = 1.0;
-   float ADCvoltage = ADS.toVoltage(ADS.getValue());
-   Obj.ArcVoltage = scale * ADCvoltage; // * ADCvoltage; // Scaled voltage, to give Plasma arc voltage
-   Obj.Voltage = ADCvoltage;            // Raw voltage, read by ADC
+#ifdef ADC_MCP3221
+   int data0 = mcp3221_0.getData();
+   int stat = mcp3221_0.ping();
+#endif
+#ifdef ADS1xxx
+   int data0 = ads1014.getValue();
+   int stat = ads1014.isConnected();
+#endif
+   if (stat == 0)
+   {                                                             // Read good value
+      Obj.CalculatedVoltage = scale * data0 + Obj.VoltageOffset; //
+      Obj.RawData = data0;                                       // Raw voltage, read by ADC
+      validVoltage0 = Obj.CalculatedVoltage;
+      validData0 = data0;
+   }
+   else
+   {                                         // Didn't read a good value. Return a hopefully useful value and restart the I2C bus
+      Obj.CalculatedVoltage = validVoltage0; // Use value from previous call
+      Obj.RawData = validData0;
+      // Reset wire here
+      Wire2.end();
+      Wire2.begin();
+      Wire2.setClock(I2C_BUS_SPEED);
+      I2C_restarts++;
+#ifdef ADS1xxx
+      ads1014_reset();
+#endif
+   }
+   Obj.Status = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
+   Obj.Status = Obj.I2C_devicetype + Obj.I2C_address;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -87,29 +134,66 @@ void setup(void)
       pinMode(outputPin[i], OUTPUT);
       digitalWrite(outputPin[i], LOW);
    }
-#if 0
    // Debug leds
    pinMode(PB4, OUTPUT);
    pinMode(PB5, OUTPUT);
    pinMode(PB6, OUTPUT);
    pinMode(PB7, OUTPUT);
-   digitalWrite(PB4, HIGH);
-   digitalWrite(PB5, HIGH);
-   digitalWrite(PB6, HIGH);
-   digitalWrite(PB7, HIGH);
-#endif
+   digitalWrite(PB4, LOW);
+   digitalWrite(PB5, LOW);
+   digitalWrite(PB6, LOW);
+   digitalWrite(PB7, LOW);
 
    Wire2.begin();
-
-   ADS.begin();
-   ADS.setGain(0);             //  0 = 6.144 volt, 1 = 4.096 V
-   ADS.setDataRate(7);         //  0 = slow   4 = medium   7 = fast
-   ADS.setMode(0);             //  continuous mode
-   ADS.setWireClock(400000UL); // 400 kHz
-   ADS.readADC(0);             //  first read to trigger settings
+   Wire2.setClock(I2C_BUS_SPEED);
+#ifdef ADS1xxx
+   ads1014_reset();
+#endif
 
 #ifdef ECAT
    ecat_slv_init(&config);
+#endif
+
+#if 0                                // Uncomment for commissioning tests
+   digitalWrite(outputPin[0], HIGH); // All four output leds should go high
+   digitalWrite(outputPin[1], HIGH);
+   digitalWrite(outputPin[2], HIGH);
+   digitalWrite(outputPin[3], HIGH);
+   while (1) // Apply voltage over the inputs 0-11 and see response in terminal
+   {
+      int nDevices = 0;
+      for (int i2caddr = 1; i2caddr < 127; i2caddr++)
+      {
+         Wire2.beginTransmission(i2caddr);
+         int stat = Wire2.endTransmission();
+         if (stat == 0)
+         {
+            Serial1.printf("I2C device found at address 0x%02x\n", i2caddr);
+            nDevices++;
+         }
+      }
+      if (!nDevices)
+         Serial1.printf("No devices\n");
+#ifdef ADC_MCP3221
+      Serial1.printf("I2C status=%d rawdata=%d ", mcp3221_0.ping(), mcp3221_0.getData());
+#endif
+#ifdef ADS1xxx
+      //     else Serial1.printf("I2C status=%d rawdata=%d pin0=%d pin1=%d\n", ads1014.isConnected() ? 0 : -1, ads1014.readADC_Differential_0_1(), ads1014.readADC(0), ads1014.readADC(1));
+      //    Serial1.println(ads1014.toVoltage(ads1014.readADC_Differential_0_1()), 5);
+      for (int i = 0; i < 10; i++)
+         Serial1.println(ads1014.getValue());
+      int dummy = 0;
+      uint32_t then = micros();
+      for (int i = 0; i < 1000; i++)
+         dummy += ads1014.getValue();
+      uint32_t now = micros();
+      Serial1.printf("1000 I2C readings take %d microseconds\n", now - then);
+#endif
+      for (int i = 0; i < 12; i++)
+         Serial1.printf("%u", digitalRead(inputPin[i]));
+      Serial1.println();
+      delay(1000);
+   }
 #endif
 }
 
@@ -128,21 +212,7 @@ void loop(void)
    dTime = longTime.extendTime(micros()) - irqTime;
    if (dTime > 5000) // Not doing interrupts - handle free-run
       ecat_slv();
-#else
-   Serial1.print("TIC ");
-   int tot = 0;
-   uint32_t before = millis();
-   for (int i = 0; i < 10000; i++)
-   {
-      int16_t raw = ADS.getValue();
-      tot += raw;
-   }
-   uint32_t after = millis();
 
-   int16_t value = ADS.getValue();
-   float fval = ADS.toVoltage(value);
-   Serial1.printf("Time för 10000=%d värdet=", after - before);
-   Serial1.println(fval);
 #endif
 }
 
