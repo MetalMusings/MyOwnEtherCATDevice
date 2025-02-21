@@ -140,9 +140,9 @@ They replace the THCAD board and comes with the entire chain from voltage readin
 
 Let's start with the plasma cutter. There is either a THTIC or THTIC2 mini-board, which reads the plasma torch voltage, and through a voltage divider lowers it to about 2 Volts during cutting. This voltage is converted by an analog to digital converter and feeds the digitized voltage to the EaserCAT 7000 board via an I2C bus (cable). The EaserCAT 7000 board makes the voltage available both as the raw read voltage for further scaling, or as a calibrated voltage using entered calibration constants.
 
-An important feature of THCTIC and THCTIC2 is that the plasma voltage side is isolated from the linuxcnc signal side. The isolation level is better than 1.5 kV. This is achieved by using an I2C isolator and an isolated DC-DC converter. The difference between the two is the choice of ADC. THTIC uses MCP3221 and THTIC2 uses ADS1014. Both are 12-bit analog to digital converters, ADS1014 is perhaps an 11-bit, both with sampling rates around 3 kHz. A newly measured voltage value can be obtained every 1 ms. Of course you only choose one of the two. Since it seemed pretty easy when I did it, I made two different ones. Always good to have options.
+An important feature of THCTIC and THCTIC2 is that the plasma voltage side is isolated from the linuxcnc signal side. The isolation level is better than 1.5 kV. This is achieved by an I2C isolator and an isolated DC-DC converter. The difference between the two cards is the choice of ADC. THTIC uses MCP3221 and THTIC2 uses ADS1014. Both are 12-bit analog to digital converters, ADS1014 is perhaps an 11-bit, both with sampling rates around 3 kHz. A newly measured voltage value can be obtained every 1 ms. Of course you only choose one of the two. Since it seemed pretty easy when I did it, I made two different ones. Always good to have options.
 
-The boards are relatively small, 55x32 mm. Voltage 5V in, current less than 0.1 mA. I2C Data and clock. 
+The boards are relatively small, 55x32 mm. Voltage 5V in, current less than 10 mA. I2C Data and clock. 
 
 ### THTIC
 ![THTIC](Utils/Pictures/THTIC-front.png) 
@@ -159,16 +159,17 @@ These are images of the prototype. The prototype is basically ok, need to give m
 ![THTIC2](Utils/Pictures/EaserCAT-7000.png)
 
 EaserCAT-7000 is an EaserCAT-6000 board where the THCAD frequency input has been replaced by the I2C bus.
+There are twelve digital inputs and four digital outputs.
 
-Configuration of the I2C device is done with the two SDOs 0x2000:0 and 0x2001:0.\
+Configuration of the connected I2C device is done with the two SDOs 0x2000:0 and 0x2001:0.\
 The I2C device type is set to 0 by default. A zero means no I2C ADC. Entering a 1 in 0x2000:0 selects the MCP3221, and a 2 in 0x2000:0 selects the ADS1014.\
 The I2C address for the ADC is written into SDO 0x2001:0. The address for the MCP3221 is selected when it is purchased - there are 8 different models each with a different I2C address 0x48-0x4f. The ADS1014 has a way to select the address, but the THTIC2 board has it fixed at 0x48.
 
-Pay attention to the polarity of when connecting the THTIC and THTIC2. Varc+ must have higher voltage potential the Varc- (as one would expect). The voltage divisor may need to be adjusted, there is now one 100 kOhm resistor and a 2.2 kOhm resistor, which brings down 100 V to around 2 V. Adjust as needed. For high voltage, pay attention to the max allowed voltage of the resistor.
+Pay attention to the polarity when connecting the plasma voltage leads the THTIC and THTIC2. Varc+ must have higher voltage potential the Varc- (as one would expect). The voltage divisor may need to be adjusted, there is now one 100 kOhm resistor and a 2.2 kOhm resistor, which brings down 100 V to around 2 V. Adjust as needed. For high voltage, pay attention to the max allowed voltage of the resistor. The ADC likes to have around 2-3 Volts when cutting.
 
 The experience with these cards has been very good so far. I have used the THTIC the most, cutting for at least an hour of cutting time, with THC enabled and active. A status variable shows that it has been working the whole time, no stops or resets. The THTIC2 has been used much less, but it behaves the same as the THTIC card, meaning it just works.
 
-### License
+## License
 
 Don't violate the original licenses. No warranties. Use it any way you like.\
 Remember: It is a hobby project, not a product.
