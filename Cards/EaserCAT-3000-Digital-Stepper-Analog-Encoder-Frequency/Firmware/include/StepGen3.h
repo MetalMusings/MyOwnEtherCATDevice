@@ -92,7 +92,12 @@ public:
     volatile uint64_t cnt = 0; // Debug counter
 #undef double
     StepGen3(void);
-    void updateStepGen(double pos_cmd1, double pos_cmd2, double pos_cmd3, double pos_cmd4, uint32_t servoPeriod);
+
+    void updateStepGen(double pos_cmd1, double pos_cmd2, double pos_cmd3, double pos_cmd4,
+                       float pos_scale1, float pos_scale2, float pos_scale3, float pos_scale4,
+                       float max_acc1, float max_acc2, float max_acc3, float max_acc4,
+                       uint8_t enable1, uint8_t enable2, uint8_t enable3, uint8_t enable4,
+                       uint32_t servoPeriod);
     void makeAllPulses(void);
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
@@ -130,6 +135,7 @@ private:
         {2, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 0};
 };
 
+// Initial values. Please update base_period using SDO, the others using PDOs
 // For the example 20000 ns => 50 kHz
 // It may be ok with over 100 kHz, it depends on the overall load. You just need to test.
 #define BASE_PERIOD 20000

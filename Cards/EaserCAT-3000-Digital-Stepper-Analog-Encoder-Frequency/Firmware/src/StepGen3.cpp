@@ -1107,7 +1107,7 @@ StepGen3::StepGen3(void)
     dirPin[3] = PE4;
 
     rtapi_app_main();
-    stepgen_array[0].pos_scale = JOINT_1_SCALE;
+    stepgen_array[0].pos_scale = JOINT_1_SCALE; // Can and should be overriden by PDO values
     stepgen_array[0].maxaccel = JOINT_1_STEPGEN_MAXACCEL;
     stepgen_array[1].pos_scale = JOINT_2_SCALE;
     stepgen_array[1].maxaccel = JOINT_2_STEPGEN_MAXACCEL;
@@ -1116,17 +1116,27 @@ StepGen3::StepGen3(void)
     stepgen_array[3].pos_scale = JOINT_4_SCALE;
     stepgen_array[3].maxaccel = JOINT_4_STEPGEN_MAXACCEL;
     stepgen_array[0].enable = stepgen_array[1].enable =
-        stepgen_array[2].enable = stepgen_array[3].enable = 1;
+        stepgen_array[2].enable = stepgen_array[3].enable = 0; // Note that they are off by default
 }
 
-void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2,
-                             double pos_cmd3, double pos_cmd4,
+void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2, double pos_cmd3, double pos_cmd4,
+                             float pos_scale1, float pos_scale2, float pos_scale3, float pos_scale4,
+                             float max_acc1, float max_acc2, float max_acc3, float max_acc4,
+                             uint8_t enable1, uint8_t enable2, uint8_t enable3, uint8_t enable4,
                              uint32_t servoPeriod)
 {
     stepgen_array[0].pos_cmd = pos_cmd1;
     stepgen_array[1].pos_cmd = pos_cmd2;
     stepgen_array[2].pos_cmd = pos_cmd3;
     stepgen_array[3].pos_cmd = pos_cmd4;
+    stepgen_array[0].pos_scale = pos_scale1;
+    stepgen_array[1].pos_scale = pos_scale2;
+    stepgen_array[2].pos_scale = pos_scale3;
+    stepgen_array[3].pos_scale = pos_scale4;
+    stepgen_array[0].maxaccel = max_acc1;
+    stepgen_array[1].maxaccel = max_acc2;
+    stepgen_array[2].maxaccel = max_acc3;
+    stepgen_array[3].maxaccel = max_acc4;
     for (int i = 0; i < num_chan; i++)
     {
         stepgen_t *step;

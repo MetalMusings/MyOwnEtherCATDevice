@@ -17,7 +17,10 @@ HardwareSerial Serial1(PA10, PA9);
 const byte INPUTS[8] = {PE8, PE9, PE10, PE11, PE12, PE13, PE14, PE15};
 const byte OUTPUTS[4] = {PC5, PB0, PB1, PE7};
 const byte THCAD_PIN = PA2; // CAN BE PA0, should be PA0
-                            // PA2 is connected to Timer 2, a 32-bit timer
+#define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
+#define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
+#define bitflip(byte, nbit) ((byte) ^= (1 << (nbit)))
+#define bitcheck(byte, nbit) ((byte) & (1 << (nbit)))
 
 ///// Analog out
 const byte DAC1_pin = PA4;
@@ -28,6 +31,10 @@ StepGen3 *Step = 0;
 HardwareTimer *baseTimer; // The base period timer
 uint32_t sync0CycleTime;  // nanosecs, often 1000000 ( 1 ms )
 volatile double posCmd1, posCmd2, posCmd3, posCmd4;
+volatile float posScale1, posScale2, posScale3, posScale4;
+volatile float maxAcc1, maxAcc2, maxAcc3, maxAcc4;
+volatile uint8_t enable1, enable2, enable3, enable4;
+volatile uint32_t basePeriod;
 volatile uint16_t basePeriodCnt;
 volatile uint16_t deltaMakePulsesCnt;
 volatile uint64_t makePulsesCnt = 0;
@@ -73,20 +80,30 @@ void globalInt(void);                         // ISR for INT line
 ////// EtherCAT routines called regularly, to read data, do stuff and write data
 void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 {
-   for (int i = 0; i < min(sizeof(Obj.Outputs), sizeof(OUTPUTS)); i++)
-      digitalWrite(OUTPUTS[i], Obj.Outputs[i] == 1 ? HIGH : LOW);
+   for (int i = 0; i < 4; i++)
+      digitalWrite(OUTPUTS[i], bitcheck(Obj.Output4, i) ? HIGH : LOW);
    // analogWrite(DAC1_pin, Obj.Voltage);
-   //Encoder1.setLatch(Obj.IndexLatchEnable);
+   // Encoder1.setLatch(Obj.IndexLatchEnable);
    // Encoder1.setScale(2000);
 
-   Step->stepgen_array[0].pos_scale = -Obj.StepsPerMM1; // Scale perhaps changed
-   Step->stepgen_array[1].pos_scale = -Obj.StepsPerMM2;
-   Step->stepgen_array[2].pos_scale = -Obj.StepsPerMM3;
-   Step->stepgen_array[3].pos_scale = -Obj.StepsPerMM4;
-   posCmd1 = Obj.CommandedPosition1; // The position update
-   posCmd2 = Obj.CommandedPosition2;
+   posScale1 = Obj.StepsPerMM1; // Scale perhaps changed
+   posScale2 = Obj.StepsPerMM2;
+   posScale3 = Obj.StepsPerMM3;
+   posScale4 = Obj.StepsPerMM4;
+   posCmd1 = Obj.CommandedPosition1; // The position update, etc
+   posCmd2 = Obj.CommandedPosition2; // Is recognised by the base Time loop
    posCmd3 = Obj.CommandedPosition3;
    posCmd4 = Obj.CommandedPosition4;
+   maxAcc1 = Obj.MaxAcceleration1;
+   maxAcc2 = Obj.MaxAcceleration2;
+   maxAcc3 = Obj.MaxAcceleration3;
+   maxAcc4 = Obj.MaxAcceleration4;
+   enable1 = Obj.Enable1;
+   enable2 = Obj.Enable2;
+   enable3 = Obj.Enable3;
+   enable4 = Obj.Enable4;
+   if (Obj.BasePeriod != 0) // Use default value from setup() if not set by SDO.
+      basePeriod = Obj.BasePeriod;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -97,8 +114,11 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       scale = Obj.Scale;
    Obj.Velocity = scale * sin(ESCvar.Time * 1e-8 * 6.28); // Test
 
-   for (int i = 0; i < min(sizeof(Obj.Inputs), sizeof(INPUTS)); i++)
-      Obj.Inputs[i] = digitalRead(INPUTS[i]) == HIGH ? 1 : 0;
+   for (int i = 0; i < 8; i++)
+      if (digitalRead(INPUTS[i]) == HIGH)
+         bitSet(Obj.Input8, i);
+      else
+         bitClear(Obj.Input8, i);
 #if 0
    Obj.IndexStatus = Encoder1.indexHappened();
    Obj.EncPos = Encoder1.currentPos();
@@ -157,12 +177,12 @@ void setup(void)
    Serial1.begin(115200);
    delay(1000); // To make terminal window ready
 
-   for (int i = 0; i < min(sizeof(Obj.Outputs), sizeof(OUTPUTS)); i++)
+   for (int i = 0; i < 4; i++)
    {
       pinMode(OUTPUTS[i], OUTPUT);
       digitalWrite(OUTPUTS[i], LOW);
    }
-   for (int i = 0; i < min(sizeof(Obj.Inputs), sizeof(INPUTS)); i++)
+   for (int i = 0; i < 8; i++)
       pinMode(INPUTS[i], INPUT);
    pinMode(DAC1_pin, OUTPUT);
    analogWrite(DAC1_pin, 0);
@@ -176,6 +196,8 @@ void setup(void)
    pinMode(PD11, OUTPUT); // Dir 3
    pinMode(PE5, OUTPUT);  // Step 4
    pinMode(PE4, OUTPUT);  // Dir 4
+
+   basePeriod = BASE_PERIOD; // Random-ish number, but it should work
 
    baseTimer = new HardwareTimer(TIM11);                        // The base period timer
    baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT); // Or the line above, This one is uncalibrated
@@ -319,10 +341,14 @@ void Rollover_IT_callback(void)
 void updateStepperGenerators(void)
 {
    baseTimer->pause();
-   Step->updateStepGen(posCmd1, posCmd2, posCmd3, posCmd4, sync0CycleTime); // Update positions
-   Step->makeAllPulses();                                                   // Make first step right here
-   basePeriodCnt = sync0CycleTime / BASE_PERIOD;                            //
-   baseTimer->refresh();                                                    //
+   Step->updateStepGen(posCmd1, posCmd2, posCmd3, posCmd4,
+                       posScale1, posScale2, posScale3, posScale4,
+                       maxAcc1, maxAcc2, maxAcc3, maxAcc4,
+                       enable1, enable2, enable3, enable4,
+                       sync0CycleTime);         // Update positions
+   Step->makeAllPulses();                       // Make first step right here
+   basePeriodCnt = sync0CycleTime / basePeriod; //
+   baseTimer->refresh();                        //
    baseTimer->resume();
    // Make the other steps in baseTimer's ISR
 }

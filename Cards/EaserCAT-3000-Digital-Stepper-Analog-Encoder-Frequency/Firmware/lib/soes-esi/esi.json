@@ -1,10 +1,10 @@
 {
   "form": {
     "VendorName": "MetalMusings",
-    "VendorID": "0xaaa",
-    "ProductCode": "0xcadcae",
+    "VendorID": "0xd0bed1d0",
+    "ProductCode": "0x3000",
     "ProfileNo": "5002",
-    "RevisionNumber": "0x001",
+    "RevisionNumber": "0x002",
     "SerialNumber": "0x001",
     "HWversion": "0.0.1",
     "SWversion": "0.0.1",
@@ -15,10 +15,10 @@
     "SM2Offset": "0x1600",
     "SM3Offset": "0x1A00",
     "TextGroupType": "MachineControl",
-    "TextGroupName5": "Plasma torch reader",
+    "TextGroupName5": "CNC control",
     "ImageName": "IMGCBY",
-    "TextDeviceType": "THCAD Reader ax58100",
-    "TextDeviceName": "MetalMusings EaserCAT 3000 test plasma torch reader",
+    "TextDeviceType": "CNC control",
+    "TextDeviceName": "MetalMusings EaserCAT 3000",
     "Port0Physical": "Y",
     "Port1Physical": "Y",
     "Port2Physical": " ",
@@ -34,6 +34,15 @@
   },
   "od": {
     "sdo": {
+      "2000": {
+        "otype": "VAR",
+        "name": "BasePeriod",
+        "access": "RW",
+        "dtype": "UNSIGNED32",
+        "value": "20000",
+        "isSDOitem": true,
+        "data": "&Obj.BasePeriod"
+      },
       "A": {
         "otype": "RECORD",
         "name": "Error Settings",
@@ -73,60 +82,6 @@
         "data": "&Obj.Velocity"
       },
       "6001": {
-        "otype": "ARRAY",
-        "name": "Inputs",
-        "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "IN1",
-            "data": "&Obj.Inputs[0]",
-            "value": "0"
-          },
-          {
-            "name": "IN2",
-            "value": "0",
-            "data": "&Obj.Inputs[1]"
-          },
-          {
-            "name": "IN3",
-            "value": "0",
-            "data": "&Obj.Inputs[2]"
-          },
-          {
-            "name": "IN4",
-            "value": "0",
-            "data": "&Obj.Inputs[3]"
-          },
-          {
-            "name": "IN5",
-            "value": "0",
-            "data": "&Obj.Inputs[4]"
-          },
-          {
-            "name": "IN6",
-            "value": "0",
-            "data": "&Obj.Inputs[5]"
-          },
-          {
-            "name": "IN7",
-            "value": "0",
-            "data": "&Obj.Inputs[6]"
-          },
-          {
-            "name": "IN8",
-            "value": "0",
-            "data": "&Obj.Inputs[7]"
-          }
-        ],
-        "pdo_mappings": [
-          "txpdo"
-        ],
-        "dtype": "UNSIGNED8"
-      },
-      "6002": {
         "otype": "VAR",
         "name": "Frequency",
         "access": "RO",
@@ -136,6 +91,17 @@
         "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.Frequency"
+      },
+      "6002": {
+        "otype": "VAR",
+        "name": "Input8",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Input8"
       },
       "6003": {
         "otype": "VAR",
@@ -191,42 +157,19 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "0",
+        "value": "1",
         "data": "&Obj.Scale"
       },
       "7001": {
-        "otype": "ARRAY",
-        "name": "Outputs",
+        "otype": "VAR",
+        "name": "Output4",
         "access": "RO",
-        "items": [
-          {
-            "name": "Max SubIndex"
-          },
-          {
-            "name": "OUT1",
-            "data": "&Obj.Outputs[0]",
-            "value": "0"
-          },
-          {
-            "name": "OUT2",
-            "value": "0",
-            "data": "&Obj.Outputs[1]"
-          },
-          {
-            "name": "OUT3",
-            "value": "0",
-            "data": "&Obj.Outputs[2]"
-          },
-          {
-            "name": "OUT4",
-            "value": "0",
-            "data": "&Obj.Outputs[3]"
-          }
-        ],
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "UNSIGNED8"
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Output4"
       },
       "7002": {
         "otype": "VAR",
@@ -279,8 +222,8 @@
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "INTEGER32",
-        "value": "0",
+        "dtype": "REAL32",
+        "value": "100",
         "data": "&Obj.StepsPerMM1"
       },
       "7007": {
@@ -290,8 +233,8 @@
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "INTEGER32",
-        "value": "0",
+        "dtype": "REAL32",
+        "value": "100",
         "data": "&Obj.StepsPerMM2"
       },
       "7008": {
@@ -301,8 +244,8 @@
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "INTEGER32",
-        "value": "0",
+        "dtype": "REAL32",
+        "value": "100",
         "data": "&Obj.StepsPerMM3"
       },
       "7009": {
@@ -312,9 +255,31 @@
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "INTEGER32",
-        "value": "0",
+        "dtype": "REAL32",
+        "value": "100",
         "data": "&Obj.StepsPerMM4"
+      },
+      "7010": {
+        "otype": "VAR",
+        "name": "Enable3",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Enable3"
+      },
+      "7011": {
+        "otype": "VAR",
+        "name": "Enable4",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Enable4"
       },
       "60664": {
         "otype": "VAR",
@@ -325,6 +290,72 @@
         ],
         "dtype": "INTEGER32",
         "value": "0"
+      },
+      "700D": {
+        "otype": "VAR",
+        "name": "MaxAcceleration4",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "10000",
+        "data": "&Obj.MaxAcceleration4"
+      },
+      "700C": {
+        "otype": "VAR",
+        "name": "MaxAcceleration3",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "10000",
+        "data": "&Obj.MaxAcceleration3"
+      },
+      "700E": {
+        "otype": "VAR",
+        "name": "Enable1",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Enable1"
+      },
+      "700F": {
+        "otype": "VAR",
+        "name": "Enable2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.Enable2"
+      },
+      "700A": {
+        "otype": "VAR",
+        "name": "MaxAcceleration1",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "10000",
+        "data": "&Obj.MaxAcceleration1"
+      },
+      "700B": {
+        "otype": "VAR",
+        "name": "MaxAcceleration2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "10000",
+        "data": "&Obj.MaxAcceleration2"
       }
     }
   },

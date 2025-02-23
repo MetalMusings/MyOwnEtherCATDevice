@@ -14,8 +14,8 @@ typedef struct
    /* Inputs */
 
    float Velocity;
-   uint8_t Inputs[8];
    float Frequency;
+   uint8_t Input8;
    float ActualPosition1;
    float ActualPosition2;
    float ActualPosition3;
@@ -24,16 +24,27 @@ typedef struct
    /* Outputs */
 
    float Scale;
-   uint8_t Outputs[4];
+   uint8_t Output4;
    float CommandedPosition1;
    float CommandedPosition2;
    float CommandedPosition3;
    float CommandedPosition4;
-   int32_t StepsPerMM1;
-   int32_t StepsPerMM2;
-   int32_t StepsPerMM3;
-   int32_t StepsPerMM4;
+   float StepsPerMM1;
+   float StepsPerMM2;
+   float StepsPerMM3;
+   float StepsPerMM4;
+   float MaxAcceleration1;
+   float MaxAcceleration2;
+   float MaxAcceleration3;
+   float MaxAcceleration4;
+   uint8_t Enable1;
+   uint8_t Enable2;
+   uint8_t Enable3;
+   uint8_t Enable4;
 
+   /* Parameters */
+
+   uint32_t BasePeriod;
 } _Objects;
 
 extern _Objects Obj;
