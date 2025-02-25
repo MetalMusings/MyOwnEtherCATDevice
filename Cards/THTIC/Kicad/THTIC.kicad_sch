@@ -5308,7 +5308,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Diode_SMD:D_SOD-323_HandSoldering"
 			(at 106.68 82.55 0)
 			(effects
 				(font
