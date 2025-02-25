@@ -6975,7 +6975,7 @@
 		(layer "Edge.Cuts")
 		(uuid "b65e0577-ae40-4e40-8b2d-baa5a05084c9")
 	)
-	(gr_text "MetalMusings THTIC\nMarch 2025"
+	(gr_text "MetalMusings THTIC2\nMarch 2025"
 		(at 180.848 95.377 0)
 		(layer "B.SilkS")
 		(uuid "347a0bd7-f244-49bd-a0e7-e1c226dcfc67")
