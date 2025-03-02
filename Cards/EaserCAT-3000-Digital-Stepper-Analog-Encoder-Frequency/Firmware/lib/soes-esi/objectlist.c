@@ -374,7 +374,7 @@ const _objd SDO6006[] =
 };
 const _objd SDO7000[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7000, 0x3f800000, &Obj.Scale},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7000, 0x00000000, &Obj.Scale},
 };
 const _objd SDO7001[] =
 {
@@ -398,35 +398,35 @@ const _objd SDO7005[] =
 };
 const _objd SDO7006[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7006, 0x42c80000, &Obj.StepsPerMM1},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7006, 0x00000000, &Obj.StepsPerMM1},
 };
 const _objd SDO7007[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7007, 0x42c80000, &Obj.StepsPerMM2},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7007, 0x00000000, &Obj.StepsPerMM2},
 };
 const _objd SDO7008[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7008, 0x42c80000, &Obj.StepsPerMM3},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7008, 0x00000000, &Obj.StepsPerMM3},
 };
 const _objd SDO7009[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7009, 0x42c80000, &Obj.StepsPerMM4},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7009, 0x00000000, &Obj.StepsPerMM4},
 };
 const _objd SDO700A[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700A, 0x461c4000, &Obj.MaxAcceleration1},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700A, 0x00000000, &Obj.MaxAcceleration1},
 };
 const _objd SDO700B[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700B, 0x461c4000, &Obj.MaxAcceleration2},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700B, 0x00000000, &Obj.MaxAcceleration2},
 };
 const _objd SDO700C[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700C, 0x461c4000, &Obj.MaxAcceleration3},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700C, 0x00000000, &Obj.MaxAcceleration3},
 };
 const _objd SDO700D[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700D, 0x461c4000, &Obj.MaxAcceleration4},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700D, 0x00000000, &Obj.MaxAcceleration4},
 };
 const _objd SDO700E[] =
 {

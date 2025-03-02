@@ -157,7 +157,7 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "1",
+        "value": "0",
         "data": "&Obj.Scale"
       },
       "7001": {
@@ -223,7 +223,7 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "100",
+        "value": "0",
         "data": "&Obj.StepsPerMM1"
       },
       "7007": {
@@ -234,7 +234,7 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "100",
+        "value": "0",
         "data": "&Obj.StepsPerMM2"
       },
       "7008": {
@@ -245,7 +245,7 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "100",
+        "value": "0",
         "data": "&Obj.StepsPerMM3"
       },
       "7009": {
@@ -256,7 +256,7 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "100",
+        "value": "0",
         "data": "&Obj.StepsPerMM4"
       },
       "7010": {
@@ -291,16 +291,27 @@
         "dtype": "INTEGER32",
         "value": "0"
       },
-      "700D": {
+      "700A": {
         "otype": "VAR",
-        "name": "MaxAcceleration4",
+        "name": "MaxAcceleration1",
         "access": "RO",
         "pdo_mappings": [
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "10000",
-        "data": "&Obj.MaxAcceleration4"
+        "value": "0",
+        "data": "&Obj.MaxAcceleration1"
+      },
+      "700B": {
+        "otype": "VAR",
+        "name": "MaxAcceleration2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.MaxAcceleration2"
       },
       "700C": {
         "otype": "VAR",
@@ -310,8 +321,19 @@
           "rxpdo"
         ],
         "dtype": "REAL32",
-        "value": "10000",
+        "value": "0",
         "data": "&Obj.MaxAcceleration3"
+      },
+      "700D": {
+        "otype": "VAR",
+        "name": "MaxAcceleration4",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.MaxAcceleration4"
       },
       "700E": {
         "otype": "VAR",
@@ -334,28 +356,6 @@
         "dtype": "UNSIGNED8",
         "value": "0",
         "data": "&Obj.Enable2"
-      },
-      "700A": {
-        "otype": "VAR",
-        "name": "MaxAcceleration1",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "10000",
-        "data": "&Obj.MaxAcceleration1"
-      },
-      "700B": {
-        "otype": "VAR",
-        "name": "MaxAcceleration2",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "10000",
-        "data": "&Obj.MaxAcceleration2"
       }
     }
   },
