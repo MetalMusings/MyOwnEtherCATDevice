@@ -113,7 +113,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
          ads1014_reset();
          old_I2Cdevice = ADS1014_TYPE;
       }
-      data0 = ads1014->getValue();
+      data0 = ads1014->getValue(); 
       stat = ads1014->isConnected() == 1 ? 0 : 1;
       break;
    default: // Not supported
@@ -198,8 +198,10 @@ void setup(void)
    ecat_slv_init(&config);
 #endif
 
-#if 0 // Uncomment for commissioning tests
+#if 1 // Uncomment for commissioning tests
+// #define only one of the below
 #define ADS1xxx
+#undef ADC_MCP3221
    digitalWrite(outputPin[0], HIGH); // All four output leds should go high
    digitalWrite(outputPin[1], HIGH);
    digitalWrite(outputPin[2], HIGH);
@@ -211,7 +213,7 @@ void setup(void)
    ads1014 = new ADS1014(0x48, &Wire2);
    ads1014_reset();
 #endif
-   while (1) // Apply voltage over the inputs 0-11 and see response in terminal
+   while (1) // Search I2C bus for devices
    {
       int nDevices = 0;
       for (int i2caddr = 1; i2caddr < 127; i2caddr++)
