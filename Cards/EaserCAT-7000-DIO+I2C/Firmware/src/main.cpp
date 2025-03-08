@@ -198,7 +198,7 @@ void setup(void)
    ecat_slv_init(&config);
 #endif
 
-#if 1 // Uncomment for commissioning tests
+#if 0 // Uncomment for commissioning tests
 // #define only one of the below
 #define ADS1xxx
 #undef ADC_MCP3221
