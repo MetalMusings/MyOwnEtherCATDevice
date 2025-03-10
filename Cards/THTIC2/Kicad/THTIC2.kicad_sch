@@ -3558,7 +3558,7 @@
 		)
 		(uuid "df56f7ac-826c-40a4-abc7-ebd3b2b28cb4")
 	)
-	(text "Typical Varc=100V\nRange 0-200V\nOp-amp range 0-5V\nR1=(200/5-1)*R0\nR1=39*R0\nLimited assortment of resistors \nthat can handle 200V+,\nchoose 100k 2512, allowed 500V.\nR0 = 100k/39 = 2.56k\nchoose 2k7\nWill need calibration anyway"
+	(text "Typical Varc=100V\nRange 0-200V\nOp-amp range 0-4V\nR1=(200/4-1)*R0\nR1=49*R0\nLimited assortment of resistors \nthat can handle 200V+,\nchoose 100k 2512, allowed 500V.\nR0 = 100k/49 = 2.04k\nchoose 2k\nWill need calibration anyway"
 		(exclude_from_sim no)
 		(at 93.98 36.83 0)
 		(effects
@@ -3752,7 +3752,7 @@
 				)
 			)
 		)
-		(property "Value" "2k7"
+		(property "Value" "2k"
 			(at 91.694 78.486 90)
 			(effects
 				(font

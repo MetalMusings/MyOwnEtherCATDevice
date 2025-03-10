@@ -60,6 +60,8 @@ I gave up and let it sit for over half a year. It was first when someone came an
 questions around it I had another look. I built a new board, and it all started to work.
 At time of writing it all seems to work.
 
+The latest vesion of the firmware has all parameters for step generators as PDOs.
+
 [Link here](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/)
 
 ## EaserCAT 4000 - THCAD reader
@@ -140,20 +142,23 @@ They replace the THCAD board and comes with the entire chain from voltage readin
 
 Let's start with the plasma cutter. There is either a THTIC or THTIC2 mini-board, which reads the plasma torch voltage, and through a voltage divider lowers it to about 2 Volts during cutting. This voltage is converted by an analog to digital converter and feeds the digitized voltage to the EaserCAT 7000 board via an I2C bus (cable). The EaserCAT 7000 board makes the voltage available both as the raw read voltage for further scaling, or as a calibrated voltage using entered calibration constants.
 
+The plasma torch voltage is DCEN - DC Electrode Negative. The workpiece ground is often connected to ground/earth.
+With ground as the reference voltage, the plasma torch voltage ranges between 0 V and -200 V.
+An inverting operational amplifier switches the polarity for the ADC. The ground planes on the circuit board are connected to the workpiece ground.
+
 An important feature of THCTIC and THCTIC2 is that the plasma voltage side is isolated from the linuxcnc signal side. The isolation level is better than 1.5 kV. This is achieved by an I2C isolator and an isolated DC-DC converter. The difference between the two cards is the choice of ADC. THTIC uses MCP3221 and THTIC2 uses ADS1014. Both are 12-bit analog to digital converters, ADS1014 is perhaps an 11-bit, both with sampling rates around 3 kHz. A newly measured voltage value can be obtained every 1 ms. Of course you only choose one of the two. Since it seemed pretty easy when I did it, I made two different ones. Always good to have options.
 
-The boards are relatively small, 55x32 mm. Voltage 5V in, current less than 10 mA. I2C Data and clock. 
+The boards are relatively small, 42x30 mm. Voltage 5V in, current less than 10 mA. I2C Data and clock. 
 
 ### THTIC
 ![THTIC](Utils/Pictures/THTIC-front.png) 
 ![THTIC](Utils/Pictures/THTIC-back.png)
-I'll fix the SDL misspelling, it's the I2C clock line.
+This shows an earlier version of the board.
 
 ### THTIC2
-
-These are images of the prototype. The prototype is basically ok, need to give more space for the dc-dc converter, the connector crashes into it. And add footprints for optional I2C pullups.
 ![THTIC2](Utils/Pictures/THTIC2-front.png) 
 ![THTIC2](Utils/Pictures/THTIC2-back.png)
+Also here is an earlier version of the board.
 
 ### EaserCAT-7000 Digital IO and I2C voltage reader
 ![THTIC2](Utils/Pictures/EaserCAT-7000.png)
