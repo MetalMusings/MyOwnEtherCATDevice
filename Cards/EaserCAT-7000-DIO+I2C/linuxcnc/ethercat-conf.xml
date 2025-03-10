@@ -1,0 +1,52 @@
+    <slave idx="3" name="THTIC" type="generic" vid="0xd0bed1d0" pid="0x00007000">
+      <!--MetalMusings EaserCAT 7000-->
+      <sdoConfig idx="2000" subIdx="0"><sdoDataRaw data ="02"/></sdoConfig> <!-- ADC device type, 1 = MCP3221, 2 = ADS1014 -->
+      <sdoConfig idx="2001" subIdx="0"><sdoDataRaw data ="48"/></sdoConfig> <!-- I2C device address often 0x48 -->
+      <syncManager idx="0" dir="in"/>
+      <syncManager idx="1" dir="out"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1600">
+          <pdoEntry idx="7000" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
+            <complexEntry bitLen="4"/>
+          </pdoEntry>
+        </pdo>
+        <pdo idx="1601">
+          <pdoEntry idx="7001" subIdx="00" bitLen="32" halPin="voltageScale" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1602">
+          <pdoEntry idx="7002" subIdx="00" bitLen="32" halPin="voltageOffset" halType="float-ieee"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a00">
+          <pdoEntry idx="6000" subIdx="00" bitLen="32" halType="complex">
+            <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-9" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-10" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-11" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-12" halType="bit"/>
+            <complexEntry bitLen="20"/>
+          </pdoEntry>
+        </pdo>
+        <pdo idx="1a01">
+          <pdoEntry idx="6001" subIdx="00" bitLen="32" halPin="rawData" halType="s32"/>
+        </pdo>
+        <pdo idx="1a02">
+          <pdoEntry idx="6002" subIdx="00" bitLen="32" halPin="calculatedVoltage" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a03">
+          <pdoEntry idx="6003" subIdx="00" bitLen="8" halPin="status" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>

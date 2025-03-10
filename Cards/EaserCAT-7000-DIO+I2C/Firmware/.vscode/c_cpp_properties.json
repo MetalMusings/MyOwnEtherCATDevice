@@ -108,7 +108,7 @@
                 "PLATFORMIO=60117",
                 "STM32F407xx",
                 "STM32F4",
-                "NOECAT",
+                "ECAT",
                 "STM32F4xx",
                 "ARDUINO=10808",
                 "ARDUINO_ARCH_STM32",

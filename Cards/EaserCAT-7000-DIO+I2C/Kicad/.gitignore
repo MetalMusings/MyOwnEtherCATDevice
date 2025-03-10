@@ -1,2 +1,10 @@
 Gerbers
 
+
+# Exported BOM files
+*.xml
+*.csv
+*.step
+*.stp
+*.stl
+.~lock.*

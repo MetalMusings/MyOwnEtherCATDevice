@@ -48,3 +48,11 @@ fp-info-cache
 Gerbers\*
 *.zip
 
+
+# Exported BOM files
+*.xml
+*.csv
+*.step
+*.stp
+*.stl
+.~lock.*
