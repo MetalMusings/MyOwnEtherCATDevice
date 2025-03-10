@@ -153,12 +153,10 @@ The boards are relatively small, 42x30 mm. Voltage 5V in, current less than 10 m
 ### THTIC
 ![THTIC](Utils/Pictures/THTIC-front.png) 
 ![THTIC](Utils/Pictures/THTIC-back.png)
-This shows an earlier version of the board.
 
 ### THTIC2
 ![THTIC2](Utils/Pictures/THTIC2-front.png) 
 ![THTIC2](Utils/Pictures/THTIC2-back.png)
-Also here is an earlier version of the board.
 
 ### EaserCAT-7000 Digital IO and I2C voltage reader
 ![THTIC2](Utils/Pictures/EaserCAT-7000.png)
