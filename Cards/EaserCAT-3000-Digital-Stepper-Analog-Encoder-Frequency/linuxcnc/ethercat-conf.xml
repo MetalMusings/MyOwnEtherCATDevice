@@ -1,32 +1,105 @@
-<masters>
-  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="5">
-    <slave idx="5" type="generic" vid="00aaa" pid="0x00cadcae" configPdos="true">
+    <slave idx="0" name="E3000" type="generic" vid="0xd0bed1d0" pid="0x00003000">
+      <!--MetalMusings EaserCAT 3000-->
       <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+      <syncManager idx="0" dir="in"/>
+      <syncManager idx="1" dir="out"/>
       <syncManager idx="2" dir="out">
-        <pdo idx="1600">
-          <pdoEntry idx="7000" subIdx="00" bitLen="32" halPin="enc-pos-scale" halType="float-ieee"/>
+	<pdo idx="1600">
+          <pdoEntry idx="7000" subIdx="00" bitLen="32" halPin="Scale" halType="float-ieee"/>
         </pdo>
         <pdo idx="1601">
-          <pdoEntry idx="7001" subIdx="01" bitLen="8" halPin="DO1" halType="u32"/>
-          <pdoEntry idx="7001" subIdx="02" bitLen="8" halPin="DO2" halType="u32"/>
-          <pdoEntry idx="7001" subIdx="03" bitLen="8" halPin="DO3" halType="u32"/>
-          <pdoEntry idx="7001" subIdx="04" bitLen="8" halPin="DO4" halType="u32"/>
+          <pdoEntry idx="7001" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
+          </pdoEntry>
         </pdo>
         <pdo idx="1602">
-          <pdoEntry idx="7002" subIdx="00" bitLen="32" halPin="commanded-position1" halType="float-ieee"/>
+          <pdoEntry idx="7002" subIdx="00" bitLen="32" halPin="CommandedPosition1" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1603">
+          <pdoEntry idx="7003" subIdx="00" bitLen="32" halPin="CommandedPosition2" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1604">
+          <pdoEntry idx="7004" subIdx="00" bitLen="32" halPin="CommandedPosition3" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1605">
+          <pdoEntry idx="7005" subIdx="00" bitLen="32" halPin="CommandedPosition4" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1606">
+          <pdoEntry idx="7006" subIdx="00" bitLen="32" halPin="StepsPerMM1" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1607">
+          <pdoEntry idx="7007" subIdx="00" bitLen="32" halPin="StepsPerMM2" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1608">
+          <pdoEntry idx="7008" subIdx="00" bitLen="32" halPin="StepsPerMM3" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1609">
+          <pdoEntry idx="7009" subIdx="00" bitLen="32" halPin="StepsPerMM4" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="160a">
+          <pdoEntry idx="700a" subIdx="00" bitLen="32" halPin="MaxAcceleration1" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="160b">
+          <pdoEntry idx="700b" subIdx="00" bitLen="32" halPin="MaxAcceleration2" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="160c">
+          <pdoEntry idx="700c" subIdx="00" bitLen="32" halPin="MaxAcceleration3" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="160d">
+          <pdoEntry idx="700d" subIdx="00" bitLen="32" halPin="MaxAcceleration4" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="160e">
+          <pdoEntry idx="700e" subIdx="00" bitLen="8" halPin="Enable1" halType="bit"/>
+        </pdo>
+        <pdo idx="160f">
+          <pdoEntry idx="700f" subIdx="00" bitLen="8" halPin="Enable2" halType="bit"/>
+        </pdo>
+        <pdo idx="1610">
+          <pdoEntry idx="7010" subIdx="00" bitLen="8" halPin="Enable3" halType="bit"/>
+        </pdo>
+        <pdo idx="1611">
+          <pdoEntry idx="7011" subIdx="00" bitLen="8" halPin="Enable4" halType="bit"/>
         </pdo>
       </syncManager>
       <syncManager idx="3" dir="in">
+        <pdo idx="1a00">
+          <pdoEntry idx="6000" subIdx="01" bitLen="32" halPin="Velocity" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a01">
+          <pdoEntry idx="6001" subIdx="01" bitLen="32" halPin="Frequency" halType="float-ieee"/>
+        </pdo>
         <pdo idx="1a01">
           <pdoEntry idx="6001" subIdx="01" bitLen="8" halPin="DI1" halType="u32"/>
           <pdoEntry idx="6001" subIdx="02" bitLen="8" halPin="DI2" halType="u32"/>
           <pdoEntry idx="6001" subIdx="03" bitLen="8" halPin="DI3" halType="u32"/>
           <pdoEntry idx="6001" subIdx="04" bitLen="8" halPin="DI4" halType="u32"/>
         </pdo>
+	<pdo idx="1a02">
+          <pdoEntry idx="6002" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
+          </pdoEntry>
+        </pdo>
         <pdo idx="1a03">
-          <pdoEntry idx="6003" subIdx="00" bitLen="32" halPin="actual-position1" halType="float-ieee"/>
+          <pdoEntry idx="6003" subIdx="01" bitLen="32" halPin="ActualPosition1" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a04">
+          <pdoEntry idx="6004" subIdx="01" bitLen="32" halPin="ActualPosition2" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a05">
+          <pdoEntry idx="6005" subIdx="01" bitLen="32" halPin="ActualPosition3" halType="float-ieee"/>
+        </pdo>
+        <pdo idx="1a06">
+          <pdoEntry idx="6006" subIdx="01" bitLen="32" halPin="ActualPosition4" halType="float-ieee"/>
         </pdo>
       </syncManager> 
     </slave>
-  </master>
-</masters>
