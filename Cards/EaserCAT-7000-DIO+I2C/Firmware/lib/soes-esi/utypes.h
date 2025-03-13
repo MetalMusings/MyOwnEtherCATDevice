@@ -17,17 +17,20 @@ typedef struct
    int32_t RawData;
    float CalculatedVoltage;
    uint8_t Status;
+   float LowpassFilteredVoltage;
 
    /* Outputs */
 
    uint8_t Output4;
    float VoltageScale;
    float VoltageOffset;
+   float LowPassFilterThresholdVoltage;
 
    /* Parameters */
 
    uint8_t I2C_devicetype;
    uint8_t I2C_address;
+   uint32_t LowpassFilterPoleFrequency;
 } _Objects;
 
 extern _Objects Obj;

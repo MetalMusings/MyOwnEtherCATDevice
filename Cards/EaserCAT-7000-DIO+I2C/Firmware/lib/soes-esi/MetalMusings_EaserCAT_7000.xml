@@ -148,6 +148,30 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT1603</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>LowPassFilterThresholdVoltage</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT1A00</Name>
                 <BitSize>48</BitSize>
                 <SubItem>
@@ -244,6 +268,30 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT1A04</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>LowpassFilteredVoltage</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT1C00ARR</Name>
                 <BaseType>USINT</BaseType>
                 <BitSize>32</BitSize>
@@ -278,38 +326,6 @@
               <DataType>
                 <Name>DT1C12ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>48</BitSize>
-                <ArrayInfo>
-                  <LBound>1</LBound>
-                  <Elements>3</Elements>
-                </ArrayInfo>
-              </DataType>
-              <DataType>
-                <Name>DT1C12</Name>
-                <BitSize>64</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <Name>Elements</Name>
-                  <Type>DT1C12ARR</Type>
-                  <BitSize>48</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT1C13ARR</Name>
-                <BaseType>UINT</BaseType>
                 <BitSize>64</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
@@ -317,7 +333,7 @@
                 </ArrayInfo>
               </DataType>
               <DataType>
-                <Name>DT1C13</Name>
+                <Name>DT1C12</Name>
                 <BitSize>80</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
@@ -331,8 +347,40 @@
                 </SubItem>
                 <SubItem>
                   <Name>Elements</Name>
-                  <Type>DT1C13ARR</Type>
+                  <Type>DT1C12ARR</Type>
                   <BitSize>64</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1C13ARR</Name>
+                <BaseType>UINT</BaseType>
+                <BitSize>80</BitSize>
+                <ArrayInfo>
+                  <LBound>1</LBound>
+                  <Elements>5</Elements>
+                </ArrayInfo>
+              </DataType>
+              <DataType>
+                <Name>DT1C13</Name>
+                <BitSize>96</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <Name>Elements</Name>
+                  <Type>DT1C13ARR</Type>
+                  <BitSize>80</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -526,6 +574,28 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x1603</Index>
+                <Name>LowPassFilterThresholdVoltage</Name>
+                <Type>DT1603</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>LowPassFilterThresholdVoltage</Name>
+                    <Info>
+                      <DefaultValue>#x70030020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x1A00</Index>
                 <Name>Input12</Name>
                 <Type>DT1A00</Type>
@@ -614,6 +684,28 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x1A04</Index>
+                <Name>LowpassFilteredVoltage</Name>
+                <Type>DT1A04</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>LowpassFilteredVoltage</Name>
+                    <Info>
+                      <DefaultValue>#x60040020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x1C00</Index>
                 <Name>Sync Manager Communication Type</Name>
                 <Type>DT1C00</Type>
@@ -657,12 +749,12 @@
                 <Index>#x1C12</Index>
                 <Name>Sync Manager 2 PDO Assignment</Name>
                 <Type>DT1C12</Type>
-                <BitSize>64</BitSize>
+                <BitSize>80</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>3</DefaultValue>
+                      <DefaultValue>4</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -683,6 +775,12 @@
                       <DefaultValue>#x1602</DefaultValue>
                     </Info>
                   </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1603</DefaultValue>
+                    </Info>
+                  </SubItem>
                 </Info>
                 <Flags>
                 </Flags>
@@ -691,12 +789,12 @@
                 <Index>#x1C13</Index>
                 <Name>Sync Manager 3 PDO Assignment</Name>
                 <Type>DT1C13</Type>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>4</DefaultValue>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -723,6 +821,12 @@
                       <DefaultValue>#x1A03</DefaultValue>
                     </Info>
                   </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1A04</DefaultValue>
+                    </Info>
+                  </SubItem>
                 </Info>
                 <Flags>
                 </Flags>
@@ -744,6 +848,18 @@
                 <Name>I2C_address</Name>
                 <Type>USINT</Type>
                 <BitSize>8</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2002</Index>
+                <Name>LowpassFilterPoleFrequency</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
@@ -804,6 +920,19 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x6004</Index>
+                <Name>LowpassFilteredVoltage</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x7000</Index>
                 <Name>Output4</Name>
                 <Type>USINT</Type>
@@ -832,6 +961,19 @@
               <Object>
                 <Index>#x7002</Index>
                 <Name>VoltageOffset</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7003</Index>
+                <Name>LowPassFilterThresholdVoltage</Name>
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
@@ -885,6 +1027,17 @@
             <DataType>REAL</DataType>
           </Entry>
         </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1603</Index>
+          <Name>LowPassFilterThresholdVoltage</Name>
+          <Entry>
+            <Index>#x7003</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>LowPassFilterThresholdVoltage</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A00</Index>
           <Name>Input12</Name>
@@ -927,6 +1080,17 @@
             <BitLen>8</BitLen>
             <Name>Status</Name>
             <DataType>USINT</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Mandatory="true" Sm="3">
+          <Index>#x1A04</Index>
+          <Name>LowpassFilteredVoltage</Name>
+          <Entry>
+            <Index>#x6004</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>LowpassFilteredVoltage</Name>
+            <DataType>REAL</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">

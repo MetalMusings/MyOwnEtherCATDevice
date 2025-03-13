@@ -52,6 +52,15 @@
         "isSDOitem": true,
         "data": "&Obj.I2C_address"
       },
+      "2002": {
+        "otype": "VAR",
+        "name": "LowpassFilterPoleFrequency",
+        "access": "RW",
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "isSDOitem": true,
+        "data": "&Obj.LowpassFilterPoleFrequency"
+      },
       "A": {
         "otype": "RECORD",
         "name": "Error Settings",
@@ -122,6 +131,17 @@
         "dtype": "UNSIGNED8",
         "value": "0",
         "data": "&Obj.Status"
+      },
+      "6004": {
+        "otype": "VAR",
+        "name": "LowpassFilteredVoltage",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.LowpassFilteredVoltage"
       }
     },
     "rxpdo": {
@@ -157,6 +177,17 @@
         "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.VoltageOffset"
+      },
+      "7003": {
+        "otype": "VAR",
+        "name": "LowPassFilterThresholdVoltage",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.LowPassFilterThresholdVoltage"
       },
       "60664": {
         "otype": "VAR",

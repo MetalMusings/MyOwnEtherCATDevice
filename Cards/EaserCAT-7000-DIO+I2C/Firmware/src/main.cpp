@@ -46,6 +46,7 @@ void ads1014_reset()
 #define bitcheck(byte, nbit) ((byte) & (1 << (nbit)))
 
 volatile uint16_t ALEventIRQ; // ALEvent that caused the interrupt
+extern "C" uint32_t ESC_SYNC0cycletime(void);
 
 void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 {
@@ -53,6 +54,9 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
    for (int i = 0; i < sizeof(outputPin); i++)
       digitalWrite(outputPin[i], bitcheck(Obj.Output4, i) ? HIGH : LOW);
 }
+
+float oldLowPassGain = 0;
+uint32_t oldLowpassFilterPoleFrequency = 0;
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
@@ -113,7 +117,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
          ads1014_reset();
          old_I2Cdevice = ADS1014_TYPE;
       }
-      data0 = ads1014->getValue(); 
+      data0 = ads1014->getValue();
       stat = ads1014->isConnected() == 1 ? 0 : 1;
       break;
    default: // Not supported
@@ -141,6 +145,19 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
       // mcp3221 has no reset, reset the I2C bus is the best we can do
    }
    Obj.Status = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
+
+   // Low pass filter. See lowpass in linuxcnc doc
+   float gain = oldLowPassGain;
+   if (oldLowpassFilterPoleFrequency != Obj.LowpassFilterPoleFrequency)
+   {
+      gain = 1 - expf(-2.0 * M_PI * Obj.LowpassFilterPoleFrequency * 1.0e-9 * ESC_SYNC0cycletime());
+      oldLowPassGain = gain;
+      oldLowpassFilterPoleFrequency = Obj.LowpassFilterPoleFrequency;
+   }
+   if (Obj.CalculatedVoltage < Obj.LowPassFilterThresholdVoltage)
+      Obj.LowpassFilteredVoltage = Obj.CalculatedVoltage; // Just forward
+   else
+      Obj.LowpassFilteredVoltage += (Obj.CalculatedVoltage - Obj.LowpassFilteredVoltage) * gain;
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -319,8 +336,6 @@ void ESC_interrupt_disable(uint32_t mask)
       ESC_write(0x5c, &bits, 4);
    }
 }
-
-extern "C" uint32_t ESC_SYNC0cycletime(void);
 
 // Setup of DC
 uint16_t dc_checker(void)
