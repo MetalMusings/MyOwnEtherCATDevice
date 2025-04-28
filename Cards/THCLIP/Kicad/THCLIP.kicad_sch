@@ -1735,6 +1735,17 @@
 		)
 		(uuid "27e903f8-2cda-408a-b35c-af8280e3ce25")
 	)
+	(text "Relay\n-----\nMeasured 10-12 A during blow back start/blow back arc.\nThis the current that will go through the relay during start.'\nAny 24VDC >20A relay with less than 2W power draw works.\n2W is coil current 83 mA, dc-dc converter spec says 3 W/125 mA."
+		(exclude_from_sim no)
+		(at 22.86 83.566 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "efdba791-5331-4111-a184-bb1ee3633e5a")
+	)
 	(global_label "Connected during sensing"
 		(shape input)
 		(at 86.36 50.8 0)
