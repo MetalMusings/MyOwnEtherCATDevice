@@ -56,7 +56,10 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 }
 
 float oldLowPassGain = 0;
+float oldLowPassFilteredVoltage = 0;
 uint32_t oldLowpassFilterPoleFrequency = 0;
+
+uint32_t timeSinceOhmicSensingEnabled = 0;
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
@@ -150,14 +153,32 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    float gain = oldLowPassGain;
    if (oldLowpassFilterPoleFrequency != Obj.LowpassFilterPoleFrequency)
    {
-      gain = 1 - expf(-2.0 * M_PI * Obj.LowpassFilterPoleFrequency * 1.0e-9 * ESC_SYNC0cycletime());
+      gain = 1 - expf(-2.0 * M_PI * Obj.LowpassFilterPoleFrequency * 0.001 /*1.0e-9 * ESC_SYNC0cycletime()*/);
       oldLowPassGain = gain;
       oldLowpassFilterPoleFrequency = Obj.LowpassFilterPoleFrequency;
    }
    if (Obj.CalculatedVoltage < Obj.LowPassFilterThresholdVoltage)
       Obj.LowpassFilteredVoltage = Obj.CalculatedVoltage; // Just forward
    else
-      Obj.LowpassFilteredVoltage += (Obj.CalculatedVoltage - Obj.LowpassFilteredVoltage) * gain;
+      Obj.LowpassFilteredVoltage = oldLowPassFilteredVoltage + (Obj.CalculatedVoltage - oldLowPassFilteredVoltage) * gain;
+   oldLowPassFilteredVoltage = Obj.LowpassFilteredVoltage;
+
+   Obj.OhmicSensingSensed = 0;
+   if (Obj.EnableOhmicSensing && stat == 0)
+   {
+      timeSinceOhmicSensingEnabled++;                                // Lazy and just use iterations now.
+      if (timeSinceOhmicSensingEnabled >= Obj.OhmicSensingSetupTime) // Let's check
+      {                                                              //
+         if (Obj.CalculatedVoltage < Obj.OhmicSensingVoltageLimit)   // Limit hit, set output
+         {
+            Obj.OhmicSensingSensed = 1;
+         }
+      }
+   }
+   else
+   {
+      timeSinceOhmicSensingEnabled = 0;
+   }
 }
 
 void ESC_interrupt_enable(uint32_t mask);

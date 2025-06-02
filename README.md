@@ -172,6 +172,15 @@ Pay attention to the polarity when connecting the plasma voltage leads the THTIC
 
 The experience with these cards has been very good so far. I have used the THTIC the most, cutting for at least an hour of cutting time, with THC enabled and active. A status variable shows that it has been working the whole time, no stops or resets. The THTIC2 has been used much less, but it behaves the same as the THTIC card, meaning it just works.
 
+## THCLIP Enable ohmic sensing with the IPTM-60 torch
+
+This is for the torches known as IPT-60 PT-60 S45 IPTM-60 IPTM-80 and many more that have blowback start with the torch tip exposed and normally shortened to the torch electrode. Normally this torch can't use ohmic sensing since all parts are connected to ground. At least on my machine, a Herocut 8000, the blowback start cable from the torch can be cut during sensing. This enables ohmic sensing and it continues to operate in other situations.
+![THCLIP](Utils/Pictures/THCLIP1.png)
+![THCLIP](Utils/Pictures/THCLIP2.png)
+I have made an adaptation to the EaserCAT 7000 to handle the contact. There is a short setup time needed to make sure the relay is activated before starting to watch for contact, a tenth of a second seems enough. Then it watches for a shift from some 7V to a settable limit, say 4V, to indicate contact. Works like a charm.
+
+The Trafimet torch hose connectors are called FY0022 and FY0023. The relay is a 24V 40A standard car relay. Check out the Kicad schematics for the other parts.
+
 ## License
 
 Don't violate the original licenses. No warranties. Use it any way you like.\

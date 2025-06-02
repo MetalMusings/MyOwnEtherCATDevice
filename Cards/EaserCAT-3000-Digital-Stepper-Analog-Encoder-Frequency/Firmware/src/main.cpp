@@ -34,7 +34,7 @@ volatile double posCmd1, posCmd2, posCmd3, posCmd4;
 volatile float posScale1, posScale2, posScale3, posScale4;
 volatile float maxAcc1, maxAcc2, maxAcc3, maxAcc4;
 volatile uint8_t enable1, enable2, enable3, enable4;
-volatile uint32_t basePeriod;
+volatile uint32_t basePeriod, newBasePeriod;
 volatile uint16_t basePeriodCnt;
 volatile uint16_t deltaMakePulsesCnt;
 volatile uint64_t makePulsesCnt = 0;
@@ -103,7 +103,7 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
    enable3 = Obj.Enable3;
    enable4 = Obj.Enable4;
    if (Obj.BasePeriod != 0) // Use default value from setup() if not set by SDO.
-      basePeriod = Obj.BasePeriod;
+      newBasePeriod = Obj.BasePeriod;
 }
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
@@ -197,7 +197,7 @@ void setup(void)
    pinMode(PE5, OUTPUT);  // Step 4
    pinMode(PE4, OUTPUT);  // Dir 4
 
-   basePeriod = BASE_PERIOD; // Random-ish number, but it should work
+   basePeriod = newBasePeriod = BASE_PERIOD; // Random-ish number, but it should work. Change through sdos
 
    baseTimer = new HardwareTimer(TIM11);                        // The base period timer
    baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT); // Or the line above, This one is uncalibrated
@@ -345,8 +345,13 @@ void updateStepperGenerators(void)
                        posScale1, posScale2, posScale3, posScale4,
                        maxAcc1, maxAcc2, maxAcc3, maxAcc4,
                        enable1, enable2, enable3, enable4,
-                       sync0CycleTime);         // Update positions
-   Step->makeAllPulses();                       // Make first step right here
+                       sync0CycleTime); // Update positions
+   Step->makeAllPulses();               // Make first step right here
+   if (newBasePeriod != basePeriod)     // Changed via sdos
+   {
+      basePeriod = newBasePeriod;
+      baseTimer->setOverflow(basePeriod / 1000, MICROSEC_FORMAT); // update timer frequency
+   }
    basePeriodCnt = sync0CycleTime / basePeriod; //
    baseTimer->refresh();                        //
    baseTimer->resume();

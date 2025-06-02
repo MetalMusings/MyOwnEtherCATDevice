@@ -18,6 +18,7 @@ typedef struct
    float CalculatedVoltage;
    uint8_t Status;
    float LowpassFilteredVoltage;
+   uint8_t OhmicSensingSensed;
 
    /* Outputs */
 
@@ -25,6 +26,9 @@ typedef struct
    float VoltageScale;
    float VoltageOffset;
    float LowPassFilterThresholdVoltage;
+   uint8_t EnableOhmicSensing;
+   uint32_t OhmicSensingSetupTime;
+   float OhmicSensingVoltageLimit;
 
    /* Parameters */
 

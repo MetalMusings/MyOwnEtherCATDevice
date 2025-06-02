@@ -142,6 +142,17 @@
         "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.LowpassFilteredVoltage"
+      },
+      "6005": {
+        "otype": "VAR",
+        "name": "OhmicSensingSensed",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.OhmicSensingSensed"
       }
     },
     "rxpdo": {
@@ -188,6 +199,39 @@
         "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.LowPassFilterThresholdVoltage"
+      },
+      "7004": {
+        "otype": "VAR",
+        "name": "EnableOhmicSensing",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.EnableOhmicSensing"
+      },
+      "7005": {
+        "otype": "VAR",
+        "name": "OhmicSensingSetupTime",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.OhmicSensingSetupTime"
+      },
+      "7006": {
+        "otype": "VAR",
+        "name": "OhmicSensingVoltageLimit",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.OhmicSensingVoltageLimit"
       },
       "60664": {
         "otype": "VAR",

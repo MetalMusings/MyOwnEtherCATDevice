@@ -172,6 +172,78 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT1604</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>EnableOhmicSensing</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1605</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>OhmicSensingSetupTime</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT1606</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>OhmicSensingVoltageLimit</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT1A00</Name>
                 <BitSize>48</BitSize>
                 <SubItem>
@@ -292,6 +364,30 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT1A05</Name>
+                <BitSize>48</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>OhmicSensingSensed</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT1C00ARR</Name>
                 <BaseType>USINT</BaseType>
                 <BitSize>32</BitSize>
@@ -326,15 +422,15 @@
               <DataType>
                 <Name>DT1C12ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>64</BitSize>
+                <BitSize>112</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>4</Elements>
+                  <Elements>7</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C12</Name>
-                <BitSize>80</BitSize>
+                <BitSize>128</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -348,7 +444,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C12ARR</Type>
-                  <BitSize>64</BitSize>
+                  <BitSize>112</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -358,15 +454,15 @@
               <DataType>
                 <Name>DT1C13ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>80</BitSize>
+                <BitSize>96</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>5</Elements>
+                  <Elements>6</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C13</Name>
-                <BitSize>96</BitSize>
+                <BitSize>112</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -380,7 +476,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C13ARR</Type>
-                  <BitSize>80</BitSize>
+                  <BitSize>96</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -596,6 +692,72 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x1604</Index>
+                <Name>EnableOhmicSensing</Name>
+                <Type>DT1604</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>EnableOhmicSensing</Name>
+                    <Info>
+                      <DefaultValue>#x70040008</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1605</Index>
+                <Name>OhmicSensingSetupTime</Name>
+                <Type>DT1605</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingSetupTime</Name>
+                    <Info>
+                      <DefaultValue>#x70050020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1606</Index>
+                <Name>OhmicSensingVoltageLimit</Name>
+                <Type>DT1606</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingVoltageLimit</Name>
+                    <Info>
+                      <DefaultValue>#x70060020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x1A00</Index>
                 <Name>Input12</Name>
                 <Type>DT1A00</Type>
@@ -706,6 +868,28 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x1A05</Index>
+                <Name>OhmicSensingSensed</Name>
+                <Type>DT1A05</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingSensed</Name>
+                    <Info>
+                      <DefaultValue>#x60050008</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x1C00</Index>
                 <Name>Sync Manager Communication Type</Name>
                 <Type>DT1C00</Type>
@@ -749,12 +933,12 @@
                 <Index>#x1C12</Index>
                 <Name>Sync Manager 2 PDO Assignment</Name>
                 <Type>DT1C12</Type>
-                <BitSize>80</BitSize>
+                <BitSize>128</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>4</DefaultValue>
+                      <DefaultValue>7</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -781,6 +965,24 @@
                       <DefaultValue>#x1603</DefaultValue>
                     </Info>
                   </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1604</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1605</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1606</DefaultValue>
+                    </Info>
+                  </SubItem>
                 </Info>
                 <Flags>
                 </Flags>
@@ -789,12 +991,12 @@
                 <Index>#x1C13</Index>
                 <Name>Sync Manager 3 PDO Assignment</Name>
                 <Type>DT1C13</Type>
-                <BitSize>96</BitSize>
+                <BitSize>112</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>5</DefaultValue>
+                      <DefaultValue>6</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -825,6 +1027,12 @@
                     <Name>PDO Mapping</Name>
                     <Info>
                       <DefaultValue>#x1A04</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>PDO Mapping</Name>
+                    <Info>
+                      <DefaultValue>#x1A05</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -933,6 +1141,19 @@
                 </Flags>
               </Object>
               <Object>
+                <Index>#x6005</Index>
+                <Name>OhmicSensingSensed</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>T</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
                 <Index>#x7000</Index>
                 <Name>Output4</Name>
                 <Type>USINT</Type>
@@ -974,6 +1195,45 @@
               <Object>
                 <Index>#x7003</Index>
                 <Name>LowPassFilterThresholdVoltage</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7004</Index>
+                <Name>EnableOhmicSensing</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7005</Index>
+                <Name>OhmicSensingSetupTime</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7006</Index>
+                <Name>OhmicSensingVoltageLimit</Name>
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
@@ -1038,6 +1298,39 @@
             <DataType>REAL</DataType>
           </Entry>
         </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1604</Index>
+          <Name>EnableOhmicSensing</Name>
+          <Entry>
+            <Index>#x7004</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>EnableOhmicSensing</Name>
+            <DataType>USINT</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1605</Index>
+          <Name>OhmicSensingSetupTime</Name>
+          <Entry>
+            <Index>#x7005</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>OhmicSensingSetupTime</Name>
+            <DataType>UDINT</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1606</Index>
+          <Name>OhmicSensingVoltageLimit</Name>
+          <Entry>
+            <Index>#x7006</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>OhmicSensingVoltageLimit</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
           <Index>#x1A00</Index>
           <Name>Input12</Name>
@@ -1091,6 +1384,17 @@
             <BitLen>32</BitLen>
             <Name>LowpassFilteredVoltage</Name>
             <DataType>REAL</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Mandatory="true" Sm="3">
+          <Index>#x1A05</Index>
+          <Name>OhmicSensingSensed</Name>
+          <Entry>
+            <Index>#x6005</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>OhmicSensingSensed</Name>
+            <DataType>USINT</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">
