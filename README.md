@@ -175,7 +175,9 @@ The experience with these cards has been very good so far. I have used the THTIC
 ## THCLIP Enable ohmic sensing with the IPTM-60 torch
 
 This is for the torches known as IPT-60 PT-60 S45 IPTM-60 IPTM-80 and many more that have blowback start with the torch tip exposed and normally shortened to the torch electrode. Normally this torch can't use ohmic sensing since all parts are connected to ground. At least on my machine, a Herocut 8000, the blowback start cable from the torch can be cut during sensing. This enables ohmic sensing and it continues to operate in other situations.
+
 ![THCLIP](Utils/Pictures/THCLIP1.png)
+
 ![THCLIP](Utils/Pictures/THCLIP2.png)
 
 I have made an adaptation to the EaserCAT 7000 to handle the contact. There is a short setup time needed to make sure the relay is activated before starting to watch for contact, a tenth of a second seems enough. Then it watches for a shift from some 7V to a settable limit, say 4V, to indicate contact. Works like a charm.
