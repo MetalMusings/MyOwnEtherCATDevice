@@ -76,8 +76,6 @@ float oldLowPassGain_1 = 0, oldLowPassGain_2 = 0;
 float oldLowPassFilteredVoltage_1 = 0, oldLowPassFilteredVoltage_2 = 0;
 uint32_t oldLowpassFilterPoleFrequency_1 = 0, oldLowpassFilterPoleFrequency_2 = 0;
 
-uint32_t timeSinceOhmicSensingEnabled = 0;
-
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
    static float validData0_1 = 0.0, validVoltage0_1 = 0.0;
@@ -408,16 +406,6 @@ void handleVoltageReader(float scale_in, float offset, float &outVoltage, int32_
    readStat = stat;
    outStatus = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
 }
-
-#if 0
-lowpassFilter(oldLowPassGain, 
-   oldLowpassFilterPoleFrequency,
-   oldLowPassFilteredVoltage,
-   Obj.Settings_Unit1.LowpassFilterPoleFrequency,
-   Obj.In_Unit1.LowPassFilterThresholdVoltage,
-   Obj.Out_Unit1.CalculatedVoltage,
-   Obj.Out_Unit1.LowpassFilteredVoltage)
-#endif
 
 void lowpassFilter(float &oldLowPassGain,
                    uint32_t &oldLowpassFilterPoleFrequency,
