@@ -43,9 +43,20 @@ void ads1014_reset(ADS1014 *ads)
    ads->readADC_Differential_0_1(); // This is the value we are interested in
 }
 
-void handleVoltageReader(float scale_in, float offset, float outVoltage, int32_t outRaw,
+void handleVoltageReader(float scale_in, float offset, float &outVoltage, int32_t &outRaw,
                          float &oldVoltage, float &oldRaw,
-                         uint8_t devType, int8_t &old_devType, uint8_t &readStat, uint32_t &outStatus, ADS1014 *ads, MyMCP3221 *mcp, uint8_t I2C_address, uint32_t &I2C_restarts);
+                         uint8_t devType, int8_t &old_devType, uint8_t &readStat, uint32_t &outStatus,
+                         ADS1014 *&ads, MyMCP3221 *mcp, uint8_t I2C_address, uint32_t &I2C_restarts);
+void lowpassFilter(float &oldLowPassGain,
+                   uint32_t &oldLowpassFilterPoleFrequency,
+                   float &oldLowPassFilteredVoltage,
+                   uint32_t LowpassFilterPoleFrequency,
+                   float LowPassFilterThresholdVoltage,
+                   float inVoltage,
+                   float &outFilteredVoltage);
+void handleOhmicSensing(uint8_t &ohmicState, uint8_t voltageState,
+                        float inVoltage, float limitVoltage,
+                        uint8_t enabled, uint8_t &sensed);
 #define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
 #define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
 #define bitflip(byte, nbit) ((byte) ^= (1 << (nbit)))
@@ -61,9 +72,9 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
       digitalWrite(outputPin[i], bitcheck(Obj.Output4, i) ? HIGH : LOW);
 }
 
-float oldLowPassGain = 0;
-float oldLowPassFilteredVoltage = 0;
-uint32_t oldLowpassFilterPoleFrequency = 0;
+float oldLowPassGain_1 = 0, oldLowPassGain_2 = 0;
+float oldLowPassFilteredVoltage_1 = 0, oldLowPassFilteredVoltage_2 = 0;
+uint32_t oldLowpassFilterPoleFrequency_1 = 0, oldLowpassFilterPoleFrequency_2 = 0;
 
 uint32_t timeSinceOhmicSensingEnabled = 0;
 
@@ -84,244 +95,36 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
                        validVoltage0_2, validData0_2,
                        Obj.Settings_Unit2.I2C_devicetype, old_I2Cdevice_2, stat_2, Obj.Out_Unit2.Status,
                        ads1014_2, mcp3221_2, Obj.Settings_Unit2.I2C_address, I2C_restarts_2);
-#if 0
-   float scale_1 = Obj.In_Unit1.VoltageScale;
-   if (scale_1 == 0.0)
-      scale_1 = 1.0;
-   int stat_1 = 1, data0_1;
-   switch (Obj.Settings_Unit1.I2C_devicetype)
-   {
-   case 0: // Not configured.
-      Obj.Out_Unit1.Status = 0;
-      stat_1 = data0_1 = 0;
-      break;
-   case MCP3221_TYPE:
-      if (old_I2Cdevice_1 != Obj.Settings_Unit1.I2C_devicetype) // Initilize and make ready
-      {
-         if (ads1014_1)
-         {
-            delete ads1014_1;
-            ads1014_1 = 0;
-         }
-         if (mcp3221_1)
-         {
-            delete mcp3221_1;
-            mcp3221_1 = 0;
-         }
-         Wire2.end();
-         Wire2.begin();
-         Wire2.setClock(I2C_BUS_SPEED);
-         mcp3221_1 = new MyMCP3221(Obj.Settings_Unit1.I2C_address, &Wire2);
-         old_I2Cdevice_1 = mcp3221_1 ? MCP3221_TYPE : -1;
-      }
-      data0_1 = mcp3221_1->getData();
-      stat_1 = mcp3221_1->ping();
-      break;
-   case ADS1014_TYPE:
-      if (old_I2Cdevice_1 != Obj.Settings_Unit1.I2C_devicetype) // Initilize and make ready
-      {
-         if (ads1014_1)
-         {
-            delete ads1014_1;
-            ads1014_1 = 0;
-         }
-         if (mcp3221_1)
-         {
-            delete mcp3221_1;
-            mcp3221_1 = 0;
-         }
+   lowpassFilter(oldLowPassGain_1,
+                 oldLowpassFilterPoleFrequency_1,
+                 oldLowPassFilteredVoltage_1,
+                 Obj.Settings_Unit1.LowpassFilterPoleFrequency,
+                 Obj.In_Unit1.LowPassFilterThresholdVoltage,
+                 Obj.Out_Unit1.CalculatedVoltage,
+                 Obj.Out_Unit1.LowpassFilteredVoltage);
+   lowpassFilter(oldLowPassGain_2,
+                 oldLowpassFilterPoleFrequency_2,
+                 oldLowPassFilteredVoltage_2,
+                 Obj.Settings_Unit2.LowpassFilterPoleFrequency,
+                 Obj.In_Unit2.LowPassFilterThresholdVoltage,
+                 Obj.Out_Unit2.CalculatedVoltage,
+                 Obj.Out_Unit2.LowpassFilteredVoltage);
 
-         Wire2.end();
-         Wire2.begin();
-         Wire2.setClock(I2C_BUS_SPEED);
-         ads1014_1 = new ADS1014(Obj.Settings_Unit1.I2C_address, &Wire2);
-         ads1014_reset(ads1014_1);
-         old_I2Cdevice_1 = ADS1014_TYPE;
-      }
-      data0_1 = ads1014_1->getValue();
-      stat_1 = ads1014_1->isConnected() == 1 ? 0 : 1;
-      break;
-   default: // Not supported
-      break;
-   }
-
-   if (stat_1 == 0)
-   {                                                                                    // Read good value
-      Obj.Out_Unit1.CalculatedVoltage = scale_1 * data0_1 + Obj.In_Unit1.VoltageOffset; //
-      Obj.Out_Unit1.RawData = data0_1;                                                  // Raw voltage, read by ADC
-      validVoltage0_1 = Obj.Out_Unit1.CalculatedVoltage;
-      validData0_1 = data0_1;
-   }
-   else
-   {                                                     // Didn't read a good value. Return a hopefully useful value and restart the I2C bus
-      Obj.Out_Unit1.CalculatedVoltage = validVoltage0_1; // Use value from previous call
-      Obj.Out_Unit1.RawData = validData0_1;
-      // Reset wire here
-      Wire2.end();
-      Wire2.begin();
-      Wire2.setClock(I2C_BUS_SPEED);
-      I2C_restarts_1++;
-      if (Obj.Settings_Unit1.I2C_devicetype == ADS1014_TYPE)
-         ads1014_reset(ads1014_1);
-      // mcp3221 has no reset, reset the I2C bus is the best we can do
-   }
-   Obj.Out_Unit1.Status = I2C_restarts_1 + (stat_1 << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
-#endif
-#if 0
-
-   float scale_2 = Obj.In_Unit2.VoltageScale;
-   if (scale_2 == 0.0)
-      scale_2 = 1.0;
-   int stat_2 = 1, data0_2;
-   switch (Obj.Settings_Unit2.I2C_devicetype)
-   {
-   case 0: // Not configured.
-      Obj.Out_Unit2.Status = 0;
-      stat_2 = data0_2 = 0;
-      break;
-   case MCP3221_TYPE:
-      if (old_I2Cdevice_2 != Obj.Settings_Unit2.I2C_devicetype) // Initilize and make ready
-      {
-         if (ads1014_2)
-         {
-            delete ads1014_2;
-            ads1014_2 = 0;
-         }
-         if (mcp3221_2)
-         {
-            delete mcp3221_2;
-            mcp3221_2 = 0;
-         }
-         Wire2.end();
-         Wire2.begin();
-         Wire2.setClock(I2C_BUS_SPEED);
-         mcp3221_2 = new MyMCP3221(Obj.Settings_Unit2.I2C_address, &Wire2);
-         old_I2Cdevice_2 = mcp3221_2 ? MCP3221_TYPE : -1;
-      }
-      data0_2 = mcp3221_2->getData();
-      stat_2 = mcp3221_2->ping();
-      break;
-   case ADS1014_TYPE:
-      if (old_I2Cdevice_2 != Obj.Settings_Unit2.I2C_devicetype) // Initilize and make ready
-      {
-         if (ads1014_2)
-         {
-            delete ads1014_2;
-            ads1014_2 = 0;
-         }
-         if (mcp3221_2)
-         {
-            delete mcp3221_2;
-            mcp3221_2 = 0;
-         }
-
-         Wire2.end();
-         Wire2.begin();
-         Wire2.setClock(I2C_BUS_SPEED);
-         ads1014_2 = new ADS1014(Obj.Settings_Unit2.I2C_address, &Wire2);
-         ads1014_reset(ads1014_2);
-         old_I2Cdevice_2 = ADS1014_TYPE;
-      }
-      data0_2 = ads1014_2->getValue();
-      stat_2 = ads1014_2->isConnected() == 1 ? 0 : 1;
-      break;
-   default: // Not supported
-      break;
-   }
-
-   if (stat_2 == 0)
-   {                                                                                    // Read good value
-      Obj.Out_Unit2.CalculatedVoltage = scale_2 * data0_2 + Obj.In_Unit2.VoltageOffset; //
-      Obj.Out_Unit2.RawData = data0_2;                                                  // Raw voltage, read by ADC
-      validVoltage0_2 = Obj.Out_Unit2.CalculatedVoltage;
-      validData0_2 = data0_2;
-   }
-   else
-   {                                                     // Didn't read a good value. Return a hopefully useful value and restart the I2C bus
-      Obj.Out_Unit2.CalculatedVoltage = validVoltage0_2; // Use value from previous call
-      Obj.Out_Unit2.RawData = validData0_2;
-      // Reset wire here
-      Wire2.end();
-      Wire2.begin();
-      Wire2.setClock(I2C_BUS_SPEED);
-      I2C_restarts_2++;
-      if (Obj.Settings_Unit2.I2C_devicetype == ADS1014_TYPE)
-         ads1014_reset(ads1014_2);
-      // mcp3221 has no reset, reset the I2C bus is the best we can do
-   }
-   Obj.Out_Unit2.Status = I2C_restarts_2 + (stat_2 << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
-
-#endif
-
-   // Low pass filter. See lowpass in linuxcnc doc
-   float gain = oldLowPassGain;
-   if (oldLowpassFilterPoleFrequency != Obj.Settings_Unit1.LowpassFilterPoleFrequency)
-   {
-      gain = 1 - expf(-2.0 * M_PI * Obj.Settings_Unit1.LowpassFilterPoleFrequency * 0.001 /*1.0e-9 * ESC_SYNC0cycletime()*/);
-      oldLowPassGain = gain;
-      oldLowpassFilterPoleFrequency = Obj.Settings_Unit1.LowpassFilterPoleFrequency;
-   }
-   if (Obj.Out_Unit1.CalculatedVoltage < Obj.In_Unit1.LowPassFilterThresholdVoltage)
-      Obj.Out_Unit1.LowpassFilteredVoltage = Obj.Out_Unit1.CalculatedVoltage; // Just forward
-   else
-      Obj.Out_Unit1.LowpassFilteredVoltage = oldLowPassFilteredVoltage + (Obj.Out_Unit1.CalculatedVoltage - oldLowPassFilteredVoltage) * gain;
-   oldLowPassFilteredVoltage = Obj.Out_Unit1.LowpassFilteredVoltage;
-#if 0
-   Obj.OhmicSensingSensed = 0;
-   if (Obj.EnableOhmicSensing && stat == 0)
-   {
-      timeSinceOhmicSensingEnabled++;                                // Lazy and just use iterations now.
-      if (timeSinceOhmicSensingEnabled >= Obj.OhmicSensingSetupTime) // Let's check
-      {                                                              //
-         if (Obj.CalculatedVoltage < Obj.OhmicSensingVoltageLimit)   // Limit hit, set output
-         {
-            Obj.OhmicSensingSensed = 1;
-         }
-      }
-   }
-   else
-   {
-      timeSinceOhmicSensingEnabled = 0;
-   }
-#else
 #define OHMIC_IDLE 0
 #define OHMIC_PROBE 1
    static uint8_t ohmicState_1 = OHMIC_IDLE;
    static uint8_t ohmicState_2 = OHMIC_IDLE;
-   Obj.Out_Unit1.OhmicSensingSensed = 0;
-   if (Obj.In_Unit1.EnableOhmicSensing && stat_1 == 0)
-   {
-      if (ohmicState_1 == OHMIC_IDLE && Obj.Out_Unit1.CalculatedVoltage > Obj.In_Unit1.OhmicSensingVoltageLimit)
-      {
-         ohmicState_1 = OHMIC_PROBE;
-      }
-      if (ohmicState_1 == OHMIC_PROBE && Obj.Out_Unit1.CalculatedVoltage <= Obj.In_Unit1.OhmicSensingVoltageLimit)
-      {
-         Obj.Out_Unit1.OhmicSensingSensed = 1;
-      }
-   }
-   else
-   {
-      ohmicState_1 = OHMIC_IDLE;
-   }
 
-   Obj.Out_Unit2.OhmicSensingSensed = 0;
-   if (Obj.In_Unit2.EnableOhmicSensing && stat_2 == 0)
-   {
-      if (ohmicState_2 == OHMIC_IDLE && Obj.Out_Unit2.CalculatedVoltage > Obj.In_Unit2.OhmicSensingVoltageLimit)
-      {
-         ohmicState_2 = OHMIC_PROBE;
-      }
-      if (ohmicState_2 == OHMIC_PROBE && Obj.Out_Unit2.CalculatedVoltage <= Obj.In_Unit2.OhmicSensingVoltageLimit)
-      {
-         Obj.Out_Unit2.OhmicSensingSensed = 1;
-      }
-   }
-   else
-   {
-      ohmicState_2 = OHMIC_IDLE;
-   }
-#endif
+   handleOhmicSensing(ohmicState_1, stat_1,
+                      Obj.Out_Unit1.CalculatedVoltage,
+                      Obj.In_Unit1.OhmicSensingVoltageLimit,
+                      Obj.In_Unit1.EnableOhmicSensing,
+                      Obj.Out_Unit1.OhmicSensingSensed);
+   handleOhmicSensing(ohmicState_2, stat_2,
+                      Obj.Out_Unit2.CalculatedVoltage,
+                      Obj.In_Unit2.OhmicSensingVoltageLimit,
+                      Obj.In_Unit2.EnableOhmicSensing,
+                      Obj.Out_Unit2.OhmicSensingSensed);
 }
 
 void ESC_interrupt_enable(uint32_t mask);
@@ -391,7 +194,7 @@ void setup(void)
    mcp3221 = new MyMCP3221(0x48, &Wire2);
 #endif
 #ifdef ADS1xxx
-   ads1014_1 = new ADS1014(0x49, &Wire2);
+   ads1014_1 = new ADS1014(0x48, &Wire2);
    ads1014_reset(ads1014_1);
 #endif
    while (1) // Search I2C bus for devices
@@ -509,17 +312,16 @@ uint16_t dc_checker(void)
    return 0;
 }
 
-#if 1
-
-void handleVoltageReader(float scale_in, float offset, float outVoltage, int32_t outRaw,
+void handleVoltageReader(float scale_in, float offset, float &outVoltage, int32_t &outRaw,
                          float &oldVoltage, float &oldRaw,
                          uint8_t devType, int8_t &old_devType, uint8_t &readStat, uint32_t &outStatus,
-                         ADS1014 *ads, MyMCP3221 *mcp, uint8_t I2C_address, uint32_t &I2C_restarts)
+                         ADS1014 *&ads, MyMCP3221 *mcp, uint8_t I2C_address, uint32_t &I2C_restarts)
 {
    float scale = scale_in;
    if (scale == 0.0)
       scale = 1.0;
    int stat = 1, data0;
+
    switch (devType)
    {
    case 0: // Not configured.
@@ -561,16 +363,23 @@ void handleVoltageReader(float scale_in, float offset, float outVoltage, int32_t
             delete mcp;
             mcp = 0;
          }
+         old_devType = 0;
 
          Wire2.end();
          Wire2.begin();
          Wire2.setClock(I2C_BUS_SPEED);
          ads = new ADS1014(I2C_address, &Wire2);
-         ads1014_reset(ads);
-         old_devType = ads ? ADS1014_TYPE : -1;
+         if (ads != nullptr)
+         {
+            ads1014_reset(ads);
+            old_devType = ADS1014_TYPE;
+         }
       }
-      data0 = ads->getValue();
-      stat = ads->isConnected() == 1 ? 0 : 1;
+      if (ads != nullptr)
+      {
+         data0 = ads->getValue();
+         stat = ads->isConnected() == 1 ? 0 : 1;
+      }
       break;
    default: // Not supported
       break;
@@ -592,11 +401,65 @@ void handleVoltageReader(float scale_in, float offset, float outVoltage, int32_t
       Wire2.begin();
       Wire2.setClock(I2C_BUS_SPEED);
       I2C_restarts++;
-      if (devType == ADS1014_TYPE)
+      if (devType == ADS1014_TYPE && ads != nullptr)
          ads1014_reset(ads);
       // mcp3221 has no reset, reset the I2C bus is the best we can do
    }
    readStat = stat;
    outStatus = I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are number of restarts (restart attempts)
 }
+
+#if 0
+lowpassFilter(oldLowPassGain, 
+   oldLowpassFilterPoleFrequency,
+   oldLowPassFilteredVoltage,
+   Obj.Settings_Unit1.LowpassFilterPoleFrequency,
+   Obj.In_Unit1.LowPassFilterThresholdVoltage,
+   Obj.Out_Unit1.CalculatedVoltage,
+   Obj.Out_Unit1.LowpassFilteredVoltage)
 #endif
+
+void lowpassFilter(float &oldLowPassGain,
+                   uint32_t &oldLowpassFilterPoleFrequency,
+                   float &oldLowPassFilteredVoltage,
+                   uint32_t LowpassFilterPoleFrequency,
+                   float LowPassFilterThresholdVoltage,
+                   float inVoltage,
+                   float &outFilteredVoltage)
+{
+   // Low pass filter. See lowpass in linuxcnc doc
+   float gain = oldLowPassGain;
+   if (oldLowpassFilterPoleFrequency != LowpassFilterPoleFrequency)
+   {
+      gain = 1 - expf(-2.0 * M_PI * LowpassFilterPoleFrequency * 0.001 /*1.0e-9 * ESC_SYNC0cycletime()*/);
+      oldLowPassGain = gain;
+      oldLowpassFilterPoleFrequency = LowpassFilterPoleFrequency;
+   }
+   if (inVoltage < LowPassFilterThresholdVoltage)
+      outFilteredVoltage = inVoltage; // Just forward
+   else
+      outFilteredVoltage = oldLowPassFilteredVoltage + (inVoltage - oldLowPassFilteredVoltage) * gain;
+   oldLowPassFilteredVoltage = outFilteredVoltage;
+}
+
+void handleOhmicSensing(uint8_t &ohmicState, uint8_t voltageState,
+                        float inVoltage, float limitVoltage,
+                        uint8_t enabled, uint8_t &sensed)
+{
+   sensed = 0;
+   if (enabled && voltageState == 0)
+   {
+      if (ohmicState == OHMIC_IDLE && inVoltage > limitVoltage)
+      {
+         ohmicState = OHMIC_PROBE;
+      }
+      if (ohmicState == OHMIC_PROBE && inVoltage <= limitVoltage)
+      {
+         sensed = 1;
+      }
+   }
+   else
+   {
+      ohmicState = OHMIC_IDLE;
+   }
+}
