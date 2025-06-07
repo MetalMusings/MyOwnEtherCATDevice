@@ -14,27 +14,59 @@ typedef struct
    /* Inputs */
 
    int32_t Input12;
-   int32_t RawData;
-   float CalculatedVoltage;
-   uint8_t Status;
-   float LowpassFilteredVoltage;
-   uint8_t OhmicSensingSensed;
+   struct
+   {
+      int32_t RawData;
+      float CalculatedVoltage;
+      uint32_t Status;
+      float LowpassFilteredVoltage;
+      uint8_t OhmicSensingSensed;
+   } Out_Unit1;
+   struct
+   {
+      int32_t RawData;
+      float CalculatedVoltage;
+      uint32_t Status;
+      float LowpassFilteredVoltage;
+      uint8_t OhmicSensingSensed;
+   } Out_Unit2;
 
    /* Outputs */
 
    uint8_t Output4;
-   float VoltageScale;
-   float VoltageOffset;
-   float LowPassFilterThresholdVoltage;
-   uint8_t EnableOhmicSensing;
-   uint32_t OhmicSensingSetupTime;
-   float OhmicSensingVoltageLimit;
+   struct
+   {
+      float VoltageScale;
+      float VoltageOffset;
+      float LowPassFilterThresholdVoltage;
+      uint8_t EnableOhmicSensing;
+      uint32_t OhmicSensingSetupTime;
+      float OhmicSensingVoltageLimit;
+   } In_Unit1;
+   struct
+   {
+      float VoltageScale;
+      float VoltageOffset;
+      float LowPassFilterThresholdVoltage;
+      uint8_t EnableOhmicSensing;
+      uint32_t OhmicSensingSetupTime;
+      float OhmicSensingVoltageLimit;
+   } In_Unit2;
 
    /* Parameters */
 
-   uint8_t I2C_devicetype;
-   uint8_t I2C_address;
-   uint32_t LowpassFilterPoleFrequency;
+   struct
+   {
+      uint8_t I2C_devicetype;
+      uint8_t I2C_address;
+      uint32_t LowpassFilterPoleFrequency;
+   } Settings_Unit1;
+   struct
+   {
+      uint8_t I2C_devicetype;
+      uint8_t I2C_address;
+      uint32_t LowpassFilterPoleFrequency;
+   } Settings_Unit2;
 } _Objects;
 
 extern _Objects Obj;
