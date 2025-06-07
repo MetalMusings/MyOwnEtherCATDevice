@@ -1845,6 +1845,16 @@
 	)
 	(wire
 		(pts
+			(xy 38.1 41.91) (xy 41.91 41.91)
+		)
+		(stroke
+			(width 1)
+			(type dash)
+		)
+		(uuid "45e1518f-ee16-4a72-9988-51d9ca021561")
+	)
+	(wire
+		(pts
 			(xy 133.35 60.96) (xy 135.89 60.96)
 		)
 		(stroke
@@ -1975,6 +1985,16 @@
 	)
 	(wire
 		(pts
+			(xy 38.1 134.62) (xy 43.18 134.62)
+		)
+		(stroke
+			(width 1)
+			(type dash)
+		)
+		(uuid "720474cb-9426-4cf8-ac63-23b15db4b508")
+	)
+	(wire
+		(pts
 			(xy 104.14 83.82) (xy 104.14 86.36)
 		)
 		(stroke
@@ -2062,6 +2082,16 @@
 			(type default)
 		)
 		(uuid "93bd9c54-62da-4bd2-a4dc-1764939b651e")
+	)
+	(wire
+		(pts
+			(xy 38.1 41.91) (xy 38.1 134.62)
+		)
+		(stroke
+			(width 1)
+			(type dash)
+		)
+		(uuid "96f8de2e-2061-42ad-8a12-3778b628af90")
 	)
 	(wire
 		(pts
@@ -3559,7 +3589,7 @@
 			"rkJggg=="
 		)
 	)
-	(text "Process\n-------\nRecieve input height sensing signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via 100 kOhm resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground\nWait a few tenths of a second to allow realy to settle before monitoring gap voltage\nWhen Arc voltage > x V: send contact Signal (repeat signal x times?)\n                        exit sensing mode\nAfter x msecs: exit sensing mode\nLoss of height sensing signal: exit sensing mode\n\nExit of sensing mode: disable height sensings voltage. This releases relay and shuts off sensing voltage.\n\n"
+	(text "Process\n-------\nRecieve input height sensing signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via 100 kOhm resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground\nWait a few tenths of a second to allow relay to settle before monitoring gap voltage\nWhen Arc voltage < x V: raise contact Signal\nLoss of height sensing signal: exit sensing mode, lower contact Signal\n\n"
 		(exclude_from_sim no)
 		(at 88.646 131.826 0)
 		(effects
