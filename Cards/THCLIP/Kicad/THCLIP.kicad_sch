@@ -3589,9 +3589,9 @@
 			"rkJggg=="
 		)
 	)
-	(text "Process\n-------\nRecieve input height sensing signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via 100 kOhm resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground\nWait a few tenths of a second to allow relay to settle before monitoring gap voltage\nWhen Arc voltage < x V: raise contact Signal\nLoss of height sensing signal: exit sensing mode, lower contact Signal\n\n"
+	(text "Process\n-------\nRecieve input height sensing enable signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via 100 kOhm resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground, gap voltage\nWait for gap voltage to go above limit voltage. Needed for relay to settle (some milliseconds)\nWhen gap voltage goes back below limit voltage, that is contact, raise sensed/contact flag\nLoss of enable signal: exit sensing mode, lower contact Signal\n\n"
 		(exclude_from_sim no)
-		(at 88.646 131.826 0)
+		(at 90.424 131.826 0)
 		(effects
 			(font
 				(size 1.27 1.27)
