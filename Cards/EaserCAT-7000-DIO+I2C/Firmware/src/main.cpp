@@ -46,7 +46,7 @@ void ads1014_reset(ADS1014 *ads)
 void handleVoltageReader(float scale_in, float offset, float &outVoltage, int32_t &outRaw,
                          float &oldVoltage, float &oldRaw,
                          uint8_t devType, int8_t &old_devType, uint8_t &readStat, uint32_t &outStatus,
-                         ADS1014 *&ads, MyMCP3221 *mcp, uint8_t I2C_address, uint32_t &I2C_restarts);
+                         ADS1014 *&ads, MyMCP3221 *&mcp, uint8_t I2C_address, uint32_t &I2C_restarts);
 void lowpassFilter(float &oldLowPassGain,
                    uint32_t &oldLowpassFilterPoleFrequency,
                    float &oldLowPassFilteredVoltage,
@@ -313,7 +313,7 @@ uint16_t dc_checker(void)
 void handleVoltageReader(float scale_in, float offset, float &outVoltage, int32_t &outRaw,
                          float &oldVoltage, float &oldRaw,
                          uint8_t devType, int8_t &old_devType, uint8_t &readStat, uint32_t &outStatus,
-                         ADS1014 *&ads, MyMCP3221 *mcp, uint8_t I2C_address, uint32_t &I2C_restarts)
+                         ADS1014 *&ads, MyMCP3221 *&mcp, uint8_t I2C_address, uint32_t &I2C_restarts)
 {
    float scale = scale_in;
    if (scale == 0.0)
