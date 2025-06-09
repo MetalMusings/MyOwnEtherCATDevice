@@ -1,52 +1,89 @@
-    <slave idx="3" name="THTIC" type="generic" vid="0xd0bed1d0" pid="0x00007000">
+    <slave idx="3" type="generic" vid="0xd0bed1d0" pid="0x00007000" name="E7000">
       <!--MetalMusings EaserCAT 7000-->
-      <sdoConfig idx="2000" subIdx="0"><sdoDataRaw data ="02"/></sdoConfig> <!-- ADC device type, 1 = MCP3221, 2 = ADS1014 -->
-      <sdoConfig idx="2001" subIdx="0"><sdoDataRaw data ="48"/></sdoConfig> <!-- I2C device address often 0x48 -->
+      <sdoConfig idx="2000" subIdx="1"><sdoDataRaw data ="02"/></sdoConfig> <!-- ADC device type, 1 = MCP3221, 2 = ADS1014 -->
+      <sdoConfig idx="2000" subIdx="2"><sdoDataRaw data ="48"/></sdoConfig> <!-- I2C device address often 0x48 -->
+      <sdoConfig idx="2000" subIdx="3"><sdoDataRaw data ="0a 00 00 00" /></sdoConfig> <!-- Lowpass filter pole frequency try 10 Hz -->
+      <sdoConfig idx="2001" subIdx="1"><sdoDataRaw data ="02"/></sdoConfig> <!-- ADC device type, 1 = MCP3221, 2 = ADS1014 -->
+      <sdoConfig idx="2001" subIdx="2"><sdoDataRaw data ="49"/></sdoConfig> <!-- I2C device address 0x49 for second one -->
+      <sdoConfig idx="2001" subIdx="3"><sdoDataRaw data ="0a 00 00 00" /></sdoConfig> <!-- Lowpass filter pole frequency try 10 Hz -->
+      <!--MetalMusings EaserCAT 7000-->
       <syncManager idx="0" dir="in"/>
       <syncManager idx="1" dir="out"/>
       <syncManager idx="2" dir="out">
         <pdo idx="1600">
-          <pdoEntry idx="7000" subIdx="00" bitLen="8" halType="complex">
-            <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
-            <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
-            <complexEntry bitLen="1" halPin="out-3" halType="bit"/>
-            <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
-            <complexEntry bitLen="4"/>
-          </pdoEntry>
+	  <pdoEntry idx="7000" subIdx="00" bitLen="8" halType="complex">
+	    <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="ActivateRelay" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
+	    <complexEntry bitLen="4"/>
+	  </pdoEntry>
         </pdo>
         <pdo idx="1601">
-          <pdoEntry idx="7001" subIdx="00" bitLen="32" halPin="voltageScale" halType="float-ieee"/>
+          <!--In_Unit1-->
+          <pdoEntry idx="7001" subIdx="01" bitLen="32" halPin="voltageScale-1" halType="float-ieee"/>
+          <pdoEntry idx="7001" subIdx="02" bitLen="32" halPin="voltageOffset-1" halType="float-ieee"/>
+          <pdoEntry idx="7001" subIdx="03" bitLen="32" halPin="LowPassFilterThresholdVoltage-1" halType="float-ieee"/>
+	  <pdoEntry idx="7001" subIdx="04" bitLen="8" halType="complex">
+	    <complexEntry bitLen="1" halPin="EnableOhmicSensing-1" halType="bit"/>
+	    <complexEntry bitLen="7"/>
+	  </pdoEntry>
+          <pdoEntry idx="7001" subIdx="05" bitLen="32" halPin="OhmicSensingSetupTime-1" halType="u32"/>
+          <pdoEntry idx="7001" subIdx="06" bitLen="32" halPin="OhmicSensingVoltageLimit-1" halType="float-ieee"/>
         </pdo>
         <pdo idx="1602">
-          <pdoEntry idx="7002" subIdx="00" bitLen="32" halPin="voltageOffset" halType="float-ieee"/>
+          <!--In_Unit2-->
+          <pdoEntry idx="7002" subIdx="01" bitLen="32" halPin="voltageScale-2" halType="float-ieee"/>
+          <pdoEntry idx="7002" subIdx="02" bitLen="32" halPin="voltageOffset-2" halType="float-ieee"/>
+          <pdoEntry idx="7002" subIdx="03" bitLen="32" halPin="LowPassFilterThresholdVoltage-2" halType="float-ieee"/>
+	  <pdoEntry idx="7002" subIdx="04" bitLen="8" halType="complex">
+	    <complexEntry bitLen="1" halPin="EnableOhmicSensing-2" halType="bit"/>
+	    <complexEntry bitLen="7"/>
+	  </pdoEntry>
+          <pdoEntry idx="7002" subIdx="05" bitLen="32" halPin="OhmicSensingSetupTime-2" halType="u32"/>
+          <pdoEntry idx="7002" subIdx="06" bitLen="32" halPin="OhmicSensingVoltageLimit-2" halType="float-ieee"/>
         </pdo>
       </syncManager>
       <syncManager idx="3" dir="in">
         <pdo idx="1a00">
           <pdoEntry idx="6000" subIdx="00" bitLen="32" halType="complex">
-            <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-9" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-10" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-11" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-12" halType="bit"/>
-            <complexEntry bitLen="20"/>
-          </pdoEntry>
+	    <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-9" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-10" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-11" halType="bit"/>
+	    <complexEntry bitLen="1" halPin="in-12" halType="bit"/>
+	    <complexEntry bitLen="20"/>
+	  </pdoEntry>
         </pdo>
+
         <pdo idx="1a01">
-          <pdoEntry idx="6001" subIdx="00" bitLen="32" halPin="rawData" halType="s32"/>
+          <!--Out_Unit1-->
+          <pdoEntry idx="6001" subIdx="01" bitLen="32" halPin="rawData-1" halType="s32"/>
+          <pdoEntry idx="6001" subIdx="02" bitLen="32" halPin="calculatedVoltage-1" halType="float-ieee"/>
+          <pdoEntry idx="6001" subIdx="03" bitLen="32" halPin="status-1" halType="u32"/>
+          <pdoEntry idx="6001" subIdx="04" bitLen="32" halPin="LowPassFilteredVoltage-1" halType="float-ieee"/>
+	  <pdoEntry idx="6001" subIdx="05" bitLen="8" halType="complex">
+	    <complexEntry bitLen="1" halPin="OhmicSensingSensed-1" halType="bit"/>
+	    <complexEntry bitLen="7"/>
+	  </pdoEntry>
         </pdo>
         <pdo idx="1a02">
-          <pdoEntry idx="6002" subIdx="00" bitLen="32" halPin="calculatedVoltage" halType="float-ieee"/>
-        </pdo>
-        <pdo idx="1a03">
-          <pdoEntry idx="6003" subIdx="00" bitLen="8" halPin="status" halType="u32"/>
+          <!--Out_Unit2-->
+          <pdoEntry idx="6002" subIdx="01" bitLen="32" halPin="rawData-2" halType="s32"/>
+          <pdoEntry idx="6002" subIdx="02" bitLen="32" halPin="calculatedVoltage-2" halType="float-ieee"/>
+          <pdoEntry idx="6002" subIdx="03" bitLen="32" halPin="status-2" halType="u32"/>
+          <pdoEntry idx="6002" subIdx="04" bitLen="32" halPin="LowPassFilteredVoltage-2" halType="float-ieee"/>
+	  <pdoEntry idx="6002" subIdx="05" bitLen="8" halType="complex">
+	    <complexEntry bitLen="1" halPin="OhmicSensingSensed-2" halType="bit"/>
+	    <complexEntry bitLen="7"/>
+	  </pdoEntry>
         </pdo>
       </syncManager>
     </slave>

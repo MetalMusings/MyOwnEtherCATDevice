@@ -164,13 +164,13 @@ The boards are relatively small, 42x30 mm. Voltage 5V in, current less than 10 m
 EaserCAT-7000 is an EaserCAT-6000 board where the THCAD frequency input has been replaced by the I2C bus.
 There are twelve digital inputs and four digital outputs.
 
-Configuration of the connected I2C device is done with the two SDOs 0x2000:0 and 0x2001:0.\
-The I2C device type is set to 0 by default. A zero means no I2C ADC. Entering a 1 in 0x2000:0 selects the MCP3221, and a 2 in 0x2000:0 selects the ADS1014.\
-The I2C address for the ADC is written into SDO 0x2001:0. The address for the MCP3221 is selected when it is purchased - there are 8 different models each with a different I2C address 0x48-0x4f. The ADS1014 has a way to select the address, but the THTIC2 board has it fixed at 0x48.
+Currently the EaserCAT-7000 can handle two I2C voltage readers, on different I2C addresses.\
+Configuration of the connected I2C devices is done by setting the voltage reader type in SDOs 0x2000:1 and 0x2001:1 for device 1 and 2. The I2C device type is set to 0 by default. A zero means no I2C ADC. Entering a 1 in 0x2000:0 selects the MCP3221, and a 2 in 0x2000:0 selects the ADS1014.\
+The I2C address for the ADC is written into SDOs 0x2000:2 and 0x2001:2. The address for the MCP3221 is selected when it is purchased - there are 8 different models each with a different I2C address 0x48-0x4f. The THTIC2 board has the address fixed at 0x48; can be modified during pcb assembly to 0x49 quite easily - check datasheet. Short version is to cut Addr-Gnd and add Addr-Vcc.
 
 Pay attention to the polarity when connecting the plasma voltage leads the THTIC and THTIC2. Varc+ must have higher voltage potential the Varc- (as one would expect). The voltage divisor may need to be adjusted, there is now one 100 kOhm resistor and a 2.2 kOhm resistor, which brings down 100 V to around 2 V. Adjust as needed. For high voltage, pay attention to the max allowed voltage of the resistor. The ADC likes to have around 2-3 Volts when cutting.
 
-The experience with these cards has been very good so far. I have used the THTIC the most, cutting for at least an hour of cutting time, with THC enabled and active. A status variable shows that it has been working the whole time, no stops or resets. The THTIC2 has been used much less, but it behaves the same as the THTIC card, meaning it just works.
+The experience with these cards has been very good. I used the THTIC a lot, cutting for at least an hour of cutting time, with THC enabled and active. A status variable shows that it has been working the whole time, no stops or resets. After that I switched to the THTIC2 card and have been using that since. Works really well.
 
 ## THCLIP Enable ohmic sensing with the IPTM-60 torch
 
@@ -180,9 +180,16 @@ This is for the torches known as IPT-60 PT-60 S45 IPTM-60 IPTM-80 and many more 
 
 ![THCLIP](Utils/Pictures/THCLIP2.png)
 
-I have made an adaptation to the EaserCAT 7000 to handle the contact. There is a short setup time needed to make sure the relay is activated before starting to watch for contact, a tenth of a second seems enough. Then it watches for a shift from some 7V to a settable limit, say 4V, to indicate contact. Works like a charm.
+I tried at first to use the normal Arc voltage reader to detect any contact between the torch and the work piece during probing. However, that was not reliable - it seems there is electronics involved with the arc voltage. Don't want to know details. 
+
+I put a second voltage reader THTIC2 close to the THCLIP and measure the 24V applied after the relay. Monitoring this voltage turns out to be reliable and makes the ohmic sensing work really well.
+
+I have made an adaptation to the EaserCAT 7000 to handle the contact. The relay has a short, some 10 msecs, setup time. The read voltage must therefor first go above the voltage limit before it starts to scan for the voltage to go below the voltage limit which indicates contact.
 
 The Trafimet torch hose connectors are called FY0022 and FY0023. The relay is a 24V 40A standard car relay. Check out the Kicad schematics for the other parts.
+
+![Schema](Utils/Pictures/THCLIP3.png)
+Leads 1 and 4 are the blowback arc start ground leads in my torch. They get cut by the relay during ohmic sensing. Voltage is measured on connector J3, between pin 1 and pin 2.
 
 ## License
 
