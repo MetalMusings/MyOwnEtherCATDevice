@@ -191,6 +191,8 @@ The Trafimet torch hose connectors are called FY0022 and FY0023. The relay is a 
 ![Schema](Utils/Pictures/THCLIP3.png)
 Leads 1 and 4 are the blowback arc start ground leads in my torch. They get cut by the relay during ohmic sensing. Voltage is measured on connector J3, between pin 1 and pin 2.
 
+![Ready for use](Utils/Pictures/THCLIP4.png)
+
 ## License
 
 Don't violate the original licenses. No warranties. Use it any way you like.\
