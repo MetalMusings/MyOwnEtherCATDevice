@@ -83,8 +83,8 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
    for (int i = 0; i < 4; i++)
       digitalWrite(OUTPUTS[i], bitcheck(Obj.Output4, i) ? HIGH : LOW);
    // analogWrite(DAC1_pin, Obj.Voltage);
-   // Encoder1.setLatch(Obj.IndexLatchEnable);
-   // Encoder1.setScale(2000);
+   Encoder1.setLatch(Obj.EncIndexLatchEnable);
+   Encoder1.setScale(Obj.EncScale);
 
    posScale1 = Obj.StepsPerMM1; // Scale perhaps changed
    posScale2 = Obj.StepsPerMM2;
@@ -108,25 +108,21 @@ void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 
 void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
-   Obj.Velocity = Obj.Scale * FrequencyMeasured;
-   float scale = 1;
-   if (Obj.Scale != 0.0)
-      scale = Obj.Scale;
-   Obj.Velocity = scale * sin(ESCvar.Time * 1e-8 * 6.28); // Test
+  float scale = 1;
+   if (Obj.EncScale != 0.0)
+      scale = Obj.EncScale;
 
    for (int i = 0; i < 8; i++)
       if (digitalRead(INPUTS[i]) == HIGH)
          bitSet(Obj.Input8, i);
       else
          bitClear(Obj.Input8, i);
-#if 0
-   Obj.IndexStatus = Encoder1.indexHappened();
-   Obj.EncPos = Encoder1.currentPos();
-   Obj.EncFrequency = Encoder1.frequency(longTime.extendTime(micros()));
-   Obj.IndexByte = Encoder1.getIndexState();
 
-   Obj.Velocity = Obj.Scale * FrequencyMeasured;
-#endif
+   Obj.IndexStatus = Encoder1.indexHappened();
+   Obj.EncPosition = Encoder1.currentPos();
+   Obj.IndexByte = Encoder1.getIndexState();
+   Obj.EncVelocity = Obj.EncScale * FrequencyMeasured;
+
    Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
    Obj.ActualPosition3 = Step->stepgen_array[2].pos_fb;

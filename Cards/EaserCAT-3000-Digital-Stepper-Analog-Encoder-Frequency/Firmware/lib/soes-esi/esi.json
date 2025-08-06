@@ -72,25 +72,25 @@
       },
       "6000": {
         "otype": "VAR",
-        "name": "Velocity",
+        "name": "EncPosition",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
         "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.Velocity"
+        "data": "&Obj.EncPosition"
       },
       "6001": {
         "otype": "VAR",
-        "name": "Frequency",
+        "name": "EncVelocity",
         "access": "RO",
         "pdo_mappings": [
           "txpdo"
         ],
         "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.Frequency"
+        "data": "&Obj.EncVelocity"
       },
       "6002": {
         "otype": "VAR",
@@ -146,19 +146,41 @@
         "dtype": "REAL32",
         "value": "0",
         "data": "&Obj.ActualPosition4"
+      },
+      "6007": {
+        "otype": "VAR",
+        "name": "IndexByte",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.IndexByte"
+      },
+      "6008": {
+        "otype": "VAR",
+        "name": "IndexStatus",
+        "access": "RO",
+        "pdo_mappings": [
+          "txpdo"
+        ],
+        "dtype": "UNSIGNED32",
+        "value": "0",
+        "data": "&Obj.IndexStatus"
       }
     },
     "rxpdo": {
       "7000": {
         "otype": "VAR",
-        "name": "Scale",
+        "name": "EncScale",
         "access": "RO",
         "pdo_mappings": [
           "rxpdo"
         ],
         "dtype": "REAL32",
         "value": "0",
-        "data": "&Obj.Scale"
+        "data": "&Obj.EncScale"
       },
       "7001": {
         "otype": "VAR",
@@ -280,6 +302,17 @@
         "dtype": "UNSIGNED8",
         "value": "0",
         "data": "&Obj.Enable4"
+      },
+      "7012": {
+        "otype": "VAR",
+        "name": "EncIndexLatchEnable",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "UNSIGNED8",
+        "value": "0",
+        "data": "&Obj.EncIndexLatchEnable"
       },
       "60664": {
         "otype": "VAR",
