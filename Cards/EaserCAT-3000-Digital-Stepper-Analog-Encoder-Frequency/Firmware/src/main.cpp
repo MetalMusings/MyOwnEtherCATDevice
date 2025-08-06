@@ -16,7 +16,7 @@ HardwareSerial Serial1(PA10, PA9);
 ////// Digital IO
 const byte INPUTS[8] = {PE8, PE9, PE10, PE11, PE12, PE13, PE14, PE15};
 const byte OUTPUTS[4] = {PC5, PB0, PB1, PE7};
-const byte THCAD_PIN = PA2; // CAN BE PA0, should be PA0
+//const byte THCAD_PIN = PA2; // CAN BE PA0, should be PA0
 #define bitset(byte, nbit) ((byte) |= (1 << (nbit)))
 #define bitclear(byte, nbit) ((byte) &= ~(1 << (nbit)))
 #define bitflip(byte, nbit) ((byte) ^= (1 << (nbit)))
@@ -121,7 +121,7 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
    Obj.IndexStatus = Encoder1.indexHappened();
    Obj.EncPosition = Encoder1.currentPos();
    Obj.IndexByte = Encoder1.getIndexState();
-   Obj.EncVelocity = Obj.EncScale * FrequencyMeasured;
+   Obj.EncVelocity = Obj.EncScale * Encoder1.frequency(longTime.extendTime(micros()));
 
    Obj.ActualPosition1 = Step->stepgen_array[0].pos_fb;
    Obj.ActualPosition2 = Step->stepgen_array[1].pos_fb;
@@ -198,24 +198,6 @@ void setup(void)
    baseTimer = new HardwareTimer(TIM11);                        // The base period timer
    baseTimer->setOverflow(BASE_PERIOD / 1000, MICROSEC_FORMAT); // Or the line above, This one is uncalibrated
    baseTimer->attachInterrupt(basePeriodCB);
-
-   // Automatically retrieve TIM instance and channel associated to pin
-   // This is used to be compatible with all STM32 series automatically.
-   TIM_TypeDef *Instance = (TIM_TypeDef *)pinmap_peripheral(digitalPinToPinName(THCAD_PIN), PinMap_PWM);
-   channel = STM_PIN_CHANNEL(pinmap_function(digitalPinToPinName(THCAD_PIN), PinMap_PWM));
-
-   // FrequencyTimer = new HardwareTimer(Instance); // TIM2
-   FrequencyTimer = new HardwareTimer(TIM5); // TIM5
-
-   uint32_t PrescalerFactor = 1;
-   FrequencyTimer->setMode(channel, TIMER_INPUT_CAPTURE_RISING, THCAD_PIN);
-   FrequencyTimer->setPrescaleFactor(PrescalerFactor);
-   FrequencyTimer->setOverflow(0xFFFFFFF0); // Max Period value to have the largest possible time to detect rising edge and avoid timer rollover
-   FrequencyTimer->attachInterrupt(channel, InputCapture_IT_callback);
-   FrequencyTimer->attachInterrupt(Rollover_IT_callback);
-   FrequencyTimer->resume();
-   // Compute this scale factor only once
-   input_freq = FrequencyTimer->getTimerClkFreq() / FrequencyTimer->getPrescaleFactor();
 
    encoder_config(); // Needed by encoder, possibly breaks some timers.
 
