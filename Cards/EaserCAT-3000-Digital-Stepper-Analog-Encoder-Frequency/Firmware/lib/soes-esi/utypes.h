@@ -27,10 +27,25 @@ typedef struct
 
    float EncScale;
    uint8_t Output4;
+   uint8_t Enable1;
+   uint8_t Enable2;
+   uint8_t Enable3;
+   uint8_t Enable4;
    float CommandedPosition1;
    float CommandedPosition2;
    float CommandedPosition3;
    float CommandedPosition4;
+   struct
+   {
+      uint8_t IndexStatus;
+      uint8_t IndexByte;
+      float Position;
+      float Frequency;
+   } EncoderIn;
+
+   /* Parameters */
+
+   uint32_t BasePeriod;
    float StepsPerMM1;
    float StepsPerMM2;
    float StepsPerMM3;
@@ -39,15 +54,6 @@ typedef struct
    float MaxAcceleration2;
    float MaxAcceleration3;
    float MaxAcceleration4;
-   uint8_t Enable1;
-   uint8_t Enable2;
-   uint8_t Enable3;
-   uint8_t Enable4;
-   uint8_t EncIndexLatchEnable;
-
-   /* Parameters */
-
-   uint32_t BasePeriod;
 } _Objects;
 
 extern _Objects Obj;

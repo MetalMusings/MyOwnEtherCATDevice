@@ -138,7 +138,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition1</Name>
+                  <Name>Enable1</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -162,7 +162,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition2</Name>
+                  <Name>Enable2</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -186,7 +186,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition3</Name>
+                  <Name>Enable3</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -210,7 +210,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>CommandedPosition4</Name>
+                  <Name>Enable4</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -234,7 +234,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>StepsPerMM1</Name>
+                  <Name>CommandedPosition1</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -258,7 +258,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>StepsPerMM2</Name>
+                  <Name>CommandedPosition2</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -282,7 +282,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>StepsPerMM3</Name>
+                  <Name>CommandedPosition3</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -306,7 +306,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>StepsPerMM4</Name>
+                  <Name>CommandedPosition4</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -317,7 +317,7 @@
               </DataType>
               <DataType>
                 <Name>DT160A</Name>
-                <BitSize>48</BitSize>
+                <BitSize>144</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -330,7 +330,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>1</SubIdx>
-                  <Name>MaxAcceleration1</Name>
+                  <Name>IndexStatus</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>16</BitOffs>
@@ -338,170 +338,32 @@
                     <Access>ro</Access>
                   </Flags>
                 </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT160B</Name>
-                <BitSize>48</BitSize>
                 <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>MaxAcceleration2</Name>
+                  <SubIdx>2</SubIdx>
+                  <Name>IndexByte</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT160C</Name>
-                <BitSize>48</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
+                  <BitOffs>48</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
                 </SubItem>
                 <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>MaxAcceleration3</Name>
+                  <SubIdx>3</SubIdx>
+                  <Name>Position</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT160D</Name>
-                <BitSize>48</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
                 </SubItem>
                 <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>MaxAcceleration4</Name>
+                  <SubIdx>4</SubIdx>
+                  <Name>Frequency</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT160E</Name>
-                <BitSize>48</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>Enable1</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT160F</Name>
-                <BitSize>48</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>Enable2</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT1610</Name>
-                <BitSize>48</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>Enable3</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-              </DataType>
-              <DataType>
-                <Name>DT1611</Name>
-                <BitSize>48</BitSize>
-                <SubItem>
-                  <SubIdx>0</SubIdx>
-                  <Name>Max SubIndex</Name>
-                  <Type>USINT</Type>
-                  <BitSize>8</BitSize>
-                  <BitOffs>0</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>1</SubIdx>
-                  <Name>Enable4</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>16</BitOffs>
+                  <BitOffs>112</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -782,15 +644,15 @@
               <DataType>
                 <Name>DT1C12ARR</Name>
                 <BaseType>UINT</BaseType>
-                <BitSize>304</BitSize>
+                <BitSize>176</BitSize>
                 <ArrayInfo>
                   <LBound>1</LBound>
-                  <Elements>19</Elements>
+                  <Elements>11</Elements>
                 </ArrayInfo>
               </DataType>
               <DataType>
                 <Name>DT1C12</Name>
-                <BitSize>320</BitSize>
+                <BitSize>192</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -804,7 +666,7 @@
                 <SubItem>
                   <Name>Elements</Name>
                   <Type>DT1C12ARR</Type>
-                  <BitSize>304</BitSize>
+                  <BitSize>176</BitSize>
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
@@ -840,6 +702,64 @@
                   <BitOffs>16</BitOffs>
                   <Flags>
                     <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT700A</Name>
+                <BitSize>96</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags>
+                    <Access>ro</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>IndexStatus</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>IndexByte</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>24</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>3</SubIdx>
+                  <Name>Position</Name>
+                  <Type>REAL</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>32</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>Frequency</Name>
+                  <Type>REAL</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>64</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">ro</Access>
+                  <PdoMapping>R</PdoMapping>
                   </Flags>
                 </SubItem>
               </DataType>
@@ -1005,272 +925,8 @@
               </Object>
               <Object>
                 <Index>#x1602</Index>
-                <Name>CommandedPosition1</Name>
-                <Type>DT1602</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>CommandedPosition1</Name>
-                    <Info>
-                      <DefaultValue>#x70020020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1603</Index>
-                <Name>CommandedPosition2</Name>
-                <Type>DT1603</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>CommandedPosition2</Name>
-                    <Info>
-                      <DefaultValue>#x70030020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1604</Index>
-                <Name>CommandedPosition3</Name>
-                <Type>DT1604</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>CommandedPosition3</Name>
-                    <Info>
-                      <DefaultValue>#x70040020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1605</Index>
-                <Name>CommandedPosition4</Name>
-                <Type>DT1605</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>CommandedPosition4</Name>
-                    <Info>
-                      <DefaultValue>#x70050020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1606</Index>
-                <Name>StepsPerMM1</Name>
-                <Type>DT1606</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM1</Name>
-                    <Info>
-                      <DefaultValue>#x70060020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1607</Index>
-                <Name>StepsPerMM2</Name>
-                <Type>DT1607</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM2</Name>
-                    <Info>
-                      <DefaultValue>#x70070020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1608</Index>
-                <Name>StepsPerMM3</Name>
-                <Type>DT1608</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM3</Name>
-                    <Info>
-                      <DefaultValue>#x70080020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x1609</Index>
-                <Name>StepsPerMM4</Name>
-                <Type>DT1609</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>StepsPerMM4</Name>
-                    <Info>
-                      <DefaultValue>#x70090020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x160A</Index>
-                <Name>MaxAcceleration1</Name>
-                <Type>DT160A</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>MaxAcceleration1</Name>
-                    <Info>
-                      <DefaultValue>#x700A0020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x160B</Index>
-                <Name>MaxAcceleration2</Name>
-                <Type>DT160B</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>MaxAcceleration2</Name>
-                    <Info>
-                      <DefaultValue>#x700B0020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x160C</Index>
-                <Name>MaxAcceleration3</Name>
-                <Type>DT160C</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>MaxAcceleration3</Name>
-                    <Info>
-                      <DefaultValue>#x700C0020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x160D</Index>
-                <Name>MaxAcceleration4</Name>
-                <Type>DT160D</Type>
-                <BitSize>48</BitSize>
-                <Info>
-                  <SubItem>
-                    <Name>Max SubIndex</Name>
-                    <Info>
-                      <DefaultValue>1</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>MaxAcceleration4</Name>
-                    <Info>
-                      <DefaultValue>#x700D0020</DefaultValue>
-                    </Info>
-                  </SubItem>
-                </Info>
-                <Flags>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x160E</Index>
                 <Name>Enable1</Name>
-                <Type>DT160E</Type>
+                <Type>DT1602</Type>
                 <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
@@ -1282,7 +938,7 @@
                   <SubItem>
                     <Name>Enable1</Name>
                     <Info>
-                      <DefaultValue>#x700E0008</DefaultValue>
+                      <DefaultValue>#x70020008</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1290,9 +946,9 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x160F</Index>
+                <Index>#x1603</Index>
                 <Name>Enable2</Name>
-                <Type>DT160F</Type>
+                <Type>DT1603</Type>
                 <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
@@ -1304,7 +960,7 @@
                   <SubItem>
                     <Name>Enable2</Name>
                     <Info>
-                      <DefaultValue>#x700F0008</DefaultValue>
+                      <DefaultValue>#x70030008</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1312,9 +968,9 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x1610</Index>
+                <Index>#x1604</Index>
                 <Name>Enable3</Name>
-                <Type>DT1610</Type>
+                <Type>DT1604</Type>
                 <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
@@ -1326,7 +982,7 @@
                   <SubItem>
                     <Name>Enable3</Name>
                     <Info>
-                      <DefaultValue>#x70100008</DefaultValue>
+                      <DefaultValue>#x70040008</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1334,9 +990,9 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x1611</Index>
+                <Index>#x1605</Index>
                 <Name>Enable4</Name>
-                <Type>DT1611</Type>
+                <Type>DT1605</Type>
                 <BitSize>48</BitSize>
                 <Info>
                   <SubItem>
@@ -1348,7 +1004,135 @@
                   <SubItem>
                     <Name>Enable4</Name>
                     <Info>
-                      <DefaultValue>#x70110008</DefaultValue>
+                      <DefaultValue>#x70050008</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1606</Index>
+                <Name>CommandedPosition1</Name>
+                <Type>DT1606</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>CommandedPosition1</Name>
+                    <Info>
+                      <DefaultValue>#x70060020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1607</Index>
+                <Name>CommandedPosition2</Name>
+                <Type>DT1607</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>CommandedPosition2</Name>
+                    <Info>
+                      <DefaultValue>#x70070020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1608</Index>
+                <Name>CommandedPosition3</Name>
+                <Type>DT1608</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>CommandedPosition3</Name>
+                    <Info>
+                      <DefaultValue>#x70080020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x1609</Index>
+                <Name>CommandedPosition4</Name>
+                <Type>DT1609</Type>
+                <BitSize>48</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>1</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>CommandedPosition4</Name>
+                    <Info>
+                      <DefaultValue>#x70090020</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x160A</Index>
+                <Name>EncoderIn</Name>
+                <Type>DT160A</Type>
+                <BitSize>144</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>4</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>IndexStatus</Name>
+                    <Info>
+                      <DefaultValue>#x700A0108</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>IndexByte</Name>
+                    <Info>
+                      <DefaultValue>#x700A0208</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Position</Name>
+                    <Info>
+                      <DefaultValue>#x700A0320</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Frequency</Name>
+                    <Info>
+                      <DefaultValue>#x700A0420</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1619,12 +1403,12 @@
                 <Index>#x1C12</Index>
                 <Name>Sync Manager 2 PDO Assignment</Name>
                 <Type>DT1C12</Type>
-                <BitSize>320</BitSize>
+                <BitSize>192</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>19</DefaultValue>
+                      <DefaultValue>11</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1691,54 +1475,6 @@
                     <Name>PDO Mapping</Name>
                     <Info>
                       <DefaultValue>#x160A</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x160B</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x160C</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x160D</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x160E</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x160F</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x1610</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x1611</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>PDO Mapping</Name>
-                    <Info>
-                      <DefaultValue>#x1612</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1821,7 +1557,103 @@
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
                 <Info>
-                  <DefaultValue>20000</DefaultValue>
+                  <DefaultValue>10000</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2001</Index>
+                <Name>StepsPerMM1</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>200</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2002</Index>
+                <Name>StepsPerMM2</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>200</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2003</Index>
+                <Name>StepsPerMM3</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>200</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2004</Index>
+                <Name>StepsPerMM4</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>200</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2005</Index>
+                <Name>MaxAcceleration1</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>1000000</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2006</Index>
+                <Name>MaxAcceleration2</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>1000000</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2007</Index>
+                <Name>MaxAcceleration3</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>1000000</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>rw</Access>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x2008</Index>
+                <Name>MaxAcceleration4</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>1000000</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>rw</Access>
@@ -1972,162 +1804,6 @@
               </Object>
               <Object>
                 <Index>#x7002</Index>
-                <Name>CommandedPosition1</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7003</Index>
-                <Name>CommandedPosition2</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7004</Index>
-                <Name>CommandedPosition3</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7005</Index>
-                <Name>CommandedPosition4</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7006</Index>
-                <Name>StepsPerMM1</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7007</Index>
-                <Name>StepsPerMM2</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7008</Index>
-                <Name>StepsPerMM3</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x7009</Index>
-                <Name>StepsPerMM4</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x700A</Index>
-                <Name>MaxAcceleration1</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x700B</Index>
-                <Name>MaxAcceleration2</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x700C</Index>
-                <Name>MaxAcceleration3</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x700D</Index>
-                <Name>MaxAcceleration4</Name>
-                <Type>REAL</Type>
-                <BitSize>32</BitSize>
-                <Info>
-                  <DefaultValue>0</DefaultValue>
-                </Info>
-                <Flags>
-                  <Access>ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                </Flags>
-              </Object>
-              <Object>
-                <Index>#x700E</Index>
                 <Name>Enable1</Name>
                 <Type>USINT</Type>
                 <BitSize>8</BitSize>
@@ -2140,7 +1816,7 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x700F</Index>
+                <Index>#x7003</Index>
                 <Name>Enable2</Name>
                 <Type>USINT</Type>
                 <BitSize>8</BitSize>
@@ -2153,7 +1829,7 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x7010</Index>
+                <Index>#x7004</Index>
                 <Name>Enable3</Name>
                 <Type>USINT</Type>
                 <BitSize>8</BitSize>
@@ -2166,7 +1842,7 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x7011</Index>
+                <Index>#x7005</Index>
                 <Name>Enable4</Name>
                 <Type>USINT</Type>
                 <BitSize>8</BitSize>
@@ -2179,16 +1855,95 @@
                 </Flags>
               </Object>
               <Object>
-                <Index>#x7012</Index>
-                <Name>EncIndexLatchEnable</Name>
-                <Type>USINT</Type>
-                <BitSize>8</BitSize>
+                <Index>#x7006</Index>
+                <Name>CommandedPosition1</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
                 <Info>
                   <DefaultValue>0</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>ro</Access>
                   <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7007</Index>
+                <Name>CommandedPosition2</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7008</Index>
+                <Name>CommandedPosition3</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x7009</Index>
+                <Name>CommandedPosition4</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info>
+                  <DefaultValue>0</DefaultValue>
+                </Info>
+                <Flags>
+                  <Access>ro</Access>
+                  <PdoMapping>R</PdoMapping>
+                </Flags>
+              </Object>
+              <Object>
+                <Index>#x700A</Index>
+                <Name>EncoderIn</Name>
+                <Type>DT700A</Type>
+                <BitSize>96</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info>
+                      <DefaultValue>4</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>IndexStatus</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>IndexByte</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Position</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Frequency</Name>
+                    <Info>
+                      <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                </Info>
+                <Flags>
                 </Flags>
               </Object>
             </Objects>
@@ -2225,141 +1980,9 @@
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
           <Index>#x1602</Index>
-          <Name>CommandedPosition1</Name>
-          <Entry>
-            <Index>#x7002</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>CommandedPosition1</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1603</Index>
-          <Name>CommandedPosition2</Name>
-          <Entry>
-            <Index>#x7003</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>CommandedPosition2</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1604</Index>
-          <Name>CommandedPosition3</Name>
-          <Entry>
-            <Index>#x7004</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>CommandedPosition3</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1605</Index>
-          <Name>CommandedPosition4</Name>
-          <Entry>
-            <Index>#x7005</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>CommandedPosition4</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1606</Index>
-          <Name>StepsPerMM1</Name>
-          <Entry>
-            <Index>#x7006</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>StepsPerMM1</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1607</Index>
-          <Name>StepsPerMM2</Name>
-          <Entry>
-            <Index>#x7007</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>StepsPerMM2</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1608</Index>
-          <Name>StepsPerMM3</Name>
-          <Entry>
-            <Index>#x7008</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>StepsPerMM3</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1609</Index>
-          <Name>StepsPerMM4</Name>
-          <Entry>
-            <Index>#x7009</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>StepsPerMM4</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x160A</Index>
-          <Name>MaxAcceleration1</Name>
-          <Entry>
-            <Index>#x700A</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>MaxAcceleration1</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x160B</Index>
-          <Name>MaxAcceleration2</Name>
-          <Entry>
-            <Index>#x700B</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>MaxAcceleration2</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x160C</Index>
-          <Name>MaxAcceleration3</Name>
-          <Entry>
-            <Index>#x700C</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>MaxAcceleration3</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x160D</Index>
-          <Name>MaxAcceleration4</Name>
-          <Entry>
-            <Index>#x700D</Index>
-            <SubIndex>#x0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>MaxAcceleration4</Name>
-            <DataType>REAL</DataType>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x160E</Index>
           <Name>Enable1</Name>
           <Entry>
-            <Index>#x700E</Index>
+            <Index>#x7002</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>8</BitLen>
             <Name>Enable1</Name>
@@ -2367,10 +1990,10 @@
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x160F</Index>
+          <Index>#x1603</Index>
           <Name>Enable2</Name>
           <Entry>
-            <Index>#x700F</Index>
+            <Index>#x7003</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>8</BitLen>
             <Name>Enable2</Name>
@@ -2378,10 +2001,10 @@
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1610</Index>
+          <Index>#x1604</Index>
           <Name>Enable3</Name>
           <Entry>
-            <Index>#x7010</Index>
+            <Index>#x7004</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>8</BitLen>
             <Name>Enable3</Name>
@@ -2389,10 +2012,10 @@
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1611</Index>
+          <Index>#x1605</Index>
           <Name>Enable4</Name>
           <Entry>
-            <Index>#x7011</Index>
+            <Index>#x7005</Index>
             <SubIndex>#x0</SubIndex>
             <BitLen>8</BitLen>
             <Name>Enable4</Name>
@@ -2400,14 +2023,79 @@
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Mandatory="true" Sm="2">
-          <Index>#x1612</Index>
-          <Name>EncIndexLatchEnable</Name>
+          <Index>#x1606</Index>
+          <Name>CommandedPosition1</Name>
           <Entry>
-            <Index>#x7012</Index>
+            <Index>#x7006</Index>
             <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>CommandedPosition1</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1607</Index>
+          <Name>CommandedPosition2</Name>
+          <Entry>
+            <Index>#x7007</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>CommandedPosition2</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1608</Index>
+          <Name>CommandedPosition3</Name>
+          <Entry>
+            <Index>#x7008</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>CommandedPosition3</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x1609</Index>
+          <Name>CommandedPosition4</Name>
+          <Entry>
+            <Index>#x7009</Index>
+            <SubIndex>#x0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>CommandedPosition4</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Mandatory="true" Sm="2">
+          <Index>#x160A</Index>
+          <Name>EncoderIn</Name>
+          <Entry>
+            <Index>#x700A</Index>
+            <SubIndex>#x1</SubIndex>
             <BitLen>8</BitLen>
-            <Name>EncIndexLatchEnable</Name>
+            <Name>IndexStatus</Name>
             <DataType>USINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x700A</Index>
+            <SubIndex>#x2</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>IndexByte</Name>
+            <DataType>USINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x700A</Index>
+            <SubIndex>#x3</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>Position</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x700A</Index>
+            <SubIndex>#x4</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>Frequency</Name>
+            <DataType>REAL</DataType>
           </Entry>
         </RxPdo>
         <TxPdo Fixed="true" Mandatory="true" Sm="3">
@@ -2510,7 +2198,7 @@
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">
-          <CoE SdoInfo="true" PdoAssign="false" PdoConfig="false" PdoUpload="true" CompleteAccess="false" />
+          <CoE SdoInfo="true" PdoAssign="true" PdoConfig="true" PdoUpload="true" CompleteAccess="true" />
         </Mailbox>
         <Dc>
           <OpMode>
