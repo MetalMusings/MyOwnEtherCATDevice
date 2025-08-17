@@ -39,9 +39,81 @@
         "name": "BasePeriod",
         "access": "RW",
         "dtype": "UNSIGNED32",
-        "value": "20000",
+        "value": "10000",
         "isSDOitem": true,
         "data": "&Obj.BasePeriod"
+      },
+      "2001": {
+        "otype": "VAR",
+        "name": "StepsPerMM1",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "200",
+        "isSDOitem": true,
+        "data": "&Obj.StepsPerMM1"
+      },
+      "2002": {
+        "otype": "VAR",
+        "name": "StepsPerMM2",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "200",
+        "isSDOitem": true,
+        "data": "&Obj.StepsPerMM2"
+      },
+      "2003": {
+        "otype": "VAR",
+        "name": "StepsPerMM3",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "200",
+        "isSDOitem": true,
+        "data": "&Obj.StepsPerMM3"
+      },
+      "2004": {
+        "otype": "VAR",
+        "name": "StepsPerMM4",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "200",
+        "isSDOitem": true,
+        "data": "&Obj.StepsPerMM4"
+      },
+      "2005": {
+        "otype": "VAR",
+        "name": "MaxAcceleration1",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "1000000",
+        "isSDOitem": true,
+        "data": "&Obj.MaxAcceleration1"
+      },
+      "2006": {
+        "otype": "VAR",
+        "name": "MaxAcceleration2",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "1000000",
+        "isSDOitem": true,
+        "data": "&Obj.MaxAcceleration2"
+      },
+      "2007": {
+        "otype": "VAR",
+        "name": "MaxAcceleration3",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "1000000",
+        "isSDOitem": true,
+        "data": "&Obj.MaxAcceleration3"
+      },
+      "2008": {
+        "otype": "VAR",
+        "name": "MaxAcceleration4",
+        "access": "RW",
+        "dtype": "REAL32",
+        "value": "1000000",
+        "isSDOitem": true,
+        "data": "&Obj.MaxAcceleration4"
       },
       "A": {
         "otype": "RECORD",
@@ -173,93 +245,27 @@
       },
       "7002": {
         "otype": "VAR",
-        "name": "CommandedPosition1",
+        "name": "Enable1",
         "access": "RO",
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "REAL32",
+        "dtype": "UNSIGNED8",
         "value": "0",
-        "data": "&Obj.CommandedPosition1"
+        "data": "&Obj.Enable1"
       },
       "7003": {
         "otype": "VAR",
-        "name": "CommandedPosition2",
+        "name": "Enable2",
         "access": "RO",
         "pdo_mappings": [
           "rxpdo"
         ],
-        "dtype": "REAL32",
+        "dtype": "UNSIGNED8",
         "value": "0",
-        "data": "&Obj.CommandedPosition2"
+        "data": "&Obj.Enable2"
       },
       "7004": {
-        "otype": "VAR",
-        "name": "CommandedPosition3",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.CommandedPosition3"
-      },
-      "7005": {
-        "otype": "VAR",
-        "name": "CommandedPosition4",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.CommandedPosition4"
-      },
-      "7006": {
-        "otype": "VAR",
-        "name": "StepsPerMM1",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.StepsPerMM1"
-      },
-      "7007": {
-        "otype": "VAR",
-        "name": "StepsPerMM2",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.StepsPerMM2"
-      },
-      "7008": {
-        "otype": "VAR",
-        "name": "StepsPerMM3",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.StepsPerMM3"
-      },
-      "7009": {
-        "otype": "VAR",
-        "name": "StepsPerMM4",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.StepsPerMM4"
-      },
-      "7010": {
         "otype": "VAR",
         "name": "Enable3",
         "access": "RO",
@@ -270,7 +276,7 @@
         "value": "0",
         "data": "&Obj.Enable3"
       },
-      "7011": {
+      "7005": {
         "otype": "VAR",
         "name": "Enable4",
         "access": "RO",
@@ -280,6 +286,50 @@
         "dtype": "UNSIGNED8",
         "value": "0",
         "data": "&Obj.Enable4"
+      },
+      "7006": {
+        "otype": "VAR",
+        "name": "CommandedPosition1",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition1"
+      },
+      "7007": {
+        "otype": "VAR",
+        "name": "CommandedPosition2",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition2"
+      },
+      "7008": {
+        "otype": "VAR",
+        "name": "CommandedPosition3",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition3"
+      },
+      "7009": {
+        "otype": "VAR",
+        "name": "CommandedPosition4",
+        "access": "RO",
+        "pdo_mappings": [
+          "rxpdo"
+        ],
+        "dtype": "REAL32",
+        "value": "0",
+        "data": "&Obj.CommandedPosition4"
       },
       "60664": {
         "otype": "VAR",
@@ -292,70 +342,45 @@
         "value": "0"
       },
       "700A": {
-        "otype": "VAR",
-        "name": "MaxAcceleration1",
+        "otype": "RECORD",
+        "name": "EncoderIn",
         "access": "RO",
+        "items": [
+          {
+            "name": "Max SubIndex"
+          },
+          {
+            "name": "IndexStatus",
+            "dtype": "UNSIGNED8",
+            "data": "&Obj.EncoderIn.IndexStatus",
+            "value": "0",
+            "access": "RO"
+          },
+          {
+            "name": "IndexByte",
+            "dtype": "UNSIGNED8",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.EncoderIn.IndexByte"
+          },
+          {
+            "name": "Position",
+            "dtype": "REAL32",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.EncoderIn.Position"
+          },
+          {
+            "name": "Frequency",
+            "dtype": "REAL32",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.EncoderIn.Frequency"
+          }
+        ],
         "pdo_mappings": [
           "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.MaxAcceleration1"
-      },
-      "700B": {
-        "otype": "VAR",
-        "name": "MaxAcceleration2",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.MaxAcceleration2"
-      },
-      "700C": {
-        "otype": "VAR",
-        "name": "MaxAcceleration3",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.MaxAcceleration3"
-      },
-      "700D": {
-        "otype": "VAR",
-        "name": "MaxAcceleration4",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "REAL32",
-        "value": "0",
-        "data": "&Obj.MaxAcceleration4"
-      },
-      "700E": {
-        "otype": "VAR",
-        "name": "Enable1",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "UNSIGNED8",
-        "value": "0",
-        "data": "&Obj.Enable1"
-      },
-      "700F": {
-        "otype": "VAR",
-        "name": "Enable2",
-        "access": "RO",
-        "pdo_mappings": [
-          "rxpdo"
-        ],
-        "dtype": "UNSIGNED8",
-        "value": "0",
-        "data": "&Obj.Enable2"
+        ]
       }
     }
   },

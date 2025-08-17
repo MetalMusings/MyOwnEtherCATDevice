@@ -1,0 +1,36 @@
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS 
+
+loadusr -W lcec_conf ethercat-conf.xml
+loadrt lcec
+
+###########################################################
+# Functions servo-thread
+###########################################################
+
+addf lcec.read-all servo-thread
+
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+
+addf lcec.write-all servo-thread
+
+#########################################
+#nets
+#########################################
+net emc-enable => iocontrol.0.emc-enable-in
+sets emc-enable 1
+
+net x-enable  joint.0.amp-enable-out lcec.0.E3000.enable1-0 
+net x-pos-cmd joint.0.motor-pos-cmd  lcec.0.E3000.commandedPosition1
+net x-pos-fb  joint.0.motor-pos-fb   lcec.0.E3000.actualPosition1
+
+net y-enable  joint.1.amp-enable-out lcec.0.E3000.enable2-0 
+net y-pos-cmd joint.1.motor-pos-cmd  lcec.0.E3000.commandedPosition2
+net y-pos-fb  joint.1.motor-pos-fb   lcec.0.E3000.actualPosition2
+
+net z-enable  joint.2.amp-enable-out lcec.0.E3000.enable3-0 
+net z-pos-cmd joint.2.motor-pos-cmd  lcec.0.E3000.commandedPosition3
+net z-pos-fb  joint.2.motor-pos-fb   lcec.0.E3000.actualPosition3
+
+
