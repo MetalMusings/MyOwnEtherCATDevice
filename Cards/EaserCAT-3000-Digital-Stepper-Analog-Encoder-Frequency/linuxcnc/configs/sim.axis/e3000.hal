@@ -21,16 +21,16 @@ addf lcec.write-all servo-thread
 net emc-enable => iocontrol.0.emc-enable-in
 sets emc-enable 1
 
-net x-enable  joint.0.amp-enable-out lcec.0.E3000.enable1-0 
-net x-pos-cmd joint.0.motor-pos-cmd  lcec.0.E3000.commandedPosition1
-net x-pos-fb  joint.0.motor-pos-fb   lcec.0.E3000.actualPosition1
+net x-enable  joint.0.amp-enable-out lcec.0.E3000.Enable1-0 
+net x-pos-cmd joint.0.motor-pos-cmd  lcec.0.E3000.CommandedPosition1
+net x-pos-fb  joint.0.motor-pos-fb   lcec.0.E3000.ActualPosition1
 
-net y-enable  joint.1.amp-enable-out lcec.0.E3000.enable2-0 
-net y-pos-cmd joint.1.motor-pos-cmd  lcec.0.E3000.commandedPosition2
-net y-pos-fb  joint.1.motor-pos-fb   lcec.0.E3000.actualPosition2
+net y-enable  joint.1.amp-enable-out lcec.0.E3000.Enable2-0 
+net y-pos-cmd joint.1.motor-pos-cmd  lcec.0.E3000.CommandedPosition2
+net y-pos-fb  joint.1.motor-pos-fb   lcec.0.E3000.ActualPosition2
 
-net z-enable  joint.2.amp-enable-out lcec.0.E3000.enable3-0 
-net z-pos-cmd joint.2.motor-pos-cmd  lcec.0.E3000.commandedPosition3
-net z-pos-fb  joint.2.motor-pos-fb   lcec.0.E3000.actualPosition3
+net z-enable  joint.2.amp-enable-out lcec.0.E3000.Enable3-0 
+net z-pos-cmd joint.2.motor-pos-cmd  lcec.0.E3000.CommandedPosition3
+net z-pos-fb  joint.2.motor-pos-fb   lcec.0.E3000.ActualPosition3
 
 

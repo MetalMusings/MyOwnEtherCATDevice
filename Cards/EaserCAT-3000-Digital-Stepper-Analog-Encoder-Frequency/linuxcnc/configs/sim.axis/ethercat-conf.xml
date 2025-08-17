@@ -11,83 +11,85 @@
       <!--MetalMusings EaserCAT 3000-->
       <syncManager idx="0" dir="in"/>
       <syncManager idx="1" dir="out"/>
+
       <syncManager idx="2" dir="out">
         <pdo idx="1600">
-          <!--Scale-->
-          <pdoEntry idx="7000" subIdx="00" bitLen="32" halPin="scale" halType="float-ieee"/>
+          <!--EncoderOut-->
+          <pdoEntry idx="7000" subIdx="01" bitLen="8" halPin="IndexLatchEnable" halType="u32"/>
+          <pdoEntry idx="7000" subIdx="02" bitLen="32" halPin="Scale" halType="float-ieee"/>
         </pdo>
         <pdo idx="1601">
           <!--Output4-->
-          <pdoEntry idx="7001" subIdx="00" bitLen="8" halPin="output4" halType="bit"/>
+          <pdoEntry idx="7001" subIdx="00" bitLen="8" halPin="Output4" halType="bit"/>
         </pdo>
         <pdo idx="1602">
-          <!--CommandedPosition1-->
-          <pdoEntry idx="7002" subIdx="00" bitLen="8" halPin="enable1" halType="bit"/>
+          <!--Enable1-->
+          <pdoEntry idx="7002" subIdx="00" bitLen="8" halPin="Enable1" halType="bit"/>
         </pdo>
         <pdo idx="1603">
-          <!--CommandedPosition2-->
-          <pdoEntry idx="7003" subIdx="00" bitLen="8" halPin="enable2" halType="bit"/>
+          <!--Enable2-->
+          <pdoEntry idx="7003" subIdx="00" bitLen="8" halPin="Enable2" halType="bit"/>
         </pdo>
         <pdo idx="1604">
-          <!--CommandedPosition3-->
-          <pdoEntry idx="7004" subIdx="00" bitLen="8" halPin="enable3" halType="bit"/>
+          <!--Enable3-->
+          <pdoEntry idx="7004" subIdx="00" bitLen="8" halPin="Enable3" halType="bit"/>
         </pdo>
         <pdo idx="1605">
-          <!--CommandedPosition4-->
-          <pdoEntry idx="7005" subIdx="00" bitLen="8" halPin="enable4" halType="bit"/>
+          <!--Enable4-->
+          <pdoEntry idx="7005" subIdx="00" bitLen="8" halPin="Enable4" halType="bit"/>
         </pdo>
         <pdo idx="1606">
-          <!--Enable1-->
-          <pdoEntry idx="7006" subIdx="00" bitLen="32" halPin="commandedPosition1" halType="float-ieee"/>
+          <!--CommandedPosition1-->
+          <pdoEntry idx="7006" subIdx="00" bitLen="32" halPin="CommandedPosition1" halType="float-ieee"/>
         </pdo>
         <pdo idx="1607">
-          <!--Enable2-->
-          <pdoEntry idx="7007" subIdx="00" bitLen="32" halPin="commandedPosition2" halType="float-ieee"/>
+          <!--CommandedPosition2-->
+          <pdoEntry idx="7007" subIdx="00" bitLen="32" halPin="CommandedPosition2" halType="float-ieee"/>
         </pdo>
         <pdo idx="1608">
-          <!--Enable3-->
-          <pdoEntry idx="7008" subIdx="00" bitLen="32" halPin="commandedPosition3" halType="float-ieee"/>
+          <!--CommandedPosition3-->
+          <pdoEntry idx="7008" subIdx="00" bitLen="32" halPin="CommandedPosition3" halType="float-ieee"/>
         </pdo>
         <pdo idx="1609">
-          <!--Enable4-->
-          <pdoEntry idx="7009" subIdx="00" bitLen="32" halPin="commandedPosition4" halType="float-ieee"/>
+          <!--CommandedPosition4-->
+          <pdoEntry idx="7009" subIdx="00" bitLen="32" halPin="CommandedPosition4" halType="float-ieee"/>
         </pdo>
         <pdo idx="160a">
-          <!--EncoderIn-->
-          <pdoEntry idx="700a" subIdx="01" bitLen="8" halPin="indexstatus" halType="u32"/>
-          <pdoEntry idx="700a" subIdx="02" bitLen="8" halPin="indexbyte" halType="u32"/>
-          <pdoEntry idx="700a" subIdx="03" bitLen="32" halPin="position" halType="float-ieee"/>
-          <pdoEntry idx="700a" subIdx="04" bitLen="32" halPin="out-frequency" halType="float-ieee"/>
+          <!--Voltage-->
+          <pdoEntry idx="700a" subIdx="00" bitLen="32" halPin="Voltage" halType="float-ieee"/>
         </pdo>
       </syncManager>
       <syncManager idx="3" dir="in">
         <pdo idx="1a00">
-          <!--Velocity-->
-          <pdoEntry idx="6000" subIdx="00" bitLen="32" halPin="velocity" halType="float-ieee"/>
+          <!--FrequencyCounterFrequency-->
+          <pdoEntry idx="6000" subIdx="00" bitLen="32" halPin="FrequencyCounterFrequency" halType="float-ieee"/>
         </pdo>
         <pdo idx="1a01">
-          <!--Frequency-->
-          <pdoEntry idx="6001" subIdx="00" bitLen="32" halPin="in-frequency" halType="float-ieee"/>
+          <!--EncoderIn-->
+          <pdoEntry idx="6001" subIdx="01" bitLen="8" halPin="IndexStatus" halType="u32"/>
+          <pdoEntry idx="6001" subIdx="02" bitLen="8" halPin="IndexByte" halType="u32"/>
+          <pdoEntry idx="6001" subIdx="03" bitLen="32" halPin="Position" halType="float-ieee"/>
+          <pdoEntry idx="6001" subIdx="04" bitLen="32" halPin="Pelocity" halType="float-ieee"/>
         </pdo>
         <pdo idx="1a02">
           <!--Input8-->
-          <pdoEntry idx="6002" subIdx="00" bitLen="8" halPin="input8" halType="bit"/>
+          <pdoEntry idx="6002" subIdx="00" bitLen="8" halPin="Input8" halType="bit"/>
         </pdo>
         <pdo idx="1a03">
           <!--ActualPosition1-->
-          <pdoEntry idx="6003" subIdx="00" bitLen="32" halPin="actualPosition1" halType="float-ieee"/>
+          <pdoEntry idx="6003" subIdx="00" bitLen="32" halPin="ActualPosition1" halType="float-ieee"/>
         </pdo>
         <pdo idx="1a04">
           <!--ActualPosition2-->
-          <pdoEntry idx="6004" subIdx="00" bitLen="32" halPin="actualPosition2" halType="float-ieee"/>
+          <pdoEntry idx="6004" subIdx="00" bitLen="32" halPin="ActualPosition2" halType="float-ieee"/>
         </pdo>
         <pdo idx="1a05">
           <!--ActualPosition3-->
-          <pdoEntry idx="6005" subIdx="00" bitLen="32" halPin="actualPosition3" halType="float-ieee"/>
+          <pdoEntry idx="6005" subIdx="00" bitLen="32" halPin="ActualPosition3" halType="float-ieee"/>
         </pdo>
         <pdo idx="1a06">
           <!--ActualPosition4-->
-          <pdoEntry idx="6006" subIdx="00" bitLen="32" halPin="actualPosition4" halType="float-ieee"/>
+          <pdoEntry idx="6006" subIdx="00" bitLen="32" halPin="ActualPosition4" halType="float-ieee"/>
         </pdo>
       </syncManager>
     </slave>

@@ -13,19 +13,27 @@ typedef struct
 
    /* Inputs */
 
-   float EncPosition;
-   float EncVelocity;
+   float FrequencyCounterFrequency;
+   struct
+   {
+      uint8_t IndexStatus;
+      uint8_t IndexByte;
+      float Position;
+      float Velocity;
+   } EncoderIn;
    uint8_t Input8;
    float ActualPosition1;
    float ActualPosition2;
    float ActualPosition3;
    float ActualPosition4;
-   uint32_t IndexByte;
-   uint32_t IndexStatus;
 
    /* Outputs */
 
-   float EncScale;
+   struct
+   {
+      uint8_t IndexLatchEnable;
+      float Scale;
+   } EncoderOut;
    uint8_t Output4;
    uint8_t Enable1;
    uint8_t Enable2;
@@ -35,13 +43,7 @@ typedef struct
    float CommandedPosition2;
    float CommandedPosition3;
    float CommandedPosition4;
-   struct
-   {
-      uint8_t IndexStatus;
-      uint8_t IndexByte;
-      float Position;
-      float Frequency;
-   } EncoderIn;
+   float Voltage;
 
    /* Parameters */
 

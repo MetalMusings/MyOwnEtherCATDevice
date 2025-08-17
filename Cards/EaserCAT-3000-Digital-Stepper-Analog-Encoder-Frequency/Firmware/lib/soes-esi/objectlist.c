@@ -13,9 +13,10 @@ static const char acName1018_01[] = "Vendor ID";
 static const char acName1018_02[] = "Product Code";
 static const char acName1018_03[] = "Revision Number";
 static const char acName1018_04[] = "Serial Number";
-static const char acName1600[] = "EncScale";
+static const char acName1600[] = "EncoderOut";
 static const char acName1600_00[] = "Max SubIndex";
-static const char acName1600_01[] = "EncScale";
+static const char acName1600_01[] = "IndexLatchEnable";
+static const char acName1600_02[] = "Scale";
 static const char acName1601[] = "Output4";
 static const char acName1601_00[] = "Max SubIndex";
 static const char acName1601_01[] = "Output4";
@@ -43,18 +44,18 @@ static const char acName1608_01[] = "CommandedPosition3";
 static const char acName1609[] = "CommandedPosition4";
 static const char acName1609_00[] = "Max SubIndex";
 static const char acName1609_01[] = "CommandedPosition4";
-static const char acName160A[] = "EncoderIn";
+static const char acName160A[] = "Voltage";
 static const char acName160A_00[] = "Max SubIndex";
-static const char acName160A_01[] = "IndexStatus";
-static const char acName160A_02[] = "IndexByte";
-static const char acName160A_03[] = "Position";
-static const char acName160A_04[] = "Frequency";
-static const char acName1A00[] = "Velocity";
+static const char acName160A_01[] = "Voltage";
+static const char acName1A00[] = "FrequencyCounterFrequency";
 static const char acName1A00_00[] = "Max SubIndex";
-static const char acName1A00_01[] = "EncPosition";
-static const char acName1A01[] = "EncVelocity";
+static const char acName1A00_01[] = "FrequencyCounterFrequency";
+static const char acName1A01[] = "EncoderIn";
 static const char acName1A01_00[] = "Max SubIndex";
-static const char acName1A01_01[] = "EncVelocity";
+static const char acName1A01_01[] = "IndexStatus";
+static const char acName1A01_02[] = "IndexByte";
+static const char acName1A01_03[] = "Position";
+static const char acName1A01_04[] = "Velocity";
 static const char acName1A02[] = "Input8";
 static const char acName1A02_00[] = "Max SubIndex";
 static const char acName1A02_01[] = "Input8";
@@ -70,12 +71,6 @@ static const char acName1A05_01[] = "ActualPosition3";
 static const char acName1A06[] = "ActualPosition4";
 static const char acName1A06_00[] = "Max SubIndex";
 static const char acName1A06_01[] = "ActualPosition4";
-static const char acName1A07[] = "IndexByte";
-static const char acName1A07_00[] = "Max SubIndex";
-static const char acName1A07_01[] = "IndexByte";
-static const char acName1A08[] = "IndexStatus";
-static const char acName1A08_00[] = "Max SubIndex";
-static const char acName1A08_01[] = "IndexStatus";
 static const char acName1C00[] = "Sync Manager Communication Type";
 static const char acName1C00_00[] = "Max SubIndex";
 static const char acName1C00_01[] = "Communications Type SM0";
@@ -104,8 +99,6 @@ static const char acName1C13_04[] = "PDO Mapping";
 static const char acName1C13_05[] = "PDO Mapping";
 static const char acName1C13_06[] = "PDO Mapping";
 static const char acName1C13_07[] = "PDO Mapping";
-static const char acName1C13_08[] = "PDO Mapping";
-static const char acName1C13_09[] = "PDO Mapping";
 static const char acName2000[] = "BasePeriod";
 static const char acName2001[] = "StepsPerMM1";
 static const char acName2002[] = "StepsPerMM2";
@@ -115,16 +108,22 @@ static const char acName2005[] = "MaxAcceleration1";
 static const char acName2006[] = "MaxAcceleration2";
 static const char acName2007[] = "MaxAcceleration3";
 static const char acName2008[] = "MaxAcceleration4";
-static const char acName6000[] = "Velocity";
-static const char acName6001[] = "Frequency";
+static const char acName6000[] = "FrequencyCounterFrequency";
+static const char acName6001[] = "EncoderIn";
+static const char acName6001_00[] = "Max SubIndex";
+static const char acName6001_01[] = "IndexStatus";
+static const char acName6001_02[] = "IndexByte";
+static const char acName6001_03[] = "Position";
+static const char acName6001_04[] = "Velocity";
 static const char acName6002[] = "Input8";
 static const char acName6003[] = "ActualPosition1";
 static const char acName6004[] = "ActualPosition2";
 static const char acName6005[] = "ActualPosition3";
 static const char acName6006[] = "ActualPosition4";
-static const char acName6007[] = "IndexByte";
-static const char acName6008[] = "IndexStatus";
-static const char acName7000[] = "EncScale";
+static const char acName7000[] = "EncoderOut";
+static const char acName7000_00[] = "Max SubIndex";
+static const char acName7000_01[] = "IndexLatchEnable";
+static const char acName7000_02[] = "Scale";
 static const char acName7001[] = "Output4";
 static const char acName7002[] = "Enable1";
 static const char acName7003[] = "Enable2";
@@ -134,12 +133,7 @@ static const char acName7006[] = "CommandedPosition1";
 static const char acName7007[] = "CommandedPosition2";
 static const char acName7008[] = "CommandedPosition3";
 static const char acName7009[] = "CommandedPosition4";
-static const char acName700A[] = "EncoderIn";
-static const char acName700A_00[] = "Max SubIndex";
-static const char acName700A_01[] = "IndexStatus";
-static const char acName700A_02[] = "IndexByte";
-static const char acName700A_03[] = "Position";
-static const char acName700A_04[] = "Frequency";
+static const char acName700A[] = "Voltage";
 
 const _objd SDO1000[] =
 {
@@ -167,8 +161,9 @@ const _objd SDO1018[] =
 };
 const _objd SDO1600[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1600_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_01, 0x70000020, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1600_00, 2, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_01, 0x70000108, NULL},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1600_02, 0x70000220, NULL},
 };
 const _objd SDO1601[] =
 {
@@ -217,16 +212,8 @@ const _objd SDO1609[] =
 };
 const _objd SDO160A[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName160A_00, 4, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName160A_01, 0x700A0108, NULL},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName160A_02, 0x700A0208, NULL},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName160A_03, 0x700A0320, NULL},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName160A_04, 0x700A0420, NULL},
-};
-const _objd SDO1612[] =
-{
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1612_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1612_01, 0x70120008, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName160A_00, 1, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName160A_01, 0x700A0020, NULL},
 };
 const _objd SDO1A00[] =
 {
@@ -235,8 +222,11 @@ const _objd SDO1A00[] =
 };
 const _objd SDO1A01[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A01_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A01_01, 0x60010020, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A01_00, 4, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A01_01, 0x60010108, NULL},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A01_02, 0x60010208, NULL},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A01_03, 0x60010320, NULL},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A01_04, 0x60010420, NULL},
 };
 const _objd SDO1A02[] =
 {
@@ -263,16 +253,6 @@ const _objd SDO1A06[] =
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A06_00, 1, NULL},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A06_01, 0x60060020, NULL},
 };
-const _objd SDO1A07[] =
-{
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A07_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A07_01, 0x60070020, NULL},
-};
-const _objd SDO1A08[] =
-{
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1A08_00, 1, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1A08_01, 0x60080020, NULL},
-};
 const _objd SDO1C00[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C00_00, 4, NULL},
@@ -298,7 +278,7 @@ const _objd SDO1C12[] =
 };
 const _objd SDO1C13[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C13_00, 9, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1C13_00, 7, NULL},
   {0x01, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_01, 0x1A00, NULL},
   {0x02, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_02, 0x1A01, NULL},
   {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_03, 0x1A02, NULL},
@@ -306,8 +286,6 @@ const _objd SDO1C13[] =
   {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_05, 0x1A04, NULL},
   {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_06, 0x1A05, NULL},
   {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_07, 0x1A06, NULL},
-  {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_08, 0x1A07, NULL},
-  {0x09, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C13_09, 0x1A08, NULL},
 };
 const _objd SDO2000[] =
 {
@@ -347,11 +325,15 @@ const _objd SDO2008[] =
 };
 const _objd SDO6000[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6000, 0x00000000, &Obj.EncPosition},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6000, 0x00000000, &Obj.FrequencyCounterFrequency},
 };
 const _objd SDO6001[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6001, 0x00000000, &Obj.EncVelocity},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6001_00, 4, NULL},
+  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6001_01, 0, &Obj.EncoderIn.IndexStatus},
+  {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6001_02, 0, &Obj.EncoderIn.IndexByte},
+  {0x03, DTYPE_REAL32, 32, ATYPE_RO, acName6001_03, 0x00000000, &Obj.EncoderIn.Position},
+  {0x04, DTYPE_REAL32, 32, ATYPE_RO, acName6001_04, 0x00000000, &Obj.EncoderIn.Velocity},
 };
 const _objd SDO6002[] =
 {
@@ -373,17 +355,11 @@ const _objd SDO6006[] =
 {
   {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName6006, 0x00000000, &Obj.ActualPosition4},
 };
-const _objd SDO6007[] =
-{
-  {0x0, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName6007, 0, &Obj.IndexByte},
-};
-const _objd SDO6008[] =
-{
-  {0x0, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName6008, 0, &Obj.IndexStatus},
-};
 const _objd SDO7000[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName7000, 0x00000000, &Obj.EncScale},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7000_00, 2, NULL},
+  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7000_01, 0, &Obj.EncoderOut.IndexLatchEnable},
+  {0x02, DTYPE_REAL32, 32, ATYPE_RO, acName7000_02, 0x00000000, &Obj.EncoderOut.Scale},
 };
 const _objd SDO7001[] =
 {
@@ -423,15 +399,7 @@ const _objd SDO7009[] =
 };
 const _objd SDO700A[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName700A_00, 4, NULL},
-  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName700A_01, 0, &Obj.EncoderIn.IndexStatus},
-  {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName700A_02, 0, &Obj.EncoderIn.IndexByte},
-  {0x03, DTYPE_REAL32, 32, ATYPE_RO, acName700A_03, 0x00000000, &Obj.EncoderIn.Position},
-  {0x04, DTYPE_REAL32, 32, ATYPE_RO, acName700A_04, 0x00000000, &Obj.EncoderIn.Frequency},
-};
-const _objd SDO7012[] =
-{
-  {0x0, DTYPE_UNSIGNED8, 8, ATYPE_RO | ATYPE_RXPDO, acName7012, 0, &Obj.EncIndexLatchEnable},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_RXPDO, acName700A, 0x00000000, &Obj.Voltage},
 };
 
 const _objectlist SDOobjects[] =
@@ -441,7 +409,7 @@ const _objectlist SDOobjects[] =
   {0x1009, OTYPE_VAR, 0, 0, acName1009, SDO1009},
   {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
   {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
-  {0x1600, OTYPE_RECORD, 1, 0, acName1600, SDO1600},
+  {0x1600, OTYPE_RECORD, 2, 0, acName1600, SDO1600},
   {0x1601, OTYPE_RECORD, 1, 0, acName1601, SDO1601},
   {0x1602, OTYPE_RECORD, 1, 0, acName1602, SDO1602},
   {0x1603, OTYPE_RECORD, 1, 0, acName1603, SDO1603},
@@ -451,16 +419,14 @@ const _objectlist SDOobjects[] =
   {0x1607, OTYPE_RECORD, 1, 0, acName1607, SDO1607},
   {0x1608, OTYPE_RECORD, 1, 0, acName1608, SDO1608},
   {0x1609, OTYPE_RECORD, 1, 0, acName1609, SDO1609},
-  {0x160A, OTYPE_RECORD, 4, 0, acName160A, SDO160A},
+  {0x160A, OTYPE_RECORD, 1, 0, acName160A, SDO160A},
   {0x1A00, OTYPE_RECORD, 1, 0, acName1A00, SDO1A00},
-  {0x1A01, OTYPE_RECORD, 1, 0, acName1A01, SDO1A01},
+  {0x1A01, OTYPE_RECORD, 4, 0, acName1A01, SDO1A01},
   {0x1A02, OTYPE_RECORD, 1, 0, acName1A02, SDO1A02},
   {0x1A03, OTYPE_RECORD, 1, 0, acName1A03, SDO1A03},
   {0x1A04, OTYPE_RECORD, 1, 0, acName1A04, SDO1A04},
   {0x1A05, OTYPE_RECORD, 1, 0, acName1A05, SDO1A05},
   {0x1A06, OTYPE_RECORD, 1, 0, acName1A06, SDO1A06},
-  {0x1A07, OTYPE_RECORD, 1, 0, acName1A07, SDO1A07},
-  {0x1A08, OTYPE_RECORD, 1, 0, acName1A08, SDO1A08},
   {0x1C00, OTYPE_ARRAY, 4, 0, acName1C00, SDO1C00},
   {0x1C12, OTYPE_ARRAY, 11, 0, acName1C12, SDO1C12},
   {0x1C13, OTYPE_ARRAY, 7, 0, acName1C13, SDO1C13},
@@ -474,15 +440,13 @@ const _objectlist SDOobjects[] =
   {0x2007, OTYPE_VAR, 0, 0, acName2007, SDO2007},
   {0x2008, OTYPE_VAR, 0, 0, acName2008, SDO2008},
   {0x6000, OTYPE_VAR, 0, 0, acName6000, SDO6000},
-  {0x6001, OTYPE_VAR, 0, 0, acName6001, SDO6001},
+  {0x6001, OTYPE_RECORD, 4, 0, acName6001, SDO6001},
   {0x6002, OTYPE_VAR, 0, 0, acName6002, SDO6002},
   {0x6003, OTYPE_VAR, 0, 0, acName6003, SDO6003},
   {0x6004, OTYPE_VAR, 0, 0, acName6004, SDO6004},
   {0x6005, OTYPE_VAR, 0, 0, acName6005, SDO6005},
   {0x6006, OTYPE_VAR, 0, 0, acName6006, SDO6006},
-  {0x6007, OTYPE_VAR, 0, 0, acName6007, SDO6007},
-  {0x6008, OTYPE_VAR, 0, 0, acName6008, SDO6008},
-  {0x7000, OTYPE_VAR, 0, 0, acName7000, SDO7000},
+  {0x7000, OTYPE_RECORD, 2, 0, acName7000, SDO7000},
   {0x7001, OTYPE_VAR, 0, 0, acName7001, SDO7001},
   {0x7002, OTYPE_VAR, 0, 0, acName7002, SDO7002},
   {0x7003, OTYPE_VAR, 0, 0, acName7003, SDO7003},
@@ -492,6 +456,6 @@ const _objectlist SDOobjects[] =
   {0x7007, OTYPE_VAR, 0, 0, acName7007, SDO7007},
   {0x7008, OTYPE_VAR, 0, 0, acName7008, SDO7008},
   {0x7009, OTYPE_VAR, 0, 0, acName7009, SDO7009},
-  {0x700A, OTYPE_RECORD, 4, 0, acName700A, SDO700A},
+  {0x700A, OTYPE_VAR, 0, 0, acName700A, SDO700A},
   {0xffff, 0xff, 0xff, 0xff, NULL, NULL}
 };
