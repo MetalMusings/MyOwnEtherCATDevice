@@ -309,19 +309,19 @@ const _objd SDO2004[] =
 };
 const _objd SDO2005[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2005, 0x49742400, &Obj.MaxAcceleration1},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2005, 0x4e6e6b28, &Obj.MaxAcceleration1},
 };
 const _objd SDO2006[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2006, 0x49742400, &Obj.MaxAcceleration2},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2006, 0x4e6e6b28, &Obj.MaxAcceleration2},
 };
 const _objd SDO2007[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2007, 0x49742400, &Obj.MaxAcceleration3},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2007, 0x4e6e6b28, &Obj.MaxAcceleration3},
 };
 const _objd SDO2008[] =
 {
-  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2008, 0x49742400, &Obj.MaxAcceleration4},
+  {0x0, DTYPE_REAL32, 32, ATYPE_RW, acName2008, 0x4e6e6b28, &Obj.MaxAcceleration4},
 };
 const _objd SDO6000[] =
 {

@@ -1519,7 +1519,7 @@
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
-                  <DefaultValue>1000000</DefaultValue>
+                  <DefaultValue>1000000000</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>rw</Access>
@@ -1531,7 +1531,7 @@
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
-                  <DefaultValue>1000000</DefaultValue>
+                  <DefaultValue>1000000000</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>rw</Access>
@@ -1543,7 +1543,7 @@
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
-                  <DefaultValue>1000000</DefaultValue>
+                  <DefaultValue>1000000000</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>rw</Access>
@@ -1555,7 +1555,7 @@
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info>
-                  <DefaultValue>1000000</DefaultValue>
+                  <DefaultValue>1000000000</DefaultValue>
                 </Info>
                 <Flags>
                   <Access>rw</Access>
