@@ -3890,7 +3890,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100k"
+		(property "Value" "4k7"
 			(at 152.146 55.88 90)
 			(effects
 				(font
@@ -3899,7 +3899,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_2512_6332Metric_Pad1.40x3.35mm_HandSolder"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 149.86 57.658 90)
 			(effects
 				(font
