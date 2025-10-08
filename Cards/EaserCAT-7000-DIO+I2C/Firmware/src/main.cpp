@@ -46,7 +46,8 @@ void ads1014_reset(ADS1014 *ads) {
 class OhmicSensing {
  public:
   void handle(uint8_t voltageState, float inVoltage, float limitVoltage,
-              uint32_t setupTime, uint8_t enabled, uint8_t &sensed);
+              float voltageDropLimit, uint32_t setupTime, uint8_t enabled,
+              uint8_t &sensed);
 
  private:
   enum OhmicStates { OHMIC_IDLE, OHMIC_SETUP, OHMIC_PROBE };
@@ -128,11 +129,13 @@ void cb_get_inputs(void)  // Set Master inputs, slave outputs, last operation
 
   Ohm1.handle(
       stat_1, Obj.Out_Unit1.CalculatedVoltage,
-      Obj.In_Unit1.OhmicSensingVoltageLimit, Obj.In_Unit1.OhmicSensingSetupTime,
+      Obj.In_Unit1.OhmicSensingVoltageLimit,
+      Obj.In_Unit1.OhmicSensingVoltageDrop, Obj.In_Unit1.OhmicSensingSetupTime,
       Obj.In_Unit1.EnableOhmicSensing, Obj.Out_Unit1.OhmicSensingSensed);
   Ohm2.handle(
       stat_2, Obj.Out_Unit2.CalculatedVoltage,
-      Obj.In_Unit2.OhmicSensingVoltageLimit, Obj.In_Unit2.OhmicSensingSetupTime,
+      Obj.In_Unit2.OhmicSensingVoltageLimit,
+      Obj.In_Unit2.OhmicSensingVoltageDrop, Obj.In_Unit2.OhmicSensingSetupTime,
       Obj.In_Unit2.EnableOhmicSensing, Obj.Out_Unit2.OhmicSensingSensed);
 }
 
@@ -427,8 +430,9 @@ void lowpassFilter(float &oldLowPassGain,
 }
 
 void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
-                          float limitVoltage, uint32_t setupTime,
-                          uint8_t enabled, uint8_t &sensed) {
+                          float limitVoltage, float voltageDropLimit,
+                          uint32_t setupTime, uint8_t enabled,
+                          uint8_t &sensed) {
   sensed = 0;
   if (enabled && voltageState == 0) {
     if (ohmicState == OHMIC_IDLE && inVoltage > limitVoltage) {
@@ -446,8 +450,11 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
       voltages.push(inVoltage);
 #define N_VOLTAGES 3
       while (voltages.size() > N_VOLTAGES) voltages.pop();  // Only N_VOLTAGES
-      if (inVoltage <= limitVoltage || oldVoltage - inVoltage >= 1.0 ||
-          voltages.front() - voltages.back() > 2.0) {
+      if (inVoltage <= limitVoltage ||                      // Below threshold
+          (abs(voltageDropLimit) > 1e-3 &&                  // Immediate drop
+           oldVoltage - inVoltage >= voltageDropLimit) ||
+          (abs(voltageDropLimit) > 1e-3 &&  // Drop over 3 cycles
+           voltages.front() - voltages.back() > voltageDropLimit)) {
         sensed = 1;
       }
       oldVoltage = inVoltage;

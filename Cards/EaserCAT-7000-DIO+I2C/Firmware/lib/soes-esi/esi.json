@@ -294,6 +294,13 @@
             "value": "0",
             "access": "RO",
             "data": "&Obj.In_Unit1.OhmicSensingVoltageLimit"
+          },
+          {
+            "name": "OhmicSensingVoltageDrop",
+            "dtype": "REAL32",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.In_Unit1.OhmicSensingVoltageDrop"
           }
         ],
         "pdo_mappings": [
@@ -349,6 +356,13 @@
             "value": "0",
             "access": "RO",
             "data": "&Obj.In_Unit2.OhmicSensingVoltageLimit"
+          },
+          {
+            "name": "OhmicSensingVoltageDrop",
+            "dtype": "REAL32",
+            "value": "0",
+            "access": "RO",
+            "data": "&Obj.In_Unit2.OhmicSensingVoltageDrop"
           }
         ],
         "pdo_mappings": [

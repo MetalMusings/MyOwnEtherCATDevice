@@ -42,6 +42,7 @@ typedef struct
       uint8_t EnableOhmicSensing;
       uint32_t OhmicSensingSetupTime;
       float OhmicSensingVoltageLimit;
+      float OhmicSensingVoltageDrop;
    } In_Unit1;
    struct
    {
@@ -51,6 +52,7 @@ typedef struct
       uint8_t EnableOhmicSensing;
       uint32_t OhmicSensingSetupTime;
       float OhmicSensingVoltageLimit;
+      float OhmicSensingVoltageDrop;
    } In_Unit2;
 
    /* Parameters */
