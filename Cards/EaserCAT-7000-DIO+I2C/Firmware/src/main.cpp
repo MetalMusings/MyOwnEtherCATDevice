@@ -49,12 +49,21 @@ class OhmicSensing {
               float voltageDropLimit, uint32_t setupTime, uint8_t enabled,
               uint8_t &sensed);
 
- private:
-  enum OhmicStates { OHMIC_IDLE, OHMIC_SETUP, OHMIC_PROBE };
+  // private:
+  enum OhmicStates {
+    OHMIC_IDLE,
+    OHMIC_SETUP,
+    OHMIC_PROBE,
+    OHMIC_PROBED_ON,
+    OHMIC_PROBE_DONE
+  };
   OhmicStates ohmicState = OHMIC_IDLE;
   uint32_t setupTimeSoFar = 0;
+  uint32_t probingTime = 0;
+  uint16_t senseOnTime = 0;
   float_t oldVoltage = 0.0;
   std::queue<float> voltages;
+  float_t refVoltage;
 };
 OhmicSensing Ohm1;
 OhmicSensing Ohm2;
@@ -429,6 +438,7 @@ void lowpassFilter(float &oldLowPassGain,
   oldLowPassFilteredVoltage = outFilteredVoltage;
 }
 
+#define N_VOLTAGES 3
 void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
                           float limitVoltage, float voltageDropLimit,
                           uint32_t setupTime, uint8_t enabled,
@@ -438,26 +448,52 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
     if (ohmicState == OHMIC_IDLE && inVoltage > limitVoltage) {
       ohmicState = OHMIC_SETUP;
       setupTimeSoFar = 0;
+      while (!voltages.empty()) voltages.pop();  // Remove history
+      return;
     }
     if (ohmicState == OHMIC_SETUP) {
       if (setupTimeSoFar++ > setupTime) {
         ohmicState = OHMIC_PROBE;
+        probingTime = 0;
         oldVoltage = 0.0;
-        while (!voltages.empty()) voltages.pop();  // Remove history
+        refVoltage = inVoltage;  // RefVoltage = voltage at end of setup
+        return;
       }
     }
     if (ohmicState == OHMIC_PROBE) {
       voltages.push(inVoltage);
-#define N_VOLTAGES 3
       while (voltages.size() > N_VOLTAGES) voltages.pop();  // Only N_VOLTAGES
-      if (inVoltage <= limitVoltage ||                      // Below threshold
-          (abs(voltageDropLimit) > 1e-3 &&                  // Immediate drop
+      if (probingTime++ > 30000) {  // Go to IDLE after 30 seconds
+        ohmicState = OHMIC_IDLE;
+        return;
+      }
+      if ((inVoltage <= limitVoltage) ||  // Below starting threshold
+          (fabs(voltageDropLimit) > 1e-3 &&
+           refVoltage - inVoltage >=
+               voltageDropLimit) ||          // Delta below refVoltage
+          (fabs(voltageDropLimit) > 1e-3 &&  // Immediate drop
            oldVoltage - inVoltage >= voltageDropLimit) ||
-          (abs(voltageDropLimit) > 1e-3 &&  // Drop over 3 cycles
+          (fabs(voltageDropLimit) > 1e-3 &&  // Drop over 3 cycles
            voltages.front() - voltages.back() > voltageDropLimit)) {
         sensed = 1;
+        senseOnTime = 0;
+        ohmicState = OHMIC_PROBED_ON;
       }
       oldVoltage = inVoltage;
+      return;
+    }
+    if (ohmicState == OHMIC_PROBED_ON) {
+      sensed = 1;
+      if (senseOnTime++ >= 100) {
+        sensed = 0;
+        ohmicState = OHMIC_PROBE_DONE;
+      }
+      return;
+    }
+    if (ohmicState == OHMIC_PROBE_DONE) {
+      sensed = 0;
+      if (!enabled) ohmicState = OHMIC_IDLE;
+      return;
     }
   } else {
     ohmicState = OHMIC_IDLE;
