@@ -52,9 +52,7 @@ class OhmicSensing {
   enum OhmicStates {
     OHMIC_IDLE,
     OHMIC_SETUP,
-    OHMIC_PROBE,
-    OHMIC_PROBED_ON,
-    OHMIC_PROBE_DONE
+    OHMIC_PROBE
   };
   OhmicStates ohmicState = OHMIC_IDLE;
   uint64_t startTime;
@@ -142,6 +140,8 @@ void cb_get_inputs(void)  // Set Master inputs, slave outputs, last operation
       Obj.In_Unit2.OhmicSensingVoltageLimit,
       Obj.In_Unit2.OhmicSensingVoltageDrop, Obj.In_Unit2.OhmicSensingSetupTime,
       Obj.In_Unit2.EnableOhmicSensing, Obj.Out_Unit2.OhmicSensingSensed);
+      Obj.Out_Unit1.RawData = validVoltage0_2;
+      Obj.Out_Unit2.RawData = Ohm2.ohmicState;
 }
 
 uint16_t dc_checker(void);
@@ -414,24 +414,8 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
           (fabs(voltageDropLimit) > 1e-3 &&  // Drop over 3 cycles
            voltages.front() - voltages.back() > voltageDropLimit)) {
         sensed = 1;
-        startTime = longTime.extendTime(micros());
-        ohmicState = OHMIC_PROBED_ON;
       }
       oldVoltage = inVoltage;
-      return;
-    }
-    if (ohmicState == OHMIC_PROBED_ON) {
-      sensed = 1;
-      dTime = longTime.extendTime(micros()) - startTime;
-      Obj.Out_Unit2.RawData = dTime;
-      if (dTime > 100000) {
-        sensed = 0;
-        ohmicState = OHMIC_PROBE_DONE;
-      }
-      return;
-    }
-    if (ohmicState == OHMIC_PROBE_DONE) {
-      sensed = 0;
       return;
     }
   } else {
