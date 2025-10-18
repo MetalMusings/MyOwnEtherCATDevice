@@ -35,25 +35,21 @@ ADS1014 *ads1014_2 = 0;
 void ads1014_reset(ADS1014 *ads) {
   ads->reset();
   ads->begin();
-  ads->setGain(1);                  // 1=4.096V
-  ads->setMode(0);                  // 0 continuous
-  ads->setDataRate(6);              // Max for ads101x
-  ads->readADC_Differential_0_1();  // This is the value we are interested in
+  ads->setGain(1);                 // 1=4.096V
+  ads->setMode(0);                 // 0 continuous
+  ads->setDataRate(6);             // Max for ads101x
+  ads->readADC_Differential_0_1(); // This is the value we are interested in
 }
 
 #include <queue>
 class OhmicSensing {
- public:
+public:
   void handle(uint8_t voltageState, float inVoltage, float limitVoltage,
               float voltageDropLimit, uint32_t setupTime, uint8_t enabled,
               uint8_t &sensed);
 
   // private:
-  enum OhmicStates {
-    OHMIC_IDLE,
-    OHMIC_SETUP,
-    OHMIC_PROBE
-  };
+  enum OhmicStates { OHMIC_IDLE, OHMIC_SETUP, OHMIC_PROBE };
   OhmicStates ohmicState = OHMIC_IDLE;
   uint64_t startTime;
   float_t oldVoltage = 0.0;
@@ -83,7 +79,7 @@ void lowpassFilter(float &oldLowPassGain,
 
 extern "C" uint32_t ESC_SYNC0cycletime(void);
 
-void cb_set_outputs(void)  // Get Master outputs, slave inputs, first operation
+void cb_set_outputs(void) // Get Master outputs, slave inputs, first operation
 {
   // Update digital output pins
   for (int i = 0; i < sizeof(outputPin); i++)
@@ -95,7 +91,7 @@ float oldLowPassFilteredVoltage_1 = 0, oldLowPassFilteredVoltage_2 = 0;
 uint32_t oldLowpassFilterPoleFrequency_1 = 0,
          oldLowpassFilterPoleFrequency_2 = 0;
 
-void cb_get_inputs(void)  // Set Master inputs, slave outputs, last operation
+void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
 {
   static float validData0_1 = 0.0, validVoltage0_1 = 0.0;
   static float validData0_2 = 0.0, validVoltage0_2 = 0.0;
@@ -140,8 +136,7 @@ void cb_get_inputs(void)  // Set Master inputs, slave outputs, last operation
       Obj.In_Unit2.OhmicSensingVoltageLimit,
       Obj.In_Unit2.OhmicSensingVoltageDrop, Obj.In_Unit2.OhmicSensingSetupTime,
       Obj.In_Unit2.EnableOhmicSensing, Obj.Out_Unit2.OhmicSensingSensed);
-      Obj.Out_Unit1.RawData = validVoltage0_2;
-      Obj.Out_Unit2.RawData = Ohm2.ohmicState;
+  Obj.Out_Unit1.RawData = (int)Ohm2.ohmicState;
 }
 
 uint16_t dc_checker(void);
@@ -191,7 +186,7 @@ void setup(void) {
   ecat_slv_init(&config);
 #endif
 
-#if 0  // Uncomment for commissioning tests
+#if 0 // Uncomment for commissioning tests
 // #define only one of the below
 #define ADS1xxx
 #undef ADC_MCP3221
@@ -265,87 +260,89 @@ void handleVoltageReader(float scale_in, float offset, float &outVoltage,
                          MyMCP3221 *&mcp, uint8_t I2C_address,
                          uint32_t &I2C_restarts) {
   float scale = scale_in;
-  if (scale == 0.0) scale = 1.0;
+  if (scale == 0.0)
+    scale = 1.0;
   int stat = 1, data0;
 
   switch (devType) {
-    case 0:  // Not configured.
-      outStatus = 0;
-      stat = data0 = 0;
-      break;
-    case MCP3221_TYPE:
-      if (old_devType != devType)  // Initilize and make ready
-      {
-        if (ads) {
-          delete ads;
-          ads = 0;
-        }
-        if (mcp) {
-          delete mcp;
-          mcp = 0;
-        }
-        Wire2.end();
-        Wire2.begin();
-        Wire2.setClock(I2C_BUS_SPEED);
-        mcp = new MyMCP3221(I2C_address, &Wire2);
-        old_devType = mcp ? MCP3221_TYPE : -1;
+  case 0: // Not configured.
+    outStatus = 0;
+    stat = data0 = 0;
+    break;
+  case MCP3221_TYPE:
+    if (old_devType != devType) // Initilize and make ready
+    {
+      if (ads) {
+        delete ads;
+        ads = 0;
       }
-      data0 = mcp->getData();
-      stat = mcp->ping();
-      break;
-    case ADS1014_TYPE:
-      if (old_devType != devType)  // Initilize and make ready
-      {
-        if (ads) {
-          delete ads;
-          ads = 0;
-        }
-        if (mcp) {
-          delete mcp;
-          mcp = 0;
-        }
-        old_devType = 0;
+      if (mcp) {
+        delete mcp;
+        mcp = 0;
+      }
+      Wire2.end();
+      Wire2.begin();
+      Wire2.setClock(I2C_BUS_SPEED);
+      mcp = new MyMCP3221(I2C_address, &Wire2);
+      old_devType = mcp ? MCP3221_TYPE : -1;
+    }
+    data0 = mcp->getData();
+    stat = mcp->ping();
+    break;
+  case ADS1014_TYPE:
+    if (old_devType != devType) // Initilize and make ready
+    {
+      if (ads) {
+        delete ads;
+        ads = 0;
+      }
+      if (mcp) {
+        delete mcp;
+        mcp = 0;
+      }
+      old_devType = 0;
 
-        Wire2.end();
-        Wire2.begin();
-        Wire2.setClock(I2C_BUS_SPEED);
-        ads = new ADS1014(I2C_address, &Wire2);
-        if (ads != nullptr) {
-          ads1014_reset(ads);
-          old_devType = ADS1014_TYPE;
-        }
-      }
+      Wire2.end();
+      Wire2.begin();
+      Wire2.setClock(I2C_BUS_SPEED);
+      ads = new ADS1014(I2C_address, &Wire2);
       if (ads != nullptr) {
-        data0 = ads->getValue();
-        stat = ads->isConnected() == 1 ? 0 : 1;
+        ads1014_reset(ads);
+        old_devType = ADS1014_TYPE;
       }
-      break;
-    default:  // Not supported
-      break;
+    }
+    if (ads != nullptr) {
+      data0 = ads->getValue();
+      stat = ads->isConnected() == 1 ? 0 : 1;
+    }
+    break;
+  default: // Not supported
+    break;
   }
 
-  if (stat == 0) {                        // Read good value
-    outVoltage = scale * data0 + offset;  //
-    outRaw = data0;                       // Raw voltage, read by ADC
+  if (stat == 0) {                       // Read good value
+    outVoltage = scale * data0 + offset; //
+    outRaw = data0;                      // Raw voltage, read by ADC
     oldVoltage = outVoltage;
     oldRaw = data0;
-  } else {  // Didn't read a good value. Return a hopefully useful value and
-            // restart
-            // the I2C bus
-    outVoltage = oldVoltage;  // Use value from previous call
+  } else { // Didn't read a good value. Return a hopefully useful value and
+           // restart
+           // the I2C bus
+    outVoltage = oldVoltage; // Use value from previous call
     outRaw = oldRaw;
     // Reset wire here
     Wire2.end();
     Wire2.begin();
     Wire2.setClock(I2C_BUS_SPEED);
     I2C_restarts++;
-    if (devType == ADS1014_TYPE && ads != nullptr) ads1014_reset(ads);
+    if (devType == ADS1014_TYPE && ads != nullptr)
+      ads1014_reset(ads);
     // mcp3221 has no reset, reset the I2C bus is the best we can do
   }
   readStat = stat;
   outStatus =
-      I2C_restarts + (stat << 28);  // Put status as bits 28-31, the lower are
-                                    // number of restarts (restart attempts)
+      I2C_restarts + (stat << 28); // Put status as bits 28-31, the lower are
+                                   // number of restarts (restart attempts)
 }
 
 void lowpassFilter(float &oldLowPassGain,
@@ -363,7 +360,7 @@ void lowpassFilter(float &oldLowPassGain,
     oldLowpassFilterPoleFrequency = LowpassFilterPoleFrequency;
   }
   if (inVoltage < LowPassFilterThresholdVoltage)
-    outFilteredVoltage = inVoltage;  // Just forward
+    outFilteredVoltage = inVoltage; // Just forward
   else
     outFilteredVoltage = oldLowPassFilteredVoltage +
                          (inVoltage - oldLowPassFilteredVoltage) * gain;
@@ -382,37 +379,44 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
     if (ohmicState == OHMIC_IDLE && inVoltage > limitVoltage) {
       ohmicState = OHMIC_SETUP;
       startTime = longTime.extendTime(micros());
-      while (!voltages.empty()) voltages.pop();  // Remove history
+      while (!voltages.empty())
+        voltages.pop(); // Remove history
       return;
     }
     if (ohmicState == OHMIC_SETUP) {
       dTime = longTime.extendTime(micros()) - startTime;
-      Obj.Out_Unit2.RawData = dTime;
       if (dTime > setupTime * 1000) {
         ohmicState = OHMIC_PROBE;
         startTime = longTime.extendTime(micros());
         oldVoltage = 0.0;
-        refVoltage = inVoltage;  // RefVoltage = voltage at end of setup
+        refVoltage = inVoltage; // RefVoltage = voltage at end of setup
         return;
       }
     }
     if (ohmicState == OHMIC_PROBE) {
       dTime = longTime.extendTime(micros()) - startTime;
-      Obj.Out_Unit2.RawData = dTime;
       voltages.push(inVoltage);
-      while (voltages.size() > N_VOLTAGES) voltages.pop();  // Only N_VOLTAGES
-      if (dTime > 30000000) {  // Go to IDLE after 30 seconds
+      while (voltages.size() > N_VOLTAGES)
+        voltages.pop();       // Only N_VOLTAGES
+      if (dTime > 30000000) { // Go to IDLE after 30 seconds
         ohmicState = OHMIC_IDLE;
         return;
       }
-      if ((inVoltage <= limitVoltage) ||  // Below starting threshold
-          (fabs(voltageDropLimit) > 1e-3 &&
-           refVoltage - inVoltage >=
-               voltageDropLimit) ||          // Delta below refVoltage
-          (fabs(voltageDropLimit) > 1e-3 &&  // Immediate drop
-           oldVoltage - inVoltage >= voltageDropLimit) ||
-          (fabs(voltageDropLimit) > 1e-3 &&  // Drop over 3 cycles
-           voltages.front() - voltages.back() > voltageDropLimit)) {
+      byte c1 = (inVoltage <= limitVoltage) ? 1 : 0; // Below starting threshold
+      byte c2 = (fabs(voltageDropLimit) > 1e-3 &&
+                 refVoltage - inVoltage >= voltageDropLimit)
+                    ? 2
+                    : 0;                          // Delta below refVoltage
+      byte c3 = (fabs(voltageDropLimit) > 1e-3 && // Immediate drop
+                 oldVoltage - inVoltage >= voltageDropLimit)
+                    ? 4
+                    : 0;
+      byte c4 = (fabs(voltageDropLimit) > 1e-3 && // Drop over 3 cycles
+                 voltages.front() - voltages.back() > voltageDropLimit)
+                    ? 8
+                    : 0;
+      Obj.Out_Unit2.RawData = c1 + c2 + c3 + c4;
+      if (c1 + c2 + c3 + c4 > 0) {
         sensed = 1;
       }
       oldVoltage = inVoltage;
