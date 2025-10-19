@@ -1444,12 +1444,6 @@
 		)
 	)
 	(junction
-		(at 82.55 59.69)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0453e4fc-ce3e-4b2d-8d50-3cb5acb0a21e")
-	)
-	(junction
 		(at 198.12 60.96)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1486,7 +1480,7 @@
 		(uuid "3e1c1d1b-ca80-497c-bd0d-c5b2f6933349")
 	)
 	(junction
-		(at 15.24 29.21)
+		(at 13.97 62.23)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "43657952-3f22-44ff-a735-5c77c2a9efae")
@@ -1522,7 +1516,7 @@
 		(uuid "91716cb1-5341-4824-8f1e-3dc14ac5a6c6")
 	)
 	(junction
-		(at 15.24 121.92)
+		(at 13.97 154.94)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "96eb9f12-ed83-45b8-b7cf-a35e5ef839f3")
@@ -1585,27 +1579,7 @@
 	)
 	(wire
 		(pts
-			(xy 114.3 59.69) (xy 114.3 76.2)
-		)
-		(stroke
-			(width 0)
-			(type dash)
-		)
-		(uuid "0be0577f-4966-4185-8553-8139da00c089")
-	)
-	(wire
-		(pts
-			(xy 114.3 76.2) (xy 129.54 76.2)
-		)
-		(stroke
-			(width 0)
-			(type dash)
-		)
-		(uuid "0c7d7335-4300-4730-a4c2-377d99c9a361")
-	)
-	(wire
-		(pts
-			(xy 104.14 83.82) (xy 129.54 83.82)
+			(xy 114.3 83.82) (xy 129.54 83.82)
 		)
 		(stroke
 			(width 0)
@@ -1645,7 +1619,17 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 29.21) (xy 15.24 15.24)
+			(xy 113.03 76.2) (xy 129.54 76.2)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "18e0584e-38d1-4b82-82d6-aa0cceee3cb4")
+	)
+	(wire
+		(pts
+			(xy 13.97 62.23) (xy 13.97 48.26)
 		)
 		(stroke
 			(width 0)
@@ -1725,7 +1709,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 121.92) (xy 34.29 121.92)
+			(xy 13.97 154.94) (xy 33.02 154.94)
 		)
 		(stroke
 			(width 0)
@@ -1735,7 +1719,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 66.04) (xy 15.24 121.92)
+			(xy 13.97 127) (xy 13.97 154.94)
 		)
 		(stroke
 			(width 0)
@@ -1745,7 +1729,7 @@
 	)
 	(wire
 		(pts
-			(xy 55.88 45.72) (xy 55.88 138.43)
+			(xy 54.61 78.74) (xy 54.61 171.45)
 		)
 		(stroke
 			(width 0)
@@ -1755,7 +1739,7 @@
 	)
 	(wire
 		(pts
-			(xy 82.55 76.2) (xy 87.63 76.2)
+			(xy 81.28 76.2) (xy 87.63 76.2)
 		)
 		(stroke
 			(width 0)
@@ -1795,7 +1779,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 15.24) (xy 82.55 15.24)
+			(xy 13.97 48.26) (xy 81.28 48.26)
 		)
 		(stroke
 			(width 0)
@@ -1845,7 +1829,7 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 41.91) (xy 41.91 41.91)
+			(xy 36.83 74.93) (xy 40.64 74.93)
 		)
 		(stroke
 			(width 1)
@@ -1875,7 +1859,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 66.04) (xy 109.22 66.04)
+			(xy 13.97 127) (xy 109.22 127)
 		)
 		(stroke
 			(width 0)
@@ -1905,6 +1889,16 @@
 	)
 	(wire
 		(pts
+			(xy 113.03 76.2) (xy 113.03 54.61)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "509cc400-34ac-41e7-a971-6e843ae31381")
+	)
+	(wire
+		(pts
 			(xy 135.89 50.8) (xy 135.89 55.88)
 		)
 		(stroke
@@ -1915,7 +1909,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 53.34) (xy 31.75 53.34)
+			(xy 13.97 86.36) (xy 30.48 86.36)
 		)
 		(stroke
 			(width 0)
@@ -1985,7 +1979,7 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 134.62) (xy 43.18 134.62)
+			(xy 36.83 167.64) (xy 41.91 167.64)
 		)
 		(stroke
 			(width 1)
@@ -1995,7 +1989,7 @@
 	)
 	(wire
 		(pts
-			(xy 104.14 83.82) (xy 104.14 86.36)
+			(xy 114.3 83.82) (xy 114.3 86.36)
 		)
 		(stroke
 			(width 0)
@@ -2005,7 +1999,7 @@
 	)
 	(wire
 		(pts
-			(xy 104.14 86.36) (xy 102.87 86.36)
+			(xy 114.3 86.36) (xy 102.87 86.36)
 		)
 		(stroke
 			(width 0)
@@ -2025,7 +2019,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 144.78) (xy 33.02 144.78)
+			(xy 13.97 177.8) (xy 31.75 177.8)
 		)
 		(stroke
 			(width 0)
@@ -2035,7 +2029,7 @@
 	)
 	(wire
 		(pts
-			(xy 82.55 59.69) (xy 82.55 76.2)
+			(xy 81.28 48.26) (xy 81.28 76.2)
 		)
 		(stroke
 			(width 0)
@@ -2045,23 +2039,13 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 53.34) (xy 15.24 29.21)
+			(xy 13.97 86.36) (xy 13.97 62.23)
 		)
 		(stroke
 			(width 0)
 			(type dash)
 		)
 		(uuid "8972c556-40d7-4439-9394-3170677beb35")
-	)
-	(wire
-		(pts
-			(xy 82.55 59.69) (xy 114.3 59.69)
-		)
-		(stroke
-			(width 0)
-			(type dash)
-		)
-		(uuid "8a65996b-dd52-4f74-8323-8d5652edf1d5")
 	)
 	(wire
 		(pts
@@ -2085,7 +2069,7 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 41.91) (xy 38.1 134.62)
+			(xy 36.83 74.93) (xy 36.83 167.64)
 		)
 		(stroke
 			(width 1)
@@ -2135,7 +2119,7 @@
 	)
 	(wire
 		(pts
-			(xy 110.49 93.98) (xy 110.49 86.36)
+			(xy 118.11 93.98) (xy 118.11 86.36)
 		)
 		(stroke
 			(width 0)
@@ -2152,6 +2136,16 @@
 			(type default)
 		)
 		(uuid "a967b78e-3640-4cf4-862c-47b8147abcfa")
+	)
+	(wire
+		(pts
+			(xy 87.63 33.02) (xy 40.64 33.02)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "abbbf012-5494-4a23-887f-367a639748cd")
 	)
 	(wire
 		(pts
@@ -2195,7 +2189,7 @@
 	)
 	(wire
 		(pts
-			(xy 85.09 93.98) (xy 110.49 93.98)
+			(xy 85.09 93.98) (xy 118.11 93.98)
 		)
 		(stroke
 			(width 0)
@@ -2205,7 +2199,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 121.92) (xy 15.24 144.78)
+			(xy 13.97 154.94) (xy 13.97 177.8)
 		)
 		(stroke
 			(width 0)
@@ -2215,7 +2209,7 @@
 	)
 	(wire
 		(pts
-			(xy 15.24 29.21) (xy 33.02 29.21)
+			(xy 13.97 62.23) (xy 31.75 62.23)
 		)
 		(stroke
 			(width 0)
@@ -2235,7 +2229,7 @@
 	)
 	(wire
 		(pts
-			(xy 109.22 66.04) (xy 109.22 78.74)
+			(xy 109.22 127) (xy 109.22 78.74)
 		)
 		(stroke
 			(width 0)
@@ -2275,13 +2269,33 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 54.61) (xy 50.8 146.05)
+			(xy 87.63 33.02) (xy 87.63 54.61)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "d3a757b9-bf4a-4b11-b45d-2416909ea21f")
+	)
+	(wire
+		(pts
+			(xy 49.53 87.63) (xy 49.53 179.07)
 		)
 		(stroke
 			(width 0)
 			(type dash)
 		)
 		(uuid "e203f62c-3280-464c-969d-33b478e34f45")
+	)
+	(wire
+		(pts
+			(xy 87.63 54.61) (xy 113.03 54.61)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "e3529929-d017-4ebb-b2a2-f87646fe8e41")
 	)
 	(wire
 		(pts
@@ -2315,17 +2329,7 @@
 	)
 	(wire
 		(pts
-			(xy 82.55 15.24) (xy 82.55 59.69)
-		)
-		(stroke
-			(width 0)
-			(type dash)
-		)
-		(uuid "efd72e66-8953-4e92-b449-f7b3c4cd3e8c")
-	)
-	(wire
-		(pts
-			(xy 110.49 86.36) (xy 129.54 86.36)
+			(xy 118.11 86.36) (xy 129.54 86.36)
 		)
 		(stroke
 			(width 0)
@@ -2366,7 +2370,7 @@
 		(uuid a9d0f8c2-7075-4e26-83e8-15065199ba8a)
 	)
 	(image
-		(at 43.815 133.35)
+		(at 42.545 166.37)
 		(scale 2.94325)
 		(uuid "19426aea-c811-4867-b736-77d9c3bdca78")
 		(data "iVBORw0KGgoAAAANSUhEUgAAAP4AAADpCAYAAAAERYpyAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9"
@@ -2978,7 +2982,7 @@
 		)
 	)
 	(image
-		(at 43.18 41.275)
+		(at 41.91 74.295)
 		(scale 2.94325)
 		(uuid "c5e78400-7bf2-4d5d-a95d-2930c2a4ddab")
 		(data "iVBORw0KGgoAAAANSUhEUgAAAP4AAADpCAYAAAAERYpyAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9"
@@ -3589,9 +3593,9 @@
 			"rkJggg=="
 		)
 	)
-	(text "Process\n-------\nRecieve input height sensing enable signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via 100 kOhm resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground, gap voltage\nWait for gap voltage to go above limit voltage. Needed for relay to settle (some milliseconds)\nWhen gap voltage goes back below limit voltage, that is contact, raise sensed/contact flag\nLoss of enable signal: exit sensing mode, lower contact Signal\n\n"
+	(text "Process\n-------\nRecieve input height sensing enable signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via R1 resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground, gap voltage\nWait for gap voltage to go above limit voltage. Needed for relay to settle (some milliseconds)\nWhen gap voltage goes back below limit voltage, that is contact, raise sensed/contact flag\nLoss of enable signal: exit sensing mode, lower contact Signal\n\n"
 		(exclude_from_sim no)
-		(at 90.424 131.826 0)
+		(at 124.206 132.842 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3612,7 +3616,7 @@
 	)
 	(text "To torch"
 		(exclude_from_sim no)
-		(at 70.866 67.564 0)
+		(at 66.548 154.432 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3632,7 +3636,7 @@
 	)
 	(text "To machine\n(plasma cutter)"
 		(exclude_from_sim no)
-		(at 82.042 50.546 0)
+		(at 75.946 85.09 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3652,6 +3656,17 @@
 		)
 		(uuid "67e9e54f-c8e7-4b96-a272-790b8967119c")
 	)
+	(text "R1 resistor\n-----------\nThe R1 resistor determines how much current can flow during short-circuit.\nLow current: sensitive to water on the workpiece\nHigh current: too much power generated in R1\nFor a 1/4W resistor, max current is 0.25W/24V = 10.4 mA\nR1 > 24V/10.4 mA = 2.3 kOhm \n\n"
+		(exclude_from_sim no)
+		(at 193.548 105.664 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9626b733-cc03-4d77-8b50-18b37497834b")
+	)
 	(text "DC-DC converter\n---------------\nRecom Power RS3K-2424S/H3\nIsolated dc-dc converter with on/off signal"
 		(exclude_from_sim no)
 		(at 202.184 75.692 0)
@@ -3665,7 +3680,7 @@
 	)
 	(text "Relay\n-----\nMeasured 10-12 A during blow back start/blow back arc.\nThis the current that will go through the relay during start.\nNo current flows during plasma cutting.\nAny 24VDC >20A relay with less than 2W power draw works.\n2W is coil current 83 mA, dc-dc converter spec says 3 W/125 mA."
 		(exclude_from_sim no)
-		(at 88.138 102.87 0)
+		(at 121.92 103.886 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3784,6 +3799,28 @@
 			)
 		)
 	)
+	(global_label "WORK PIECE GND (+)"
+		(shape input)
+		(at 40.64 33.02 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "985fac21-1e05-4b9a-a32e-c7cbf6ee36a0")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 16.851 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "+24VDC"
 		(shape input)
 		(at 256.54 46.99 0)
@@ -3890,7 +3927,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4k7"
+		(property "Value" "2k4"
 			(at 152.146 55.88 90)
 			(effects
 				(font
