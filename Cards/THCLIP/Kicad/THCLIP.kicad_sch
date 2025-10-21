@@ -1498,6 +1498,12 @@
 		(uuid "557814e4-a2cd-414a-a91e-2b9d5cd43550")
 	)
 	(junction
+		(at 143.51 55.88)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "5959a604-00ad-4844-a261-d73c310c79d2")
+	)
+	(junction
 		(at 245.11 66.04)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1508,6 +1514,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "63ed7fe9-667e-47ed-bf7c-9c78d9b25f39")
+	)
+	(junction
+		(at 151.13 60.96)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8c72dfae-39f8-4e59-ba3e-e306eaad447c")
 	)
 	(junction
 		(at 232.41 66.04)
@@ -1532,6 +1544,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a2426af3-2460-48fd-bf6f-a33ccb7f0fc6")
+	)
+	(junction
+		(at 44.45 48.26)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a999c181-71cc-4263-819a-e7e3e29426f3")
 	)
 	(junction
 		(at 129.54 78.74)
@@ -1609,13 +1627,23 @@
 	)
 	(wire
 		(pts
-			(xy 135.89 55.88) (xy 146.05 55.88)
+			(xy 135.89 55.88) (xy 143.51 55.88)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "16af47b8-1d4b-4099-8179-1f98e871e820")
+	)
+	(wire
+		(pts
+			(xy 151.13 58.42) (xy 151.13 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "184a21e6-1037-4cbd-9758-74873151fbd9")
 	)
 	(wire
 		(pts
@@ -1656,6 +1684,16 @@
 			(type dash)
 		)
 		(uuid "1c7a6575-b36e-49ae-a137-4bd0cbebdd44")
+	)
+	(wire
+		(pts
+			(xy 44.45 48.26) (xy 81.28 48.26)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "1ec0399b-d04d-4e25-b6f5-f5cbc51110cf")
 	)
 	(wire
 		(pts
@@ -1779,7 +1817,7 @@
 	)
 	(wire
 		(pts
-			(xy 13.97 48.26) (xy 81.28 48.26)
+			(xy 13.97 48.26) (xy 44.45 48.26)
 		)
 		(stroke
 			(width 0)
@@ -1979,6 +2017,16 @@
 	)
 	(wire
 		(pts
+			(xy 39.37 40.64) (xy 44.45 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6f00421b-9766-4496-a147-a6f3c770c3ac")
+	)
+	(wire
+		(pts
 			(xy 36.83 167.64) (xy 41.91 167.64)
 		)
 		(stroke
@@ -2006,6 +2054,16 @@
 			(type dash)
 		)
 		(uuid "777a6bb0-a425-4704-ad07-bee7c250fda3")
+	)
+	(wire
+		(pts
+			(xy 151.13 60.96) (xy 179.07 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7969ac85-8284-4760-9bff-99353ebf2de5")
 	)
 	(wire
 		(pts
@@ -2039,6 +2097,16 @@
 	)
 	(wire
 		(pts
+			(xy 143.51 55.88) (xy 153.67 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "891dcfcb-b58e-4c81-9aaf-255d08804fed")
+	)
+	(wire
+		(pts
 			(xy 13.97 86.36) (xy 13.97 62.23)
 		)
 		(stroke
@@ -2059,7 +2127,7 @@
 	)
 	(wire
 		(pts
-			(xy 153.67 55.88) (xy 163.83 55.88)
+			(xy 161.29 55.88) (xy 167.64 55.88)
 		)
 		(stroke
 			(width 0)
@@ -2079,13 +2147,23 @@
 	)
 	(wire
 		(pts
-			(xy 171.45 55.88) (xy 176.53 55.88)
+			(xy 175.26 55.88) (xy 176.53 55.88)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "9d13e583-9086-4848-8b5a-210bc6af26e4")
+	)
+	(wire
+		(pts
+			(xy 143.51 55.88) (xy 143.51 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9fa2a41e-8367-4df0-a048-a7eba74d39bf")
 	)
 	(wire
 		(pts
@@ -2149,7 +2227,7 @@
 	)
 	(wire
 		(pts
-			(xy 135.89 60.96) (xy 179.07 60.96)
+			(xy 135.89 60.96) (xy 151.13 60.96)
 		)
 		(stroke
 			(width 0)
@@ -2309,6 +2387,16 @@
 	)
 	(wire
 		(pts
+			(xy 44.45 40.64) (xy 44.45 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea006069-f7fd-4d02-869d-7bf916000974")
+	)
+	(wire
+		(pts
 			(xy 218.44 60.96) (xy 222.25 60.96)
 		)
 		(stroke
@@ -2368,6 +2456,18 @@
 			(type none)
 		)
 		(uuid a9d0f8c2-7075-4e26-83e8-15065199ba8a)
+	)
+	(rectangle
+		(start 15.24 25.4)
+		(end 49.53 43.18)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid b7c13596-2465-4aae-af99-392fda01f923)
 	)
 	(image
 		(at 42.545 166.37)
@@ -3593,6 +3693,17 @@
 			"rkJggg=="
 		)
 	)
+	(text "DJK10-25 socket"
+		(exclude_from_sim no)
+		(at 17.272 35.56 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "10449e6b-9468-4dc7-9be6-8f1104c6b23e")
+	)
 	(text "Process\n-------\nRecieve input height sensing enable signal\nActivate dc-dc converter\n	- 24V DC will appear on the dc-dc converter output\n	- A small current will flow through via R1 resistor (shorted output)\n	- Relay will activate\n		- Connection between work piece ground and torch shield ground is broken\n		- Output will be unshorted, current through resistor stops flowing\n		- 23V voltage appears between electrode and work piece ground, gap voltage\nWait for gap voltage to go above limit voltage. Needed for relay to settle (some milliseconds)\nWhen gap voltage goes back below limit voltage, that is contact, raise sensed/contact flag\nLoss of enable signal: exit sensing mode, lower contact Signal\n\n"
 		(exclude_from_sim no)
 		(at 124.206 132.842 0)
@@ -3656,6 +3767,17 @@
 		)
 		(uuid "67e9e54f-c8e7-4b96-a272-790b8967119c")
 	)
+	(text "Measure voltage over these two"
+		(exclude_from_sim no)
+		(at 17.272 28.702 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "69ffe540-825d-4995-92e7-b0142d94b219")
+	)
 	(text "R1 resistor\n-----------\nThe R1 resistor determines how much current can flow during short-circuit.\nLow current: sensitive to water on the workpiece\nHigh current: too much power generated in R1\nFor a 1/4W resistor, max current is 0.25W/24V = 10.4 mA\nR1 > 24V/10.4 mA = 2.3 kOhm \n\n"
 		(exclude_from_sim no)
 		(at 193.548 105.664 0)
@@ -3677,6 +3799,17 @@
 			(justify left top)
 		)
 		(uuid "bc4a6b8c-cc61-4ab8-9201-0ed56ca6fcef")
+	)
+	(text "R2 resistor\n-----------\nOptional weak pull-up resistor.\nOptional to experiment with this."
+		(exclude_from_sim no)
+		(at 193.802 118.11 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e453c05c-fa5c-480f-bb5f-11104d93f179")
 	)
 	(text "Relay\n-----\nMeasured 10-12 A during blow back start/blow back arc.\nThis the current that will go through the relay during start.\nNo current flows during plasma cutting.\nAny 24VDC >20A relay with less than 2W power draw works.\n2W is coil current 83 mA, dc-dc converter spec says 3 W/125 mA."
 		(exclude_from_sim no)
@@ -3887,6 +4020,28 @@
 			)
 		)
 	)
+	(global_label "ELECTRODE (-)"
+		(shape input)
+		(at 39.37 40.64 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "edeaf437-da8a-491a-bfec-41c521ef2859")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 21.5682 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "Relay (+)"
 		(shape input)
 		(at 142.24 77.47 0)
@@ -3911,7 +4066,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 149.86 55.88 90)
+		(at 157.48 55.88 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3919,7 +4074,7 @@
 		(dnp no)
 		(uuid "1431b03f-edc2-4586-b646-d5c3e81e275c")
 		(property "Reference" "R1"
-			(at 156.21 54.864 90)
+			(at 163.83 54.864 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3928,7 +4083,7 @@
 			)
 		)
 		(property "Value" "2k4"
-			(at 152.146 55.88 90)
+			(at 159.766 55.88 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3937,7 +4092,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
-			(at 149.86 57.658 90)
+			(at 157.48 57.658 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3946,7 +4101,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 149.86 55.88 0)
+			(at 157.48 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3955,7 +4110,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 149.86 55.88 0)
+			(at 157.48 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4535,8 +4690,77 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 147.32 58.42 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "89571959-11da-40de-bd30-72eb5d1d7926")
+		(property "Reference" "R2"
+			(at 142.24 58.674 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100k"
+			(at 149.606 58.42 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 147.32 60.198 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 147.32 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 147.32 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "6a580446-c0dc-4c75-8669-dd0a41a4561c")
+		)
+		(pin "1"
+			(uuid "22f18540-8668-4a8e-a134-0aa2ea34f1ce")
+		)
+		(instances
+			(project "THCLIP"
+				(path "/2f7c1153-70ce-434d-b080-3c6aade9d7b3"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Diode:1N4007")
-		(at 167.64 55.88 0)
+		(at 171.45 55.88 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4544,7 +4768,7 @@
 		(dnp no)
 		(uuid "9c723cc0-ade8-4448-b420-262985c3b551")
 		(property "Reference" "D1"
-			(at 164.846 55.118 0)
+			(at 168.656 55.118 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4552,7 +4776,7 @@
 			)
 		)
 		(property "Value" "1N4007"
-			(at 162.306 56.896 0)
+			(at 166.116 56.896 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4560,7 +4784,7 @@
 			)
 		)
 		(property "Footprint" "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal"
-			(at 167.64 60.325 0)
+			(at 171.45 60.325 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4569,7 +4793,7 @@
 			)
 		)
 		(property "Datasheet" "http://www.vishay.com/docs/88503/1n4001.pdf"
-			(at 167.64 55.88 0)
+			(at 171.45 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4578,7 +4802,7 @@
 			)
 		)
 		(property "Description" "1000V 1A General Purpose Rectifier Diode, DO-41"
-			(at 167.64 55.88 0)
+			(at 171.45 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4587,7 +4811,7 @@
 			)
 		)
 		(property "Sim.Device" "D"
-			(at 167.64 55.88 0)
+			(at 171.45 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4596,7 +4820,7 @@
 			)
 		)
 		(property "Sim.Pins" "1=K 2=A"
-			(at 167.64 55.88 0)
+			(at 171.45 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
