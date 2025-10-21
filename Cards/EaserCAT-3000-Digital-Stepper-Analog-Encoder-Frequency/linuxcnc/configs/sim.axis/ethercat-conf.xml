@@ -1,7 +1,7 @@
 <masters>
-  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="1000">
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="1000" syncToRefClock="true">
     <slave idx="0" type="generic" vid="0xd0bed1d0" pid="0x00003000" name="E3000" configPdos="true">
-      <!--dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/-->   
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0">   
       <!--MetalMusings EaserCAT 3000-->
       <sdoConfig idx="2000" subIdx="0"><sdoDataRaw data ="10 27 00 00"/></sdoConfig>  <!-- Base period (ns) 10000 (100 kHz) -->
       <sdoConfig idx="2001" subIdx="0"><sdoDataRaw data ="00 00 48 43"/></sdoConfig>  <!-- Steps per mm stepper 1.  200.0 = 43 48 00 00, use ieee float to hex converter -->
