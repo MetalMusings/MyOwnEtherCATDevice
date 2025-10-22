@@ -22,18 +22,16 @@ static const char acName1601_01[] = "VoltageScale";
 static const char acName1601_02[] = "VoltageOffset";
 static const char acName1601_03[] = "LowPassFilterThresholdVoltage";
 static const char acName1601_04[] = "EnableOhmicSensing";
-static const char acName1601_05[] = "OhmicSensingSetupTime";
-static const char acName1601_06[] = "OhmicSensingVoltageLimit";
-static const char acName1601_07[] = "OhmicSensingVoltageDrop";
+static const char acName1601_05[] = "OhmicSensingVoltageLimit";
+static const char acName1601_06[] = "OhmicSensingVoltageDrop";
 static const char acName1602[] = "In_Unit2";
 static const char acName1602_00[] = "Max SubIndex";
 static const char acName1602_01[] = "VoltageScale";
 static const char acName1602_02[] = "VoltageOffset";
 static const char acName1602_03[] = "LowPassFilterThresholdVoltage";
 static const char acName1602_04[] = "EnableOhmicSensing";
-static const char acName1602_05[] = "OhmicSensingSetupTime";
-static const char acName1602_06[] = "OhmicSensingVoltageLimit";
-static const char acName1602_07[] = "OhmicSensingVoltageDrop";
+static const char acName1602_05[] = "OhmicSensingVoltageLimit";
+static const char acName1602_06[] = "OhmicSensingVoltageDrop";
 static const char acName1A00[] = "Input12";
 static const char acName1A00_00[] = "Max SubIndex";
 static const char acName1A00_01[] = "Input12";
@@ -72,11 +70,15 @@ static const char acName2000_00[] = "Max SubIndex";
 static const char acName2000_01[] = "I2C_devicetype";
 static const char acName2000_02[] = "I2C_address";
 static const char acName2000_03[] = "LowpassFilterPoleFrequency";
+static const char acName2000_04[] = "OhmicSensingSetupTime";
+static const char acName2000_05[] = "OhmicSensingPulseLength";
 static const char acName2001[] = "Settings_Unit2";
 static const char acName2001_00[] = "Max SubIndex";
 static const char acName2001_01[] = "I2C_devicetype";
 static const char acName2001_02[] = "I2C_address";
 static const char acName2001_03[] = "LowpassFilterPoleFrequency";
+static const char acName2001_04[] = "OhmicSensingSetupTime";
+static const char acName2001_05[] = "OhmicSensingPulseLength";
 static const char acName6000[] = "Input12";
 static const char acName6001[] = "Out_Unit1";
 static const char acName6001_00[] = "Max SubIndex";
@@ -99,18 +101,16 @@ static const char acName7001_01[] = "VoltageScale";
 static const char acName7001_02[] = "VoltageOffset";
 static const char acName7001_03[] = "LowPassFilterThresholdVoltage";
 static const char acName7001_04[] = "EnableOhmicSensing";
-static const char acName7001_05[] = "OhmicSensingSetupTime";
-static const char acName7001_06[] = "OhmicSensingVoltageLimit";
-static const char acName7001_07[] = "OhmicSensingVoltageDrop";
+static const char acName7001_05[] = "OhmicSensingVoltageLimit";
+static const char acName7001_06[] = "OhmicSensingVoltageDrop";
 static const char acName7002[] = "In_Unit2";
 static const char acName7002_00[] = "Max SubIndex";
 static const char acName7002_01[] = "VoltageScale";
 static const char acName7002_02[] = "VoltageOffset";
 static const char acName7002_03[] = "LowPassFilterThresholdVoltage";
 static const char acName7002_04[] = "EnableOhmicSensing";
-static const char acName7002_05[] = "OhmicSensingSetupTime";
-static const char acName7002_06[] = "OhmicSensingVoltageLimit";
-static const char acName7002_07[] = "OhmicSensingVoltageDrop";
+static const char acName7002_05[] = "OhmicSensingVoltageLimit";
+static const char acName7002_06[] = "OhmicSensingVoltageDrop";
 
 const _objd SDO1000[] =
 {
@@ -143,25 +143,23 @@ const _objd SDO1600[] =
 };
 const _objd SDO1601[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1601_00, 7, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1601_00, 6, NULL},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_01, 0x70010120, NULL},
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_02, 0x70010220, NULL},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_03, 0x70010320, NULL},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_04, 0x70010408, NULL},
   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_05, 0x70010520, NULL},
   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_06, 0x70010620, NULL},
-  {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1601_07, 0x70010720, NULL},
 };
 const _objd SDO1602[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1602_00, 7, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName1602_00, 6, NULL},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_01, 0x70020120, NULL},
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_02, 0x70020220, NULL},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_03, 0x70020320, NULL},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_04, 0x70020408, NULL},
   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_05, 0x70020520, NULL},
   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_06, 0x70020620, NULL},
-  {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1602_07, 0x70020720, NULL},
 };
 const _objd SDO1A00[] =
 {
@@ -210,17 +208,21 @@ const _objd SDO1C13[] =
 };
 const _objd SDO2000[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2000_00, 3, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2000_00, 5, NULL},
   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2000_01, 0, &Obj.Settings_Unit1.I2C_devicetype},
   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2000_02, 0, &Obj.Settings_Unit1.I2C_address},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2000_03, 0, &Obj.Settings_Unit1.LowpassFilterPoleFrequency},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2000_04, 100, &Obj.Settings_Unit1.OhmicSensingSetupTime},
+  {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2000_05, 5, &Obj.Settings_Unit1.OhmicSensingPulseLength},
 };
 const _objd SDO2001[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2001_00, 3, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2001_00, 5, NULL},
   {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2001_01, 0, &Obj.Settings_Unit2.I2C_devicetype},
   {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2001_02, 0, &Obj.Settings_Unit2.I2C_address},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2001_03, 0, &Obj.Settings_Unit2.LowpassFilterPoleFrequency},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2001_04, 100, &Obj.Settings_Unit2.OhmicSensingSetupTime},
+  {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2001_05, 5, &Obj.Settings_Unit2.OhmicSensingPulseLength},
 };
 const _objd SDO6000[] =
 {
@@ -250,25 +252,23 @@ const _objd SDO7000[] =
 };
 const _objd SDO7001[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7001_00, 7, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7001_00, 6, NULL},
   {0x01, DTYPE_REAL32, 32, ATYPE_RO, acName7001_01, 0x00000000, &Obj.In_Unit1.VoltageScale},
   {0x02, DTYPE_REAL32, 32, ATYPE_RO, acName7001_02, 0x00000000, &Obj.In_Unit1.VoltageOffset},
   {0x03, DTYPE_REAL32, 32, ATYPE_RO, acName7001_03, 0x00000000, &Obj.In_Unit1.LowPassFilterThresholdVoltage},
   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7001_04, 0, &Obj.In_Unit1.EnableOhmicSensing},
-  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7001_05, 0, &Obj.In_Unit1.OhmicSensingSetupTime},
-  {0x06, DTYPE_REAL32, 32, ATYPE_RO, acName7001_06, 0x00000000, &Obj.In_Unit1.OhmicSensingVoltageLimit},
-  {0x07, DTYPE_REAL32, 32, ATYPE_RO, acName7001_07, 0x00000000, &Obj.In_Unit1.OhmicSensingVoltageDrop},
+  {0x05, DTYPE_REAL32, 32, ATYPE_RO, acName7001_05, 0x00000000, &Obj.In_Unit1.OhmicSensingVoltageLimit},
+  {0x06, DTYPE_REAL32, 32, ATYPE_RO, acName7001_06, 0x00000000, &Obj.In_Unit1.OhmicSensingVoltageDrop},
 };
 const _objd SDO7002[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7002_00, 7, NULL},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7002_00, 6, NULL},
   {0x01, DTYPE_REAL32, 32, ATYPE_RO, acName7002_01, 0x00000000, &Obj.In_Unit2.VoltageScale},
   {0x02, DTYPE_REAL32, 32, ATYPE_RO, acName7002_02, 0x00000000, &Obj.In_Unit2.VoltageOffset},
   {0x03, DTYPE_REAL32, 32, ATYPE_RO, acName7002_03, 0x00000000, &Obj.In_Unit2.LowPassFilterThresholdVoltage},
   {0x04, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7002_04, 0, &Obj.In_Unit2.EnableOhmicSensing},
-  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7002_05, 0, &Obj.In_Unit2.OhmicSensingSetupTime},
-  {0x06, DTYPE_REAL32, 32, ATYPE_RO, acName7002_06, 0x00000000, &Obj.In_Unit2.OhmicSensingVoltageLimit},
-  {0x07, DTYPE_REAL32, 32, ATYPE_RO, acName7002_07, 0x00000000, &Obj.In_Unit2.OhmicSensingVoltageDrop},
+  {0x05, DTYPE_REAL32, 32, ATYPE_RO, acName7002_05, 0x00000000, &Obj.In_Unit2.OhmicSensingVoltageLimit},
+  {0x06, DTYPE_REAL32, 32, ATYPE_RO, acName7002_06, 0x00000000, &Obj.In_Unit2.OhmicSensingVoltageDrop},
 };
 
 const _objectlist SDOobjects[] =
@@ -279,21 +279,21 @@ const _objectlist SDOobjects[] =
   {0x100A, OTYPE_VAR, 0, 0, acName100A, SDO100A},
   {0x1018, OTYPE_RECORD, 4, 0, acName1018, SDO1018},
   {0x1600, OTYPE_RECORD, 1, 0, acName1600, SDO1600},
-  {0x1601, OTYPE_RECORD, 7, 0, acName1601, SDO1601},
-  {0x1602, OTYPE_RECORD, 7, 0, acName1602, SDO1602},
+  {0x1601, OTYPE_RECORD, 6, 0, acName1601, SDO1601},
+  {0x1602, OTYPE_RECORD, 6, 0, acName1602, SDO1602},
   {0x1A00, OTYPE_RECORD, 1, 0, acName1A00, SDO1A00},
   {0x1A01, OTYPE_RECORD, 5, 0, acName1A01, SDO1A01},
   {0x1A02, OTYPE_RECORD, 5, 0, acName1A02, SDO1A02},
   {0x1C00, OTYPE_ARRAY, 4, 0, acName1C00, SDO1C00},
   {0x1C12, OTYPE_ARRAY, 3, 0, acName1C12, SDO1C12},
   {0x1C13, OTYPE_ARRAY, 3, 0, acName1C13, SDO1C13},
-  {0x2000, OTYPE_RECORD, 3, 0, acName2000, SDO2000},
-  {0x2001, OTYPE_RECORD, 3, 0, acName2001, SDO2001},
+  {0x2000, OTYPE_RECORD, 5, 0, acName2000, SDO2000},
+  {0x2001, OTYPE_RECORD, 5, 0, acName2001, SDO2001},
   {0x6000, OTYPE_VAR, 0, 0, acName6000, SDO6000},
   {0x6001, OTYPE_RECORD, 5, 0, acName6001, SDO6001},
   {0x6002, OTYPE_RECORD, 5, 0, acName6002, SDO6002},
   {0x7000, OTYPE_VAR, 0, 0, acName7000, SDO7000},
-  {0x7001, OTYPE_RECORD, 7, 0, acName7001, SDO7001},
-  {0x7002, OTYPE_RECORD, 7, 0, acName7002, SDO7002},
+  {0x7001, OTYPE_RECORD, 6, 0, acName7001, SDO7001},
+  {0x7002, OTYPE_RECORD, 6, 0, acName7002, SDO7002},
   {0xffff, 0xff, 0xff, 0xff, NULL, NULL}
 };

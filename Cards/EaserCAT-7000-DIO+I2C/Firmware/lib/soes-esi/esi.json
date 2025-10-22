@@ -62,6 +62,20 @@
             "value": "0",
             "access": "RW",
             "data": "&Obj.Settings_Unit1.LowpassFilterPoleFrequency"
+          },
+          {
+            "name": "OhmicSensingSetupTime",
+            "dtype": "UNSIGNED16",
+            "value": "100",
+            "access": "RW",
+            "data": "&Obj.Settings_Unit1.OhmicSensingSetupTime"
+          },
+          {
+            "name": "OhmicSensingPulseLength",
+            "dtype": "UNSIGNED16",
+            "value": "5",
+            "access": "RW",
+            "data": "&Obj.Settings_Unit1.OhmicSensingPulseLength"
           }
         ],
         "isSDOitem": true
@@ -94,6 +108,20 @@
             "value": "0",
             "access": "RW",
             "data": "&Obj.Settings_Unit2.LowpassFilterPoleFrequency"
+          },
+          {
+            "name": "OhmicSensingSetupTime",
+            "dtype": "UNSIGNED16",
+            "value": "100",
+            "access": "RW",
+            "data": "&Obj.Settings_Unit2.OhmicSensingSetupTime"
+          },
+          {
+            "name": "OhmicSensingPulseLength",
+            "dtype": "UNSIGNED16",
+            "value": "5",
+            "access": "RW",
+            "data": "&Obj.Settings_Unit2.OhmicSensingPulseLength"
           }
         ],
         "isSDOitem": true
@@ -282,13 +310,6 @@
             "data": "&Obj.In_Unit1.EnableOhmicSensing"
           },
           {
-            "name": "OhmicSensingSetupTime",
-            "dtype": "UNSIGNED32",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.In_Unit1.OhmicSensingSetupTime"
-          },
-          {
             "name": "OhmicSensingVoltageLimit",
             "dtype": "REAL32",
             "value": "0",
@@ -342,13 +363,6 @@
             "value": "0",
             "access": "RO",
             "data": "&Obj.In_Unit2.EnableOhmicSensing"
-          },
-          {
-            "name": "OhmicSensingSetupTime",
-            "dtype": "UNSIGNED32",
-            "value": "0",
-            "access": "RO",
-            "data": "&Obj.In_Unit2.OhmicSensingSetupTime"
           },
           {
             "name": "OhmicSensingVoltageLimit",

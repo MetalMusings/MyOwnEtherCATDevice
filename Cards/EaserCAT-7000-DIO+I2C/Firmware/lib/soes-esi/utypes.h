@@ -40,7 +40,6 @@ typedef struct
       float VoltageOffset;
       float LowPassFilterThresholdVoltage;
       uint8_t EnableOhmicSensing;
-      uint32_t OhmicSensingSetupTime;
       float OhmicSensingVoltageLimit;
       float OhmicSensingVoltageDrop;
    } In_Unit1;
@@ -50,7 +49,6 @@ typedef struct
       float VoltageOffset;
       float LowPassFilterThresholdVoltage;
       uint8_t EnableOhmicSensing;
-      uint32_t OhmicSensingSetupTime;
       float OhmicSensingVoltageLimit;
       float OhmicSensingVoltageDrop;
    } In_Unit2;
@@ -62,12 +60,16 @@ typedef struct
       uint8_t I2C_devicetype;
       uint8_t I2C_address;
       uint32_t LowpassFilterPoleFrequency;
+      uint16_t OhmicSensingSetupTime;
+      uint16_t OhmicSensingPulseLength;
    } Settings_Unit1;
    struct
    {
       uint8_t I2C_devicetype;
       uint8_t I2C_address;
       uint32_t LowpassFilterPoleFrequency;
+      uint16_t OhmicSensingSetupTime;
+      uint16_t OhmicSensingPulseLength;
    } Settings_Unit2;
 } _Objects;
 

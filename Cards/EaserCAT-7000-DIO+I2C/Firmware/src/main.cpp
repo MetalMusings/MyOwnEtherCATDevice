@@ -45,13 +45,14 @@ void ads1014_reset(ADS1014 *ads) {
 class OhmicSensing {
 public:
   void handle(uint8_t voltageState, float inVoltage, float limitVoltage,
-              float voltageDropLimit, uint32_t setupTime, uint8_t enabled,
-              uint8_t &sensed);
+              float voltageDropLimit, uint32_t setupTime, uint16_t pulseLength,
+              uint8_t enabled, uint8_t &sensed);
 
   // private:
-  enum OhmicStates { OHMIC_IDLE, OHMIC_SETUP, OHMIC_PROBE };
+  enum OhmicStates { OHMIC_IDLE, OHMIC_SETUP, OHMIC_PROBE, OHMIC_PULSE };
   OhmicStates ohmicState = OHMIC_IDLE;
   uint64_t startTime;
+  uint64_t contactTime;
   float_t oldVoltage = 0.0;
   std::queue<float> voltages;
   float_t refVoltage;
@@ -126,16 +127,20 @@ void cb_get_inputs(void) // Set Master inputs, slave outputs, last operation
                 Obj.Out_Unit2.CalculatedVoltage,
                 Obj.Out_Unit2.LowpassFilteredVoltage);
 
-  Ohm1.handle(
-      stat_1, Obj.Out_Unit1.CalculatedVoltage,
-      Obj.In_Unit1.OhmicSensingVoltageLimit,
-      Obj.In_Unit1.OhmicSensingVoltageDrop, Obj.In_Unit1.OhmicSensingSetupTime,
-      Obj.In_Unit1.EnableOhmicSensing, Obj.Out_Unit1.OhmicSensingSensed);
-  Ohm2.handle(
-      stat_2, Obj.Out_Unit2.CalculatedVoltage,
-      Obj.In_Unit2.OhmicSensingVoltageLimit,
-      Obj.In_Unit2.OhmicSensingVoltageDrop, Obj.In_Unit2.OhmicSensingSetupTime,
-      Obj.In_Unit2.EnableOhmicSensing, Obj.Out_Unit2.OhmicSensingSensed);
+  Ohm1.handle(stat_1, Obj.Out_Unit1.CalculatedVoltage,
+              Obj.In_Unit1.OhmicSensingVoltageLimit,
+              Obj.In_Unit1.OhmicSensingVoltageDrop,
+              Obj.Settings_Unit1.OhmicSensingSetupTime,
+              Obj.Settings_Unit1.OhmicSensingPulseLength,
+              Obj.In_Unit1.EnableOhmicSensing,
+              Obj.Out_Unit1.OhmicSensingSensed);
+  Ohm2.handle(stat_2, Obj.Out_Unit2.CalculatedVoltage,
+              Obj.In_Unit2.OhmicSensingVoltageLimit,
+              Obj.In_Unit2.OhmicSensingVoltageDrop,
+              Obj.Settings_Unit2.OhmicSensingSetupTime,
+              Obj.Settings_Unit2.OhmicSensingPulseLength,
+              Obj.In_Unit2.EnableOhmicSensing,
+              Obj.Out_Unit2.OhmicSensingSensed);
   Obj.Out_Unit1.RawData = (int)Ohm2.ohmicState;
 }
 
@@ -370,8 +375,8 @@ void lowpassFilter(float &oldLowPassGain,
 #define N_VOLTAGES 3
 void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
                           float limitVoltage, float voltageDropLimit,
-                          uint32_t setupTime, uint8_t enabled,
-                          uint8_t &sensed) {
+                          uint32_t setupTime, uint16_t pulseLength,
+                          uint8_t enabled, uint8_t &sensed) {
   sensed = 0;
   uint64_t dTime;
   Obj.Out_Unit1.RawData = ohmicState;
@@ -381,19 +386,18 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
       startTime = longTime.extendTime(micros());
       while (!voltages.empty())
         voltages.pop(); // Remove history
-      return;
     }
-    if (ohmicState == OHMIC_SETUP) {
+    switch (ohmicState) {
+    case OHMIC_SETUP:
       dTime = longTime.extendTime(micros()) - startTime;
       if (dTime > setupTime * 1000) {
         ohmicState = OHMIC_PROBE;
         startTime = longTime.extendTime(micros());
         oldVoltage = 0.0;
         refVoltage = inVoltage; // RefVoltage = voltage at end of setup
-        return;
       }
-    }
-    if (ohmicState == OHMIC_PROBE) {
+      break;
+    case OHMIC_PROBE: {
       dTime = longTime.extendTime(micros()) - startTime;
       voltages.push(inVoltage);
       while (voltages.size() > N_VOLTAGES)
@@ -403,6 +407,7 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
         return;
       }
       byte c1 = (inVoltage <= limitVoltage) ? 1 : 0; // Below starting threshold
+
       byte c2 = (fabs(voltageDropLimit) > 1e-3 &&
                  refVoltage - inVoltage >= voltageDropLimit)
                     ? 2
@@ -417,10 +422,26 @@ void OhmicSensing::handle(uint8_t voltageState, float inVoltage,
                     : 0;
       Obj.Out_Unit2.RawData = c1 + c2 + c3 + c4;
       if (c1 + c2 + c3 + c4 > 0) {
-        sensed = 1;
+        if (pulseLength == 0) { // Real pulse length
+          sensed = 1;
+        } else { // Timed pulse length
+          contactTime = longTime.extendTime(micros());
+          sensed = 1;
+          ohmicState = OHMIC_PULSE;
+        }
       }
+    }
       oldVoltage = inVoltage;
-      return;
+      break;
+    case OHMIC_PULSE: // For a pulse with a set length
+      int dTime = longTime.extendTime(micros()) - contactTime;
+      if (dTime < pulseLength * 1000) {
+        sensed = 1;
+      } else {
+        sensed = 0;
+        ohmicState = OHMIC_IDLE;
+      }
+      break;
     }
   } else {
     ohmicState = OHMIC_IDLE;

@@ -101,7 +101,7 @@
               </DataType>
               <DataType>
                 <Name>DT1601</Name>
-                <BitSize>240</BitSize>
+                <BitSize>208</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -154,7 +154,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>5</SubIdx>
-                  <Name>OhmicSensingSetupTime</Name>
+                  <Name>OhmicSensingVoltageLimit</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>144</BitOffs>
@@ -164,20 +164,10 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>6</SubIdx>
-                  <Name>OhmicSensingVoltageLimit</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>176</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>7</SubIdx>
                   <Name>OhmicSensingVoltageDrop</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>208</BitOffs>
+                  <BitOffs>176</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -185,7 +175,7 @@
               </DataType>
               <DataType>
                 <Name>DT1602</Name>
-                <BitSize>240</BitSize>
+                <BitSize>208</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -238,7 +228,7 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>5</SubIdx>
-                  <Name>OhmicSensingSetupTime</Name>
+                  <Name>OhmicSensingVoltageLimit</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>144</BitOffs>
@@ -248,20 +238,10 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>6</SubIdx>
-                  <Name>OhmicSensingVoltageLimit</Name>
-                  <Type>UDINT</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>176</BitOffs>
-                  <Flags>
-                    <Access>ro</Access>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>7</SubIdx>
                   <Name>OhmicSensingVoltageDrop</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>208</BitOffs>
+                  <BitOffs>176</BitOffs>
                   <Flags>
                     <Access>ro</Access>
                   </Flags>
@@ -517,7 +497,7 @@
               </DataType>
               <DataType>
                 <Name>DT2000</Name>
-                <BitSize>64</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -554,6 +534,26 @@
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>32</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">rw</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>OhmicSensingSetupTime</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>64</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">rw</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>5</SubIdx>
+                  <Name>OhmicSensingPulseLength</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">rw</Access>
                   </Flags>
@@ -561,7 +561,7 @@
               </DataType>
               <DataType>
                 <Name>DT2001</Name>
-                <BitSize>64</BitSize>
+                <BitSize>96</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -598,6 +598,26 @@
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>32</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">rw</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>OhmicSensingSetupTime</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>64</BitOffs>
+                  <Flags>
+                    <Access WriteRestrictions="PreOP">rw</Access>
+                  </Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>5</SubIdx>
+                  <Name>OhmicSensingPulseLength</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>80</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">rw</Access>
                   </Flags>
@@ -743,7 +763,7 @@
               </DataType>
               <DataType>
                 <Name>DT7001</Name>
-                <BitSize>216</BitSize>
+                <BitSize>184</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -800,8 +820,8 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>5</SubIdx>
-                  <Name>OhmicSensingSetupTime</Name>
-                  <Type>UDINT</Type>
+                  <Name>OhmicSensingVoltageLimit</Name>
+                  <Type>REAL</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>120</BitOffs>
                   <Flags>
@@ -811,21 +831,10 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>6</SubIdx>
-                  <Name>OhmicSensingVoltageLimit</Name>
-                  <Type>REAL</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>152</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>7</SubIdx>
                   <Name>OhmicSensingVoltageDrop</Name>
                   <Type>REAL</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>184</BitOffs>
+                  <BitOffs>152</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">ro</Access>
                   <PdoMapping>R</PdoMapping>
@@ -834,7 +843,7 @@
               </DataType>
               <DataType>
                 <Name>DT7002</Name>
-                <BitSize>216</BitSize>
+                <BitSize>184</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -891,8 +900,8 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>5</SubIdx>
-                  <Name>OhmicSensingSetupTime</Name>
-                  <Type>UDINT</Type>
+                  <Name>OhmicSensingVoltageLimit</Name>
+                  <Type>REAL</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>120</BitOffs>
                   <Flags>
@@ -902,21 +911,10 @@
                 </SubItem>
                 <SubItem>
                   <SubIdx>6</SubIdx>
-                  <Name>OhmicSensingVoltageLimit</Name>
-                  <Type>REAL</Type>
-                  <BitSize>32</BitSize>
-                  <BitOffs>152</BitOffs>
-                  <Flags>
-                    <Access WriteRestrictions="PreOP">ro</Access>
-                  <PdoMapping>R</PdoMapping>
-                  </Flags>
-                </SubItem>
-                <SubItem>
-                  <SubIdx>7</SubIdx>
                   <Name>OhmicSensingVoltageDrop</Name>
                   <Type>REAL</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>184</BitOffs>
+                  <BitOffs>152</BitOffs>
                   <Flags>
                     <Access WriteRestrictions="PreOP">ro</Access>
                   <PdoMapping>R</PdoMapping>
@@ -1069,12 +1067,12 @@
                 <Index>#x1601</Index>
                 <Name>In_Unit1</Name>
                 <Type>DT1601</Type>
-                <BitSize>240</BitSize>
+                <BitSize>208</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>7</DefaultValue>
+                      <DefaultValue>6</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1102,21 +1100,15 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>OhmicSensingSetupTime</Name>
+                    <Name>OhmicSensingVoltageLimit</Name>
                     <Info>
                       <DefaultValue>#x70010520</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>OhmicSensingVoltageLimit</Name>
-                    <Info>
-                      <DefaultValue>#x70010620</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
                     <Name>OhmicSensingVoltageDrop</Name>
                     <Info>
-                      <DefaultValue>#x70010720</DefaultValue>
+                      <DefaultValue>#x70010620</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1127,12 +1119,12 @@
                 <Index>#x1602</Index>
                 <Name>In_Unit2</Name>
                 <Type>DT1602</Type>
-                <BitSize>240</BitSize>
+                <BitSize>208</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>7</DefaultValue>
+                      <DefaultValue>6</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1160,21 +1152,15 @@
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>OhmicSensingSetupTime</Name>
+                    <Name>OhmicSensingVoltageLimit</Name>
                     <Info>
                       <DefaultValue>#x70020520</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
-                    <Name>OhmicSensingVoltageLimit</Name>
-                    <Info>
-                      <DefaultValue>#x70020620</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
                     <Name>OhmicSensingVoltageDrop</Name>
                     <Info>
-                      <DefaultValue>#x70020720</DefaultValue>
+                      <DefaultValue>#x70020620</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1407,12 +1393,12 @@
                 <Index>#x2000</Index>
                 <Name>Settings_Unit1</Name>
                 <Type>DT2000</Type>
-                <BitSize>64</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>3</DefaultValue>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1431,6 +1417,18 @@
                     <Name>LowpassFilterPoleFrequency</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingSetupTime</Name>
+                    <Info>
+                      <DefaultValue>100</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingPulseLength</Name>
+                    <Info>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1441,12 +1439,12 @@
                 <Index>#x2001</Index>
                 <Name>Settings_Unit2</Name>
                 <Type>DT2001</Type>
-                <BitSize>64</BitSize>
+                <BitSize>96</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>3</DefaultValue>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1465,6 +1463,18 @@
                     <Name>LowpassFilterPoleFrequency</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingSetupTime</Name>
+                    <Info>
+                      <DefaultValue>100</DefaultValue>
+                    </Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>OhmicSensingPulseLength</Name>
+                    <Info>
+                      <DefaultValue>5</DefaultValue>
                     </Info>
                   </SubItem>
                 </Info>
@@ -1593,12 +1603,12 @@
                 <Index>#x7001</Index>
                 <Name>In_Unit1</Name>
                 <Type>DT7001</Type>
-                <BitSize>216</BitSize>
+                <BitSize>184</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>7</DefaultValue>
+                      <DefaultValue>6</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1621,12 +1631,6 @@
                   </SubItem>
                   <SubItem>
                     <Name>EnableOhmicSensing</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>OhmicSensingSetupTime</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
                     </Info>
@@ -1651,12 +1655,12 @@
                 <Index>#x7002</Index>
                 <Name>In_Unit2</Name>
                 <Type>DT7002</Type>
-                <BitSize>216</BitSize>
+                <BitSize>184</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
                     <Info>
-                      <DefaultValue>7</DefaultValue>
+                      <DefaultValue>6</DefaultValue>
                     </Info>
                   </SubItem>
                   <SubItem>
@@ -1679,12 +1683,6 @@
                   </SubItem>
                   <SubItem>
                     <Name>EnableOhmicSensing</Name>
-                    <Info>
-                      <DefaultValue>0</DefaultValue>
-                    </Info>
-                  </SubItem>
-                  <SubItem>
-                    <Name>OhmicSensingSetupTime</Name>
                     <Info>
                       <DefaultValue>0</DefaultValue>
                     </Info>
@@ -1761,19 +1759,12 @@
             <Index>#x7001</Index>
             <SubIndex>#x5</SubIndex>
             <BitLen>32</BitLen>
-            <Name>OhmicSensingSetupTime</Name>
-            <DataType>UDINT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x7001</Index>
-            <SubIndex>#x6</SubIndex>
-            <BitLen>32</BitLen>
             <Name>OhmicSensingVoltageLimit</Name>
             <DataType>REAL</DataType>
           </Entry>
           <Entry>
             <Index>#x7001</Index>
-            <SubIndex>#x7</SubIndex>
+            <SubIndex>#x6</SubIndex>
             <BitLen>32</BitLen>
             <Name>OhmicSensingVoltageDrop</Name>
             <DataType>REAL</DataType>
@@ -1814,19 +1805,12 @@
             <Index>#x7002</Index>
             <SubIndex>#x5</SubIndex>
             <BitLen>32</BitLen>
-            <Name>OhmicSensingSetupTime</Name>
-            <DataType>UDINT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x7002</Index>
-            <SubIndex>#x6</SubIndex>
-            <BitLen>32</BitLen>
             <Name>OhmicSensingVoltageLimit</Name>
             <DataType>REAL</DataType>
           </Entry>
           <Entry>
             <Index>#x7002</Index>
-            <SubIndex>#x7</SubIndex>
+            <SubIndex>#x6</SubIndex>
             <BitLen>32</BitLen>
             <Name>OhmicSensingVoltageDrop</Name>
             <DataType>REAL</DataType>
