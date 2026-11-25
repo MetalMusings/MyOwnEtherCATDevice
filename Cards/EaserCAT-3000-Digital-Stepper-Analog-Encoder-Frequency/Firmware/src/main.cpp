@@ -56,7 +56,11 @@ extend32to64 longTime;
 const uint32_t SYNC0_PIN = PC3;
 volatile bool sync0Pending = false;      // Set by the SYNC0 interrupt
 volatile uint32_t lastSync0Micros = 0;
+volatile bool sync0Seen = false;         // A SYNC0 has arrived since the interrupt was enabled
 volatile uint16_t sync0Overruns = 0;     // SYNC0 arrived before the last cycle was served
+// The master sets the SYNC0 start time ahead (IgH: about 100 ms) and may request OP before
+// the first pulse. Only a SYNC0 that has not started within this time is an error.
+const int32_t SYNC0_START_TIMEOUT_US = 1000000;
 uint32_t sync0CycleNs = 0;               // From the ESC when DC is activated
 uint32_t lastCycleMicros = 0;
 bool commLostPending = false;
@@ -295,13 +299,22 @@ void loop(void) {
     return;
   }
 
+  // Read lastSync0Micros before micros(): the SYNC0 interrupt can update it at any time,
+  // and a value newer than 'now' would wrap the difference and look like a lost SYNC0.
+  uint32_t lastSync0 = lastSync0Micros;
+  bool seen = sync0Seen;
   uint32_t now = micros();
-  bool dcRunning = ESCvar.dcsync && sync0CycleNs != 0 &&
-                   (now - lastSync0Micros) < 3 * (sync0CycleNs / 1000) + 2000;
+  bool dcActive = ESCvar.dcsync && sync0CycleNs != 0;
+  int32_t sinceSync0 = (int32_t)(now - lastSync0);  // since the last SYNC0, or since enabling
+  bool dcRunning = dcActive && seen &&
+                   sinceSync0 < (int32_t)(3 * (sync0CycleNs / 1000) + 2000);
   if (dcRunning) return;  // Wait for SYNC0, don't disturb it with SPI traffic
 
-  if (ESCvar.dcsync && inOp() && sync0CycleNs != 0) {
-    // DC was activated but SYNC0 stopped: synchronization error (ETG.1020)
+  // Before the first SYNC0 the loop polls as usual, so the mailbox and the state machine
+  // keep running while the master waits for the SYNC0 start time.
+  bool sync0Lost = dcActive && (seen || sinceSync0 >= SYNC0_START_TIMEOUT_US);
+  if (sync0Lost && inOp()) {
+    // DC was activated but SYNC0 stopped, or never started: synchronization error (ETG.1020)
     Obj.SmOutParam.SyncError = Obj.SmInParam.SyncError = 1;
     ESC_ALstatusgotoerror((ESCsafeop | ESCerror), ALERR_SYNCERROR);
   }
@@ -332,12 +345,14 @@ void sync0Handler(void) {
   // No SPI access here, it would collide with an SPI transfer of the main loop.
   if (sync0Pending) sync0Overruns++;
   lastSync0Micros = micros();
+  sync0Seen = true;
   sync0Pending = true;
 }
 
 void ESC_interrupt_enable(uint32_t mask) {
   if (mask & ESCREG_ALEVENT_DC_SYNC0) {
-    lastSync0Micros = micros();  // Give SYNC0 time to start
+    sync0Seen = false;
+    lastSync0Micros = micros();  // SYNC0_START_TIMEOUT_US counts from here
     attachInterrupt(digitalPinToInterrupt(SYNC0_PIN), sync0Handler, RISING);
   }
 }
@@ -346,6 +361,7 @@ void ESC_interrupt_disable(uint32_t mask) {
   if (mask & ESCREG_ALEVENT_DC_SYNC0) {
     detachInterrupt(digitalPinToInterrupt(SYNC0_PIN));
     sync0Pending = false;
+    sync0Seen = false;
   }
 }
 
