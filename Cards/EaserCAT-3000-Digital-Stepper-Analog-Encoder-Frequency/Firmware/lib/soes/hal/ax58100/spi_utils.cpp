@@ -40,26 +40,26 @@ inline static uint8_t spi_transfer_byte(uint8_t byte)
     // so no need to care for now
 }
 
-void spi_write (int8_t board, uint8_t *data, uint8_t size)
+void spi_write (int8_t board, uint8_t *data, uint16_t size)
 {
-    for(int i = 0; i < size; ++i)
+    for(uint16_t i = 0; i < size; ++i)
     {
         spi_transfer_byte(data[i]);
     }
 }
 
-void spi_read (int8_t board, uint8_t *result, uint8_t size)
+void spi_read (int8_t board, uint8_t *result, uint16_t size)
 {
-	for(int i = 0; i < size; ++i)
+	for(uint16_t i = 0; i < size; ++i)
     {
         result[i] = spi_transfer_byte(DUMMY_BYTE);
     }
 }
 
 
-void spi_bidirectionally_transfer (int8_t board, uint8_t *result, uint8_t *data, uint8_t size)
+void spi_bidirectionally_transfer (int8_t board, uint8_t *result, uint8_t *data, uint16_t size)
 {
-	for(int i = 0; i < size; ++i)
+	for(uint16_t i = 0; i < size; ++i)
     {
         result[i] = spi_transfer_byte(data[i]);
     }
