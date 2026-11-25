@@ -33,7 +33,7 @@ void GpioConfigPortA(GPIO_TypeDef *GPIOx)
     {
         pos = ((uint32_t)0x01) << pinpos;
         /* Get the port pins position */
-        currentpin = (GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_6 | GPIO_Pin_7) & pos;
+        currentpin = (GPIO_Pin_0 | GPIO_Pin_1) & pos; // TIM2 encoder inputs only. PA6/PA7 are not used by the encoder
 
         if (currentpin == pos)
         {
@@ -272,13 +272,14 @@ void encoder_config()
 
     RCC->APB1ENR |= 0x20000000; // ENABLE DAC
                                 //  RCC->APB2ENR |= 0x00000002; // APB2 TIM8
-    RCC->APB1ENR |= 0x00000004; // APB1 TIM4
     RCC->APB1ENR |= 0x00000001; // APB1 TIM2
                                 //   RCC->APB1ENR |= 0x00000002; // APB1 TIM3
 
     GpioConfigPortA(GPIOA);
     //   GpioConfigPortC(GPIOC);
-    GpioConfigPortD(GPIOD);
+    // NOTE: PD12/PD13 (TIM4) must not be configured as encoder inputs, PD12 is the
+    // step output of stepper 3 and PD11 its direction output.
+    //   GpioConfigPortD(GPIOD);
 #if 0 // Skipping since TIM8 is step generator and TIM3, chan4 is smae as TIM8, chan4
     GPIO_PinAF(GPIOA, GPIO_PinSource6, GPIO_AF_TIM3);
     GPIO_PinAF(GPIOA, GPIO_PinSource7, GPIO_AF_TIM3);
@@ -286,8 +287,6 @@ void encoder_config()
     GPIO_PinAF(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
     GPIO_PinAF(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
 #endif
-    GPIO_PinAF(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
-    GPIO_PinAF(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
 
     GPIO_PinAF(GPIOA, GPIO_PinSource0, GPIO_AF_TIM2);
     GPIO_PinAF(GPIOA, GPIO_PinSource1, GPIO_AF_TIM2);
@@ -300,13 +299,6 @@ void encoder_config()
     TIM_Cmd(TIM8, ENABLE);
     TIM8->CNT = 0;
 #endif
-    TIM_EncoderInterConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
-    TIMER_InitStructureE.TIM_Period = 65535;
-    TIMER_InitStructureE.TIM_CounterMode = TIM_CounterMode_Up | TIM_CounterMode_Down;
-    TIM_TimeBaseInit(TIM4, &TIMER_InitStructureE);
-    TIM_TimeBaseStructInit(&TIMER_InitStructureE);
-    TIM_Cmd(TIM4, ENABLE);
-    TIM4->CNT = 0;
 
     TIM_EncoderInterConfig(TIM2, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
     TIMER_InitStructureEE.TIM_Period = 65535;

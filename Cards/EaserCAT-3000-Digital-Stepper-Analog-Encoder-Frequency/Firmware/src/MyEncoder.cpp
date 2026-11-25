@@ -67,10 +67,10 @@ double MyEncoder::frequency(uint64_t time)
     if (Pos.size() == RINGBUFFERLEN)
     {
         diffT = 1.0e-6 * (TDelta.last() - TDelta.first()); // Time is in microseconds
-        diffPos = fabs(Pos.last() - Pos.first());
-        frequency = diffPos / diffT;
+        diffPos = Pos.last() - Pos.first(); // Signed, keeps the direction
+        frequency = diffT > 0 ? diffPos / diffT : 0.0;
         oldFrequency = frequency;
-        return frequency; // Revolutions per second
+        return frequency; // Position units (e.g. revolutions) per second
     }
     else
         return oldFrequency;

@@ -36,7 +36,6 @@ typedef struct
     unsigned int step_space;            /* parameter: min step pulse spacing */
     double old_pos_cmd;                 /* previous position command (counts) */
     int count;                          /* pin: captured feedback in counts */
-#define double float
     double pos_scale;          /* param: steps per position unit */
     double old_scale;          /* stored scale value */
     double scale_recip;        /* reciprocal value used for scaling */
@@ -90,14 +89,24 @@ public:
     double dt;                 // update_freq period in seconds */
     double recip_dt;           // recprocal of period, avoids divides */
     volatile uint64_t cnt = 0; // Debug counter
-#undef double
+    long basePeriodNs = 10000; // Actual period of the makeAllPulses() calls in ns
+    uint32_t stepPinName[MAX_CHAN] = {0}; // PinName of the step outputs, for fast GPIO
+    uint32_t dirPinName[MAX_CHAN] = {0};  // PinName of the direction outputs
     StepGen3(void);
 
-    void updateStepGen(double pos_cmd1, double pos_cmd2, double pos_cmd3, double pos_cmd4,
-                       float pos_scale1, float pos_scale2, float pos_scale3, float pos_scale4,
-                       float max_acc1, float max_acc2, float max_acc3, float max_acc4,
-                       uint8_t enable1, uint8_t enable2, uint8_t enable3, uint8_t enable4,
-                       uint32_t servoPeriod);
+    // Set the command of one channel for the next servo period.
+    //   posMode: true = position command, false = velocity command
+    //   resync : restart the position loop without velocity feed forward (avoids a
+    //            velocity step after enable or a mode change)
+    void setChannel(int ch, bool enable, bool posMode, double posCmd, double velCmd,
+                    double maxVel, double maxAccel, bool resync);
+    // Step timing in ns. 0 means one base period (the minimum).
+    void setTiming(int ch, uint32_t stepLen, uint32_t stepSpace, uint32_t dirSetup,
+                   uint32_t dirHold);
+    // Update pos_fb of all channels from the DDS accumulators
+    void updatePositions(void);
+    // Run the position/velocity loop of all channels, servoPeriodNs = cycle time
+    void updateFrequencies(long servoPeriodNs);
     void makeAllPulses(void);
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
@@ -135,18 +144,8 @@ private:
         {2, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 0};
 };
 
-// Initial values. Please update base_period using SDO, the others using PDOs
-// For the example 20000 ns => 50 kHz
-// It may be ok with over 100 kHz, it depends on the overall load. You just need to test.
-#define BASE_PERIOD 20000
-// #define SERVO_PERIOD 2000000
-#define JOINT_1_STEPGEN_MAXACCEL 100000.0
-#define JOINT_2_STEPGEN_MAXACCEL 100000.0
-#define JOINT_3_STEPGEN_MAXACCEL 100000.0
-#define JOINT_4_STEPGEN_MAXACCEL 100000.0
-#define JOINT_1_SCALE 100
-#define JOINT_2_SCALE 100
-#define JOINT_3_SCALE 100
-#define JOINT_4_SCALE 100
+// Default base period (ns) of the step pulse generation, until overridden by SDO 0x2000.
+// 10000 ns => 100 kHz. Higher rates may work, depending on the overall load.
+#define BASE_PERIOD 10000
 
 #endif

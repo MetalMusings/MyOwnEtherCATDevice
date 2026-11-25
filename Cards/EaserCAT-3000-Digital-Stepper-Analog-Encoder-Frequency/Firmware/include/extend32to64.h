@@ -1,5 +1,5 @@
 #ifndef EXTEND32TO64
-#define EXTEND32TO54
+#define EXTEND32TO64
 
 #include <Arduino.h>
 

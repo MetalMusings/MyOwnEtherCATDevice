@@ -7,7 +7,7 @@ extern "C"
 {
 #include "esc.h"
 }
-extern HardwareSerial Serial1;
+extern HardwareSerial DebugSerial;
 ////////////////////////////////////////////////
 /********************************************************************
  * Description:  stepgen.c
@@ -954,7 +954,6 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
         }
     }
 
-    printf("Exporting %d\n", num);
 
     /* set default parameter values */
     addr->pos_scale = 1.0;
@@ -966,7 +965,6 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
     addr->step_type = step_type;
     addr->pos_mode = pos_mode;
 
-    printf("Exporting 1\n");
     /* timing parameter defaults depend on step type */
     addr->step_len = 1;
     if (step_type < 2)
@@ -989,7 +987,6 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
     }
     /* set 'old' values to make update_freq validate the timing params */
 
-    printf("Exporting 2\n");
     addr->old_step_len = ~0;
     addr->old_step_space = ~0;
     addr->old_dir_hold_dly = ~0;
@@ -1019,7 +1016,6 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
     addr->printed_error = 0;
     addr->old_pos_cmd = 0.0;
 
-    printf("Exporting 3\n");
     /* set initial pin values */
     addr->count = 0;
     addr->pos_fb = 0.0;
@@ -1033,7 +1029,6 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
     }
     /* restore saved message level */
     // rtapi_set_msg_level(msg);
-    printf("Exporting done\n");
     return 0;
 }
 
@@ -1081,76 +1076,66 @@ CONTROL StepGen3::parse_ctrl_type(const char *ctrl)
 
 StepGen3::StepGen3(void)
 {
-
-    step_type[0] = 0;
-    ctrl_type[0] = (char *)malloc(2);
-    strcpy(ctrl_type[0], "p");
-    stepPin[0] = PA11;
-    dirPin[0] = PA12;
-
-    step_type[1] = 0;
-    ctrl_type[1] = (char *)malloc(2);
-    strcpy(ctrl_type[1], "p");
-    stepPin[1] = PC9;
-    dirPin[1] = PC8;
-
-    step_type[2] = 0;
-    ctrl_type[2] = (char *)malloc(2);
-    strcpy(ctrl_type[2], "p");
-    stepPin[2] = PD12;
-    dirPin[2] = PD11;
-
-    step_type[3] = 0;
-    ctrl_type[3] = (char *)malloc(2);
-    strcpy(ctrl_type[3], "p");
-    stepPin[3] = PE5;
-    dirPin[3] = PE4;
-
+    // Step/dir outputs of the four channels
+    const uint32_t steps[4] = {PA11, PC9, PD12, PE5};
+    const uint32_t dirs[4] = {PA12, PC8, PD11, PE4};
+    for (int i = 0; i < 4; i++)
+    {
+        step_type[i] = 0;                    // step/dir
+        ctrl_type[i] = (char *)"p";          // position mode, switched at runtime
+        stepPin[i] = steps[i];
+        dirPin[i] = dirs[i];
+        stepPinName[i] = digitalPinToPinName(steps[i]);
+        dirPinName[i] = digitalPinToPinName(dirs[i]);
+    }
     rtapi_app_main();
-    #if 0
-    stepgen_array[0].pos_scale = JOINT_1_SCALE; // Can and should be overriden by PDO values
-    stepgen_array[0].maxaccel = JOINT_1_STEPGEN_MAXACCEL;
-    stepgen_array[1].pos_scale = JOINT_2_SCALE;
-    stepgen_array[1].maxaccel = JOINT_2_STEPGEN_MAXACCEL;
-    stepgen_array[2].pos_scale = JOINT_3_SCALE;
-    stepgen_array[2].maxaccel = JOINT_3_STEPGEN_MAXACCEL;
-    stepgen_array[3].pos_scale = JOINT_4_SCALE;
-    stepgen_array[3].maxaccel = JOINT_4_STEPGEN_MAXACCEL;
-    stepgen_array[0].enable = stepgen_array[1].enable =
-        stepgen_array[2].enable = stepgen_array[3].enable = 0; // Note that they are off by default
-        #endif
+    // Positions are handled in steps, scaling is done by the EtherCAT master
+    for (int i = 0; i < num_chan; i++)
+        stepgen_array[i].pos_scale = 1.0;
 }
 
-void StepGen3::updateStepGen(double pos_cmd1, double pos_cmd2, double pos_cmd3, double pos_cmd4,
-                             float pos_scale1, float pos_scale2, float pos_scale3, float pos_scale4,
-                             float max_acc1, float max_acc2, float max_acc3, float max_acc4,
-                             uint8_t enable1, uint8_t enable2, uint8_t enable3, uint8_t enable4,
-                             uint32_t servoPeriod)
+void StepGen3::setChannel(int ch, bool enable, bool posMode, double posCmd, double velCmd,
+                          double maxVel, double maxAccel, bool resync)
 {
-    stepgen_array[0].pos_cmd = pos_cmd1;
-    stepgen_array[1].pos_cmd = pos_cmd2;
-    stepgen_array[2].pos_cmd = pos_cmd3;
-    stepgen_array[3].pos_cmd = pos_cmd4;
-    stepgen_array[0].pos_scale = pos_scale1;
-    stepgen_array[1].pos_scale = pos_scale2;
-    stepgen_array[2].pos_scale = pos_scale3;
-    stepgen_array[3].pos_scale = pos_scale4;
-    stepgen_array[0].maxaccel = max_acc1;
-    stepgen_array[1].maxaccel = max_acc2;
-    stepgen_array[2].maxaccel = max_acc3;
-    stepgen_array[3].maxaccel = max_acc4;
-    stepgen_array[0].enable = enable1;
-    stepgen_array[1].enable = enable2;
-    stepgen_array[2].enable = enable3;
-    stepgen_array[3].enable = enable4;
-
-    for (int i = 0; i < num_chan; i++)
+    stepgen_t *s = &stepgen_array[ch];
+    if (posMode && (!s->pos_mode || resync))
     {
-        stepgen_t *step;
-        step = &(stepgen_array[i]);
-        update_pos(step, servoPeriod); // servoPeriod is in nanosecs
-        update_freq(step, servoPeriod);
+        // No velocity feed forward from an old command in the first cycle
+        s->old_pos_cmd = posCmd * s->pos_scale;
     }
+    s->pos_mode = posMode ? 1 : 0;
+    s->pos_cmd = posCmd;
+    s->vel_cmd = velCmd;
+    s->maxvel = maxVel;
+    s->maxaccel = maxAccel;
+    s->enable = enable ? 1 : 0;
+}
+
+void StepGen3::setTiming(int ch, uint32_t stepLen, uint32_t stepSpace, uint32_t dirSetup,
+                         uint32_t dirHold)
+{
+    stepgen_t *s = &stepgen_array[ch];
+    // update_freq() rounds these up to whole base periods. Only write when the
+    // requested value is different from the rounded one, to avoid recalculation.
+    if (ulceil(stepLen ? stepLen : 1, periodns) != (unsigned long)s->step_len)
+        s->step_len = stepLen ? stepLen : 1;
+    if (ulceil(stepSpace, periodns) != s->step_space)
+        s->step_space = stepSpace;
+    if (ulceil(dirSetup, periodns) != s->dir_setup)
+        s->dir_setup = dirSetup;
+    if (ulceil(dirHold ? dirHold : 1, periodns) != s->dir_hold_dly)
+        s->dir_hold_dly = dirHold ? dirHold : 1;
+}
+
+void StepGen3::updatePositions(void)
+{
+    update_pos(stepgen_array, 0);
+}
+
+void StepGen3::updateFrequencies(long servoPeriodNs)
+{
+    // update_freq() handles all channels in one call
+    update_freq(stepgen_array, servoPeriodNs);
 }
 
 int StepGen3::rtapi_app_main()
@@ -1180,10 +1165,10 @@ int StepGen3::rtapi_app_main()
     }
     if (num_chan == 0)
     {
-        Serial1.printf("STEPGEN: ERROR: no channels configured\n");
+        DebugSerial.printf("STEPGEN: ERROR: no channels configured\n");
         return -1;
     }
-    Serial1.printf("num_chan = %d\n", num_chan);
+    DebugSerial.printf("num_chan = %d\n", num_chan);
     /* periodns will be set to the proper value when 'make_pulses()' runs for
        the first time.  We load a default value here to avoid glitches at
        startup, but all these 'constants' are recomputed inside
@@ -1220,15 +1205,13 @@ int StepGen3::rtapi_app_main()
     }
     return 0;
 }
-extern volatile uint64_t makePulsesCnt;
 void StepGen3::makeAllPulses(void)
 {
-    makePulsesCnt++;
-
-    make_pulses(stepgen_array, BASE_PERIOD);
+    make_pulses(stepgen_array, basePeriodNs);
     for (int i = 0; i < num_chan; i++)
     {
-        digitalWrite(dirPin[i], stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
-        digitalWrite(stepPin[i], stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
+        // Fast GPIO access, this runs in the base period interrupt
+        digitalWriteFast((PinName)dirPinName[i], stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
+        digitalWriteFast((PinName)stepPinName[i], stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
     }
 }

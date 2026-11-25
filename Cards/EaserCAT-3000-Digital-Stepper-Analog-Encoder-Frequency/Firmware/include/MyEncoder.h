@@ -20,7 +20,7 @@ public:
 private:
     int64_t previousEncoderCounterValue = 0;
     double PosScaleRes = 1.0;
-    uint32_t CurPosScale = 1;
+    double CurPosScale = 1.0;
     uint8_t oldLatchCEnable = 0;
     volatile uint8_t indexPulseFired = 0;
     volatile uint8_t pleaseZeroTheCounter = 0;
@@ -28,7 +28,7 @@ private:
     uint8_t indexPin;
 
     CircularBuffer<double_t, RINGBUFFERLEN> Pos;
-    CircularBuffer<uint32_t, RINGBUFFERLEN> TDelta;
+    CircularBuffer<uint64_t, RINGBUFFERLEN> TDelta; // micros(), extended to 64 bit
     double curPos;
     double oldFrequency;
 
