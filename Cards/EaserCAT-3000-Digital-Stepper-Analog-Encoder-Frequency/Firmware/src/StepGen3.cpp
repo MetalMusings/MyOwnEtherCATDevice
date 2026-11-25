@@ -1205,6 +1205,19 @@ int StepGen3::rtapi_app_main()
     }
     return 0;
 }
+bool StepGen3::allIdle(void) const
+{
+    for (int i = 0; i < num_chan; i++)
+    {
+        const stepgen_t &sg = stepgen_array[i];
+        if (sg.timer1 || sg.timer2 || sg.timer3 || sg.hold_dds)
+            return false;
+        if (sg.enable && (sg.addval != 0 || sg.target_addval != 0))
+            return false;
+    }
+    return true;
+}
+
 void StepGen3::makeAllPulses(void)
 {
     make_pulses(stepgen_array, basePeriodNs);

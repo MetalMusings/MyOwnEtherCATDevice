@@ -32,35 +32,20 @@ void spi_unselect (int8_t board)
     #endif
 }
 
-inline static uint8_t spi_transfer_byte(uint8_t byte)
-{
-    return SPI.transfer(byte);
-    // AVR will need handling last byte transfer difference,
-    // but then again they pobably wont even fit EtherCAT stack in RAM
-    // so no need to care for now
-}
-
+// Whole blocks per call: a call per byte cost about 2 us per byte, the SPI clock itself
+// (42 MHz) only 0.2 us.
 void spi_write (int8_t board, uint8_t *data, uint16_t size)
 {
-    for(uint16_t i = 0; i < size; ++i)
-    {
-        spi_transfer_byte(data[i]);
-    }
+    SPI.transfer(static_cast<const void *>(data), static_cast<void *>(nullptr), size);
 }
 
 void spi_read (int8_t board, uint8_t *result, uint16_t size)
 {
-	for(uint16_t i = 0; i < size; ++i)
-    {
-        result[i] = spi_transfer_byte(DUMMY_BYTE);
-    }
+    SPI.transfer(static_cast<const void *>(nullptr), static_cast<void *>(result), size);  // NULL: clocks out DUMMY_BYTE (0xFF)
 }
 
 
 void spi_bidirectionally_transfer (int8_t board, uint8_t *result, uint8_t *data, uint16_t size)
 {
-	for(uint16_t i = 0; i < size; ++i)
-    {
-        result[i] = spi_transfer_byte(data[i]);
-    }
+    SPI.transfer(static_cast<const void *>(data), static_cast<void *>(result), size);
 }

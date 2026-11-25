@@ -130,6 +130,12 @@ void restartPulseTrain(uint32_t cycleNs) {
   int32_t n = (int32_t)(cycleNs / (uint32_t)Step->basePeriodNs);
   baseTimer->pause();
   Step->makeAllPulses();  // First base period right now
+  if (Step->allIdle()) {
+    // Nothing to step on any channel this cycle: leave the timer stopped. The base period
+    // interrupt would otherwise take a large part of the CPU for nothing.
+    pulsesLeft = 0;
+    return;
+  }
   // Some margin, so a slightly late next cycle does not create a gap. The train always
   // stops by itself if no new cycle arrives.
   pulsesLeft = n - 1 + n / 4 + 2;

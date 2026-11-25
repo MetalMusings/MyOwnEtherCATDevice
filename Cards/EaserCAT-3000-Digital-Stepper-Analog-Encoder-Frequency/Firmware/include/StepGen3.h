@@ -108,6 +108,10 @@ public:
     // Run the position/velocity loop of all channels, servoPeriodNs = cycle time
     void updateFrequencies(long servoPeriodNs);
     void makeAllPulses(void);
+    // True when makeAllPulses() would change nothing on any channel: no step pulse or
+    // direction timing in progress, and each channel disabled or at zero frequency.
+    // The base period timer can then be stopped until the next cycle.
+    bool allIdle(void) const;
     int rtapi_app_main();
     int export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mode);
     void make_pulses(void *arg, long period);
