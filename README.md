@@ -60,7 +60,10 @@ I gave up and let it sit for over half a year. It was first when someone came an
 questions around it I had another look. I built a new board, and it all started to work.
 At time of writing it all seems to work.
 
-The latest vesion of the firmware has all parameters for step generators as PDOs.
+The firmware now makes it a four-axis CiA402 stepper drive (ETG.6010, csp and csv, product code
+0x3402): see [CiA402.md](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/Firmware/CiA402.md).
+A LinuxCNC configuration for linuxcnc-ethercat and the IgH kernel master is in
+[linuxcnc/configs/axis-cia402](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/linuxcnc/configs/axis-cia402/).
 
 [Link here](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/)
 

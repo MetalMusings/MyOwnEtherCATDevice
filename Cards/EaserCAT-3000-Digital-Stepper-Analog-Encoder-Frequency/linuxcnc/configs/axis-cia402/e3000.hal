@@ -1,0 +1,109 @@
+# EaserCAT 3000 CiA402 with linuxcnc-ethercat (lcec) and the IgH kernel master.
+#
+# lcec exchanges the board's process data (ethercat-conf.xml); the cia402
+# component (hal-cia402) runs each axis' CiA402 state machine and turns
+# machine units into the board's steps: pos-scale = steps per machine unit,
+# from [JOINT_n]SCALE.
+#
+# Axis 1..3 of the board drive joints 0..2 (X, Y, Z); axis 4 is not used and
+# stays in "Switch on disabled".
+
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+loadusr -W lcec_conf ethercat-conf.xml
+loadrt lcec
+loadrt cia402 names=cia402.x,cia402.y,cia402.z
+
+# lcec reads first and writes last; the state machines run between
+addf lcec.read-all          servo-thread
+addf cia402.x.read-all      servo-thread
+addf cia402.y.read-all      servo-thread
+addf cia402.z.read-all      servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller      servo-thread
+addf cia402.x.write-all     servo-thread
+addf cia402.y.write-all     servo-thread
+addf cia402.z.write-all     servo-thread
+addf lcec.write-all         servo-thread
+
+# No external E-stop in this example: wire one to iocontrol.0.emc-enable-in
+# (for example a board input: net estop-ok lcec.0.E3000.in-1 => iocontrol.0.emc-enable-in).
+net estop-loop iocontrol.0.user-enable-out => iocontrol.0.emc-enable-in
+
+#########################################################################
+# Joint 0 (X) = board axis 1
+#########################################################################
+setp cia402.x.csp-mode  1
+setp cia402.x.pos-scale [JOINT_0]SCALE
+
+net x-pos-cmd    joint.0.motor-pos-cmd     => cia402.x.pos-cmd
+net x-pos-fb     cia402.x.pos-fb           => joint.0.motor-pos-fb
+net x-enable     joint.0.amp-enable-out    => cia402.x.enable
+net x-fault      cia402.x.drv-fault        => joint.0.amp-fault-in
+
+net x-statusword    lcec.0.E3000.ax1-statusword       => cia402.x.statusword
+net x-opmode-disp   lcec.0.E3000.ax1-opmode-display   => cia402.x.opmode-display
+net x-act-pos       lcec.0.E3000.ax1-actual-position  => cia402.x.drv-actual-position
+net x-act-vel       lcec.0.E3000.ax1-actual-velocity  => cia402.x.drv-actual-velocity
+net x-controlword   cia402.x.controlword              => lcec.0.E3000.ax1-controlword
+net x-opmode        cia402.x.opmode                   => lcec.0.E3000.ax1-opmode
+net x-target-pos    cia402.x.drv-target-position      => lcec.0.E3000.ax1-target-position
+net x-target-vel    cia402.x.drv-target-velocity      => lcec.0.E3000.ax1-target-velocity
+
+#########################################################################
+# Joint 1 (Y) = board axis 2
+#########################################################################
+setp cia402.y.csp-mode  1
+setp cia402.y.pos-scale [JOINT_1]SCALE
+
+net y-pos-cmd    joint.1.motor-pos-cmd     => cia402.y.pos-cmd
+net y-pos-fb     cia402.y.pos-fb           => joint.1.motor-pos-fb
+net y-enable     joint.1.amp-enable-out    => cia402.y.enable
+net y-fault      cia402.y.drv-fault        => joint.1.amp-fault-in
+
+net y-statusword    lcec.0.E3000.ax2-statusword       => cia402.y.statusword
+net y-opmode-disp   lcec.0.E3000.ax2-opmode-display   => cia402.y.opmode-display
+net y-act-pos       lcec.0.E3000.ax2-actual-position  => cia402.y.drv-actual-position
+net y-act-vel       lcec.0.E3000.ax2-actual-velocity  => cia402.y.drv-actual-velocity
+net y-controlword   cia402.y.controlword              => lcec.0.E3000.ax2-controlword
+net y-opmode        cia402.y.opmode                   => lcec.0.E3000.ax2-opmode
+net y-target-pos    cia402.y.drv-target-position      => lcec.0.E3000.ax2-target-position
+net y-target-vel    cia402.y.drv-target-velocity      => lcec.0.E3000.ax2-target-velocity
+
+#########################################################################
+# Joint 2 (Z) = board axis 3
+#########################################################################
+setp cia402.z.csp-mode  1
+setp cia402.z.pos-scale [JOINT_2]SCALE
+
+net z-pos-cmd    joint.2.motor-pos-cmd     => cia402.z.pos-cmd
+net z-pos-fb     cia402.z.pos-fb           => joint.2.motor-pos-fb
+net z-enable     joint.2.amp-enable-out    => cia402.z.enable
+net z-fault      cia402.z.drv-fault        => joint.2.amp-fault-in
+
+net z-statusword    lcec.0.E3000.ax3-statusword       => cia402.z.statusword
+net z-opmode-disp   lcec.0.E3000.ax3-opmode-display   => cia402.z.opmode-display
+net z-act-pos       lcec.0.E3000.ax3-actual-position  => cia402.z.drv-actual-position
+net z-act-vel       lcec.0.E3000.ax3-actual-velocity  => cia402.z.drv-actual-velocity
+net z-controlword   cia402.z.controlword              => lcec.0.E3000.ax3-controlword
+net z-opmode        cia402.z.opmode                   => lcec.0.E3000.ax3-opmode
+net z-target-pos    cia402.z.drv-target-position      => lcec.0.E3000.ax3-target-position
+net z-target-vel    cia402.z.drv-target-velocity      => lcec.0.E3000.ax3-target-velocity
+
+#########################################################################
+# Board axis 4: not used. Its controlword stays 0 (no pins connected).
+#########################################################################
+
+#########################################################################
+# I/O, examples
+#########################################################################
+# net coolant-flood  iocontrol.0.coolant-flood => lcec.0.E3000.out-1
+# net home-x         lcec.0.E3000.in-1         => joint.0.home-sw-in
+#
+# Spindle speed as 0..3.3 V on the DAC pin (scale it to your VFD's input):
+# loadrt scale names=spindle-volts
+# addf spindle-volts servo-thread
+# setp spindle-volts.gain 0.000275      # 3.3 V at 12000 rpm
+# net spindle-rpm    spindle.0.speed-out-abs => spindle-volts.in
+# net spindle-volts  spindle-volts.out       => lcec.0.E3000.analog-out-v
