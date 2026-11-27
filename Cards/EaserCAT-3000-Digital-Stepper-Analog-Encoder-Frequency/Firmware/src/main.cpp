@@ -20,6 +20,7 @@ extern "C" {
 _Objects Obj;
 
 #include "Cia402Axis.h"
+#include "CycleModel.h"
 #include "ObjectHooks.h"
 #include "StepGen3.h"
 #include "extend32to64.h"
@@ -272,6 +273,16 @@ static inline void baseTimerStart() {
   TIM11->CR1 = TIM_CR1_CEN;
 }
 
+// Base period interrupt statistics for 0x2001, in CPU cycles (DWT cycle counter)
+static volatile uint32_t isrCyclesSum = 0;  // since the start of the last cycle
+static volatile uint32_t isrCyclesMax = 0;
+static volatile uint32_t isrLate = 0;       // entries more than 1.5 base periods apart
+static volatile uint32_t isrLastEntry = 0;  // 0 = the train (re)starts, no gap to measure
+static uint32_t isrLateGap = 0;             // 1.5 base periods, set by setBasePeriod()
+
+static float nsPerCycle = 6.25f;  // set by setBasePeriod() from SystemCoreClock
+static inline uint32_t cyclesToNs(uint32_t c) { return (uint32_t)((float)c * nsPerCycle); }
+
 void setBasePeriod(uint32_t ns) {
   requestedBasePeriod = ns;
   if (ns < BASE_PERIOD_MIN_NS) ns = BASE_PERIOD_MIN_NS;
@@ -281,22 +292,61 @@ void setBasePeriod(uint32_t ns) {
   TIM11->ARR = ticks - 1;
   // Use the period actually produced by the timer in the step generator math
   Step->basePeriodNs = (long)(((uint64_t)ticks * 1000000000ULL) / clk);
+  isrLateGap = (uint32_t)((uint64_t)Step->basePeriodNs * (SystemCoreClock / 1000000u) * 3u / 2000u);
+  nsPerCycle = 1e9f / (float)SystemCoreClock;
 }
+
+#ifdef CYCLE_PROFILE
+// Load and timing of the base period interrupt, and the cycle, while running (CPU
+// cycles). The debugger zeroes it to start a measurement and reads it without halting.
+struct RunProfile {
+  uint32_t magic;
+  uint32_t isrCalls, isrSum, isrMax;  // interrupt entry to exit
+  uint32_t isrLate, isrGapMax;        // entries more than 1.5 base periods apart, max gap
+  uint32_t cycles, cycleSum, cycleMax;  // serveCycle from SYNC0, in OP
+  uint32_t lastEntry;
+};
+volatile RunProfile runProf = {0xC0FFEE01};
+#endif
 
 extern "C" void baseTimerIrq(void) {
   TIM11->SR = ~TIM_SR_UIF;  // clear first: the work below is far longer than the write
+  uint32_t e = DWT->CYCCNT;
+  if (isrLastEntry && e - isrLastEntry > isrLateGap) isrLate++;
+  isrLastEntry = e;
+#ifdef CYCLE_PROFILE
+  if (runProf.lastEntry) {
+    uint32_t gap = e - runProf.lastEntry;
+    if (gap > runProf.isrGapMax) runProf.isrGapMax = gap;
+    if (gap > (uint32_t)Step->basePeriodNs * (SystemCoreClock / 1000000u) * 3u / 2000u)
+      runProf.isrLate++;
+  }
+  runProf.lastEntry = e;
+#endif
   if (pulsesLeft > 0) {
     pulsesLeft--;
     Step->makeAllPulses();
   } else {
     baseTimerStop();
   }
+  uint32_t d = DWT->CYCCNT - e;
+  isrCyclesSum += d;
+  if (d > isrCyclesMax) isrCyclesMax = d;
+#ifdef CYCLE_PROFILE
+  runProf.isrCalls++;
+  runProf.isrSum += d;
+  if (d > runProf.isrMax) runProf.isrMax = d;
+#endif
 }
 
 // Restart the pulse train in phase with the current cycle
 void restartPulseTrain(uint32_t cycleNs) {
   int32_t n = (int32_t)(cycleNs / (uint32_t)Step->basePeriodNs);
   baseTimerStop();
+  isrLastEntry = 0;  // the train restarts here: no gap to measure across it
+#ifdef CYCLE_PROFILE
+  runProf.lastEntry = 0;
+#endif
   Step->makeAllPulses();  // First base period right now
   if (Step->allIdle()) {
     // Nothing to step on any channel this cycle: leave the timer stopped. The base period
@@ -366,7 +416,7 @@ void preStateChange(uint8_t *as, uint8_t *an) {
 ////// Application cycle
 
 #ifdef CYCLE_PROFILE
-// Cycle profile in CPU cycles (168 MHz), read with the debugger without halting.
+// Cycle profile in CPU cycles (160 MHz), read with the debugger without halting.
 // Build: PLATFORMIO_BUILD_FLAGS=-DCYCLE_PROFILE pio run -e genericSTM32F407VGT6
 #include <SPI.h>
 extern "C" volatile uint8_t spi_use_fast;  // lib/soes/hal/ax58100/spi_utils.cpp
@@ -517,6 +567,95 @@ static void profileBench() {
 #define PT() 0u
 #endif
 
+////// Cycle diagnostics (0x2001, 0x1C32/0x1C33:05, :08, :0A)
+static uint32_t lastSyncCycleStart = 0;  // DWT at the start of the last SYNC0 cycle
+static bool lastCycleFromSync = false;
+
+// 0x1C32:08 / 0x1C33:08 "Get cycle time": 1 = new measurement, 2 = also the counters
+static void cycleDiagCommand() {
+  uint16_t cmd = Obj.SmOutParam.GetCycleTime > Obj.SmInParam.GetCycleTime
+                     ? Obj.SmOutParam.GetCycleTime
+                     : Obj.SmInParam.GetCycleTime;
+  if (cmd == 0) return;
+  Obj.SmOutParam.GetCycleTime = Obj.SmInParam.GetCycleTime = 0;
+  Obj.SmOutParam.CalcCopyTime = Obj.SmInParam.CalcCopyTime = 0;
+  isrCyclesMax = 0;
+  Obj.CycleDiag.IsrTimeMax = 0;
+  Obj.CycleDiag.IsrLoadMax = 0;
+  Obj.CycleDiag.CycleUsedMax = 0;
+  Obj.CycleDiag.CycleDistanceMax = 0;
+  if (cmd == 2) {
+    Obj.SmOutParam.SmEventMissed = Obj.SmInParam.SmEventMissed = 0;
+    sync0Overruns = 0;
+    isrLate = 0;
+    Obj.CycleDiag.FrequencyLimited = 0;
+  }
+}
+
+// What the step generator can do with its present settings. The limits (64-bit
+// division, slow on the M4) only when the base period or a step timing changes.
+static void updateStepDiagnostics() {
+  static uint32_t lastKey = 0xFFFFFFFFu;
+  uint32_t base = (uint32_t)Step->basePeriodNs;
+  uint32_t key = base;
+  uint8_t limited = 0;
+  for (int i = 0; i < N_AXES; i++) {
+    stepgen_t &sg = Step->stepgen_array[i];
+    if (sg.freq_limited) {
+      limited |= 1u << i;
+      sg.freq_limited = 0;
+    }
+    key = key * 31u + Obj.StepTiming[i].StepLength;
+    key = key * 31u + Obj.StepTiming[i].StepSpace;
+  }
+  if (key != lastKey) {
+    lastKey = key;
+    uint32_t maxFreq = 0xFFFFFFFFu;
+    for (int i = 0; i < N_AXES; i++) {
+      const StepTiming_t &t = Obj.StepTiming[i];
+      uint32_t f = cycleModelMaxStepFrequency(base, t.StepLength, t.StepSpace);
+      if (f < maxFreq) maxFreq = f;
+    }
+    Obj.CycleDiag.BasePeriod = base;
+    Obj.CycleDiag.MaxStepFrequency = maxFreq;
+    Obj.SmOutParam.MinCycleTime = Obj.SmInParam.MinCycleTime = cycleModelMinCycle(base);
+  }
+  Obj.CycleDiag.FrequencyLimited |= limited;
+  Obj.CycleDiag.IsrTimeMax = cyclesToNs(isrCyclesMax);
+  Obj.CycleDiag.LateBasePeriods = isrLate;
+  Obj.SmOutParam.Sync0CycleTime = Obj.SmInParam.Sync0CycleTime = ESCvar.dcsync ? sync0CycleNs : 0;
+}
+
+// Interrupt load since the last cycle and the time between SYNC0 cycles, at a cycle start
+static void cycleDiagStart(uint32_t now, bool fromSync) {
+  __disable_irq();
+  uint32_t isr = isrCyclesSum;
+  isrCyclesSum = 0;
+  __enable_irq();
+  if (fromSync && lastCycleFromSync) {
+    uint32_t dist = now - lastSyncCycleStart;
+    if (dist) {
+      uint32_t load = (uint32_t)((float)isr * 1000.0f / (float)dist);
+      Obj.CycleDiag.IsrLoad = load > 1000 ? 1000 : load;
+      if (Obj.CycleDiag.IsrLoad > Obj.CycleDiag.IsrLoadMax)
+        Obj.CycleDiag.IsrLoadMax = Obj.CycleDiag.IsrLoad;
+      uint32_t distNs = cyclesToNs(dist);
+      if (distNs > Obj.CycleDiag.CycleDistanceMax) Obj.CycleDiag.CycleDistanceMax = distNs;
+    }
+  }
+  if (fromSync) lastSyncCycleStart = now;
+  lastCycleFromSync = fromSync;
+}
+
+// Share of the cycle time this cycle took, at its end
+static void cycleDiagEnd(uint32_t start, uint32_t cycleNs, bool fromSync) {
+  if (!fromSync || cycleNs == 0) return;
+  uint32_t used = (uint32_t)((float)cyclesToNs(DWT->CYCCNT - start) * 1000.0f / (float)cycleNs);
+  Obj.CycleDiag.CycleUsed = used > 0xFFFF ? 0xFFFF : used;
+  if (Obj.CycleDiag.CycleUsed > Obj.CycleDiag.CycleUsedMax)
+    Obj.CycleDiag.CycleUsedMax = Obj.CycleDiag.CycleUsed;
+}
+
 void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
   uint32_t p0 = PT();
   float dt = (float)cycleNs * 1e-9f;
@@ -582,6 +721,7 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
     }
   }
   Obj.ErrorRegister = errorRegister;
+  updateStepDiagnostics();
   uint32_t p2 = PT();
 #ifdef CYCLE_PROFILE
   prof.axCycle = sumCycle;
@@ -606,6 +746,9 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
 // One complete process data cycle. fromSync: triggered by SYNC0.
 void serveCycle(uint32_t cycleNs, bool fromSync) {
   uint32_t t0 = micros();
+  uint32_t c0 = DWT->CYCCNT;
+  cycleDiagCommand();
+  cycleDiagStart(c0, fromSync);
   uint32_t q0 = PT();
   uint32_t ev = ESC_ALeventread();  // also refreshes ESCvar.ALevent
   bool newOutputs = (ev & ESCREG_ALEVENT_SM2) != 0;
@@ -634,6 +777,11 @@ void serveCycle(uint32_t cycleNs, bool fromSync) {
   prof.total = q4 - q0;
   if (prof.total > prof.maxTotal) prof.maxTotal = prof.total;
   prof.n++;
+  if (fromSync && outputsValid) {
+    runProf.cycles++;
+    runProf.cycleSum += prof.total;
+    if (prof.total > runProf.cycleMax) runProf.cycleMax = prof.total;
+  }
 #else
   (void)q0; (void)q1; (void)q2; (void)q3;
 #endif
@@ -646,16 +794,16 @@ void serveCycle(uint32_t cycleNs, bool fromSync) {
   }
   Obj.SmOutParam.CycleTimeTooSmall = sync0Overruns;
   Obj.SmInParam.CycleTimeTooSmall = sync0Overruns;
+  cycleDiagEnd(c0, cycleNs, fromSync);
   lastCycleMicros = t0;
 }
 
 void setup(void) {
   DebugSerial.begin(115200);
-#ifdef CYCLE_PROFILE
+  // DWT cycle counter: the timing measurements of 0x2001
   CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
   DWT->CYCCNT = 0;
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-#endif
   delay(100);
 
   for (int i = 0; i < 4; i++) {
@@ -781,7 +929,9 @@ void ESC_interrupt_disable(uint32_t mask) {
 // Called by SOES at PREOP->SAFEOP when the master has activated the SYNC unit
 uint16_t dc_checker(void) {
   uint32_t cycle = ESC_SYNC0cycletime();  // ns
-  uint32_t minCycle = 250000;             // 0x1C32:05
+  // 0x1C32:05: what the base period 0x2000 allows with all four axes stepping
+  uint32_t minCycle = cycleModelMinCycle(Obj.BasePeriod);
+  Obj.SmOutParam.MinCycleTime = Obj.SmInParam.MinCycleTime = minCycle;
   if (cycle < minCycle || cycle > 100000000 || cycle < 2 * (uint32_t)Step->basePeriodNs)
     return ALERR_DCSYNC0CYCLETIME;
   sync0CycleNs = cycle;

@@ -971,7 +971,7 @@
               </DataType>
               <DataType>
                 <Name>DT1C32</Name>
-                <BitSize>241</BitSize>
+                <BitSize>305</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -1029,11 +1029,27 @@
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
+                  <SubIdx>8</SubIdx>
+                  <Name>Get cycle time</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>176</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
                   <SubIdx>9</SubIdx>
                   <Name>Delay time</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>176</BitOffs>
+                  <BitOffs>192</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>10</SubIdx>
+                  <Name>Sync0 cycle time</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>224</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
@@ -1041,7 +1057,7 @@
                   <Name>SM event missed</Name>
                   <Type>UINT</Type>
                   <BitSize>16</BitSize>
-                  <BitOffs>208</BitOffs>
+                  <BitOffs>256</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
@@ -1049,7 +1065,15 @@
                   <Name>Cycle time too small</Name>
                   <Type>UINT</Type>
                   <BitSize>16</BitSize>
-                  <BitOffs>224</BitOffs>
+                  <BitOffs>272</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>13</SubIdx>
+                  <Name>Shift time too short</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>288</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
@@ -1057,13 +1081,13 @@
                   <Name>Sync error</Name>
                   <Type>BOOL</Type>
                   <BitSize>1</BitSize>
-                  <BitOffs>240</BitOffs>
+                  <BitOffs>304</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
               </DataType>
               <DataType>
                 <Name>DT1C33</Name>
-                <BitSize>241</BitSize>
+                <BitSize>305</BitSize>
                 <SubItem>
                   <SubIdx>0</SubIdx>
                   <Name>Max SubIndex</Name>
@@ -1121,11 +1145,27 @@
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
+                  <SubIdx>8</SubIdx>
+                  <Name>Get cycle time</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>176</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
                   <SubIdx>9</SubIdx>
                   <Name>Delay time</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
-                  <BitOffs>176</BitOffs>
+                  <BitOffs>192</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>10</SubIdx>
+                  <Name>Sync0 cycle time</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>224</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
@@ -1133,7 +1173,7 @@
                   <Name>SM event missed</Name>
                   <Type>UINT</Type>
                   <BitSize>16</BitSize>
-                  <BitOffs>208</BitOffs>
+                  <BitOffs>256</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
@@ -1141,7 +1181,15 @@
                   <Name>Cycle time too small</Name>
                   <Type>UINT</Type>
                   <BitSize>16</BitSize>
-                  <BitOffs>224</BitOffs>
+                  <BitOffs>272</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>13</SubIdx>
+                  <Name>Shift time too short</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>288</BitOffs>
                   <Flags><Access>ro</Access></Flags>
                 </SubItem>
                 <SubItem>
@@ -1149,8 +1197,100 @@
                   <Name>Sync error</Name>
                   <Type>BOOL</Type>
                   <BitSize>1</BitSize>
-                  <BitOffs>240</BitOffs>
+                  <BitOffs>304</BitOffs>
                   <Flags><Access>ro</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT2001</Name>
+                <BitSize>248</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Base period ns</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Max step frequency Hz</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>48</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>3</SubIdx>
+                  <Name>Step interrupt time max ns</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>80</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>Step interrupt load 0.1%</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>112</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>5</SubIdx>
+                  <Name>Step interrupt load max 0.1%</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>128</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>6</SubIdx>
+                  <Name>Cycle time used 0.1%</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>144</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>7</SubIdx>
+                  <Name>Cycle time used max 0.1%</Name>
+                  <Type>UINT</Type>
+                  <BitSize>16</BitSize>
+                  <BitOffs>160</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>8</SubIdx>
+                  <Name>Cycle distance max ns</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>176</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>9</SubIdx>
+                  <Name>Late base periods</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>208</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>10</SubIdx>
+                  <Name>Frequency limited axes</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>240</BitOffs>
+                  <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
                 </SubItem>
               </DataType>
               <DataType>
@@ -2533,7 +2673,7 @@
                 <Index>#x1C32</Index>
                 <Name>Output SyncManager Parameter</Name>
                 <Type>DT1C32</Type>
-                <BitSize>241</BitSize>
+                <BitSize>305</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -2564,7 +2704,15 @@
                     <Info><DefaultData>00000000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
+                    <Name>Get cycle time</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
                     <Name>Delay time</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Sync0 cycle time</Name>
                     <Info><DefaultData>00000000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
@@ -2573,6 +2721,10 @@
                   </SubItem>
                   <SubItem>
                     <Name>Cycle time too small</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Shift time too short</Name>
                     <Info><DefaultData>0000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
@@ -2586,7 +2738,7 @@
                 <Index>#x1C33</Index>
                 <Name>Input SyncManager Parameter</Name>
                 <Type>DT1C33</Type>
-                <BitSize>241</BitSize>
+                <BitSize>305</BitSize>
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
@@ -2617,7 +2769,15 @@
                     <Info><DefaultData>00000000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
+                    <Name>Get cycle time</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
                     <Name>Delay time</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Sync0 cycle time</Name>
                     <Info><DefaultData>00000000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
@@ -2626,6 +2786,10 @@
                   </SubItem>
                   <SubItem>
                     <Name>Cycle time too small</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Shift time too short</Name>
                     <Info><DefaultData>0000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
@@ -2642,6 +2806,59 @@
                 <BitSize>32</BitSize>
                 <Info><DefaultData>10270000</DefaultData></Info>
                 <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x2001</Index>
+                <Name>Cycle diagnostics</Name>
+                <Type>DT2001</Type>
+                <BitSize>248</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>0a</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Base period ns</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Max step frequency Hz</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Step interrupt time max ns</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Step interrupt load 0.1%</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Step interrupt load max 0.1%</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Cycle time used 0.1%</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Cycle time used max 0.1%</Name>
+                    <Info><DefaultData>0000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Cycle distance max ns</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Late base periods</Name>
+                    <Info><DefaultData>00000000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Frequency limited axes</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
               </Object>
               <Object>
                 <Index>#x2010</Index>

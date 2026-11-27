@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "Cia402Axis.h"
+#include "CycleModel.h"
 #include "ObjectHooks.h"
 #include "StepGenChannel.h"
 #include "StepGenLoop.h"
@@ -999,6 +1000,107 @@ static void testPositionLoop() {
   CHECK(maxLagNew <= maxLagRef + 1);
 }
 
+// ---------------------------------------------------------------------------
+// Cycle time model, diagnostics objects and the frequency limit flag
+// ---------------------------------------------------------------------------
+static void testCycleDiagnostics() {
+  // The model against the OP measurements (four axes, 160 MHz): 10 us -> 231 us measured,
+  // 7 us -> 380 us; 7 us fits 0.5 ms, 6 us fits 1 ms but not 0.5 ms, 5.5 us nothing
+  CHECK(cycleModelMinCycle(10000) >= 231000 && cycleModelMinCycle(10000) <= 300000);
+  CHECK(cycleModelMinCycle(7000) >= 380000 && cycleModelMinCycle(7000) <= 500000);
+  CHECK(cycleModelMinCycle(6000) > 500000 && cycleModelMinCycle(6000) <= 1000000);
+  CHECK_EQ(cycleModelMinCycle(5500), CYCLE_IMPOSSIBLE);
+  CHECK_EQ(cycleModelMinCycle(5000), CYCLE_IMPOSSIBLE);
+  CHECK(cycleModelMinCycle(200000) == 400000);  // at least two base periods
+  CHECK(cycleModelMinBasePeriod() > 5500 && cycleModelMinBasePeriod() <= 6000);
+  CHECK_EQ(cycleModelIsrLoad(9800), 500);
+  // Step rate: length and space at least one base period each, rounded up
+  CHECK_EQ(cycleModelMaxStepFrequency(10000, 0, 0), 50000);
+  CHECK_EQ(cycleModelMaxStepFrequency(10000, 2500, 0), 50000);
+  CHECK_EQ(cycleModelMaxStepFrequency(10000, 15000, 5000), 33333);
+  CHECK_EQ(cycleModelMaxStepFrequency(5000, 5000, 5000), 100000);
+
+  // Objects: 0x1C32/0x1C33 :05, :08, :0A, :0D, and 0x2001
+  COE_initDefaultValues();
+  int32_t nidx = SDO_findobject(0x1C32);
+  CHECK(nidx >= 0);
+  CHECK(SDO_findsubindex(nidx, 5) >= 0);
+  CHECK(SDO_findsubindex(nidx, 8) >= 0);
+  CHECK(SDO_findsubindex(nidx, 10) >= 0);
+  CHECK(SDO_findsubindex(nidx, 13) >= 0);
+  CHECK(SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 5)].data == &Obj.SmOutParam.MinCycleTime);
+  nidx = SDO_findobject(0x2001);
+  CHECK(nidx >= 0);
+  CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 10);
+  int16_t sub = SDO_findsubindex(nidx, 10);
+  CHECK(sub >= 0 && SDOobjects[nidx].objdesc[sub].data == &Obj.CycleDiag.FrequencyLimited);
+  CHECK((SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 4)].flags & ATYPE_TXPDO) != 0);
+  // and it can be mapped
+  CHECK_EQ(sdoWrite(0x1A04, 0, 0, 1), 0);
+  CHECK_EQ(sdoWrite(0x1A04, 7, 0x20010610, 4), 0);  // cycle time used, 16 bit
+  CHECK_EQ(sdoWrite(0x1A04, 0, 7, 1), 0);
+  _SMmap map[64];
+  int n = 0;
+  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 75 + 2);
+  COE_initDefaultValues();
+
+  // Get cycle time: 0..2
+  CHECK_EQ(sdoWrite(0x1C32, 8, 2, 2), 0);
+  CHECK_EQ(sdoWrite(0x1C33, 8, 1, 2), 0);
+  CHECK_EQ(sdoWrite(0x1C32, 8, 3, 2), ABORT_VALUE_EXCEEDED);
+
+  // Base period: range always; on SYNC0 not shorter than the cycle time allows
+  Obj.SmOutParam.SyncType = 1;
+  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), 0);
+  CHECK_EQ(sdoWrite(0x2000, 0, 4000, 4), ABORT_VALUE_EXCEEDED);
+  Obj.SmOutParam.SyncType = 2;
+  Obj.SmOutParam.CycleTime = 500000;
+  ESCvar.ALstatus = ESCpreop;  // back in PREOP the old values do not count
+  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), 0);
+  ESCvar.ALstatus = ESCop;
+  CHECK_EQ(sdoWrite(0x2000, 0, 7000, 4), 0);
+  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), ABORT_VALUE_TOO_LOW);
+  Obj.SmOutParam.CycleTime = 1000000;
+  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), 0);
+  CHECK_EQ(sdoWrite(0x2000, 0, 5500, 4), ABORT_VALUE_TOO_LOW);
+  Obj.SmOutParam.SyncType = 0;
+  Obj.SmOutParam.CycleTime = 0;
+  ESCvar.ALstatus = 0;
+  COE_initDefaultValues();
+
+  // The frequency limit flag: set when the command is faster than the step timing
+  StepLoopTiming k = {0.001f, 1000.0f, (float)((1L << PICKOFF) * 1e-5),
+                      (float)((1L << PICKOFF) * 1e-10)};
+  stepgen_t g;
+  memset((void *)&g, 0, sizeof(g));
+  g.enable = 1;
+  g.step_len = 10000;
+  g.step_space = 10000;  // 50 kHz
+  g.vel_cmd = 40000;
+  stepgenUpdateFreq(&g, k);
+  CHECK_EQ(g.freq_limited, 0);
+  g.vel_cmd = -60000;
+  stepgenUpdateFreq(&g, k);
+  CHECK_EQ(g.freq_limited, 1);
+  stepgenUpdateFreq(&g, k);  // the ramp: at most 50 kHz per cycle here
+  CHECK(fabsf(g.freq + 50000.0f) < 1.0f);
+  // position mode: a command moving faster than 50 kHz
+  memset((void *)&g, 0, sizeof(g));
+  g.enable = 1;
+  g.pos_mode = 1;
+  g.step_len = 10000;
+  g.step_space = 10000;
+  g.accum = 1LL << (PICKOFF - 1);
+  for (int c = 1; c <= 3; c++) {
+    g.pos_cmd = stepgenFxFromSteps(40 * c);  // 40 kHz
+    stepgenUpdateFreq(&g, k);
+  }
+  CHECK_EQ(g.freq_limited, 0);
+  g.pos_cmd = stepgenFxFromSteps(120 + 70);  // 70 kHz
+  stepgenUpdateFreq(&g, k);
+  CHECK_EQ(g.freq_limited, 1);
+}
+
 int main() {
   testPositionLoop();
   testStepPulses();
@@ -1016,6 +1118,7 @@ int main() {
   testCommunicationLoss();
   testUnsupportedMode();
   testObjectDictionary();
+  testCycleDiagnostics();
   printf("%d checks, %d failures\n", checks, failures);
   return failures ? 1 : 0;
 }

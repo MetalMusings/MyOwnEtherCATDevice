@@ -27,7 +27,10 @@ typedef struct
    uint16_t SyncType;
    uint32_t CycleTime;
    uint32_t ShiftTime;
+   uint32_t MinCycleTime;
    uint32_t CalcCopyTime;
+   uint16_t GetCycleTime;
+   uint32_t Sync0CycleTime;
    uint16_t SmEventMissed;
    uint16_t CycleTimeTooSmall;
    uint8_t SyncError;
@@ -97,6 +100,19 @@ typedef struct
 
    /* Manufacturer specific */
    uint32_t BasePeriod;
+   struct
+   {
+      uint32_t BasePeriod;           /* :01 actual, after the timer's rounding */
+      uint32_t MaxStepFrequency;     /* :02 Hz, the lowest of the axes' step timing limits */
+      uint32_t IsrTimeMax;           /* :03 ns */
+      uint16_t IsrLoad;              /* :04 0.1 %, last cycle */
+      uint16_t IsrLoadMax;           /* :05 */
+      uint16_t CycleUsed;            /* :06 0.1 % of the cycle time, last cycle */
+      uint16_t CycleUsedMax;         /* :07 */
+      uint32_t CycleDistanceMax;     /* :08 ns between cycle starts */
+      uint32_t LateBasePeriods;      /* :09 base period interrupts > 1.5 periods apart */
+      uint8_t FrequencyLimited;      /* :0A bit n: axis n+1 was held at its step timing limit */
+   } CycleDiag;
    StepTiming_t StepTiming[N_AXES];
    struct
    {

@@ -25,6 +25,7 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
     /* calculate frequency limit */
     const long min_step_period = sg->step_len + sg->step_space;
     float max_freq = 1.0e9f / (float)min_step_period;
+    const float timing_freq = max_freq;  /* what the step timing allows at all */
     /* check for user specified frequency limit parameter */
     if (sg->maxvel <= 0.0f)
         sg->maxvel = 0.0f;
@@ -96,11 +97,16 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
             new_vel = max_freq;
         else if (new_vel < -max_freq)
             new_vel = -max_freq;
+        /* the command itself is faster than the step timing allows */
+        if (fabsf(vel_cmd) > timing_freq)
+            sg->freq_limited = 1;
     }
     else
     {
         /* velocity mode is simpler */
         float vel_cmd = sg->vel_cmd;
+        if (fabsf(vel_cmd) > timing_freq)
+            sg->freq_limited = 1;
         /* apply frequency limit */
         if (vel_cmd > max_freq)
             vel_cmd = max_freq;

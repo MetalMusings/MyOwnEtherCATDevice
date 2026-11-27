@@ -3,8 +3,12 @@
 // - PDO mapping objects 0x16xx/0x1Axx and PDO assignment 0x1C12/0x1C13 are checked
 //   according to ETG.1020 chapter 10 "Change of Mapping Objects".
 // - CiA402 option codes and other parameters are range checked.
+// - The base period 0x2000 is refused in SAFEOP/OP if the cycle time could not take it
+//   (CycleModel.h).
 
 #include "ObjectHooks.h"
+
+#include "CycleModel.h"
 
 extern "C" {
 #include "ecat_slv.h"
@@ -104,9 +108,19 @@ uint32_t ObjectHooks_preDownload(uint16_t index, uint8_t subindex, void *data, s
   if (index == 0x1C12) return checkAssignObject(&Obj.Sm2Assign, true, subindex, value);
   if (index == 0x1C13) return checkAssignObject(&Obj.Sm3Assign, false, subindex, value);
 
-  if (index == 0x2000)  // Base period ns
-    return (value >= BASE_PERIOD_MIN_NS && value <= BASE_PERIOD_MAX_NS) ? 0
-                                                                        : ABORT_VALUE_EXCEEDED;
+  if (index == 0x2000) {  // Base period ns
+    if (value < BASE_PERIOD_MIN_NS || value > BASE_PERIOD_MAX_NS) return ABORT_VALUE_EXCEEDED;
+    // Running on SYNC0 in SAFEOP/OP: not a base period that the cycle time cannot take.
+    // (SyncType and CycleTime keep their values after going back to PREOP.)
+    uint8_t state = ESCvar.ALstatus & 0x0F;
+    if ((state == ESCsafeop || state == ESCop) && Obj.SmOutParam.SyncType == 2 &&
+        Obj.SmOutParam.CycleTime != 0 && cycleModelMinCycle(value) > Obj.SmOutParam.CycleTime)
+      return ABORT_VALUE_TOO_LOW;
+    return 0;
+  }
+
+  if ((index == 0x1C32 || index == 0x1C33) && subindex == 8)  // Get cycle time: 0, 1, 2
+    return value <= 2 ? 0 : ABORT_VALUE_EXCEEDED;
 
   if (index >= 0x2020 && index < 0x2020 + N_AXES && subindex >= 1 && subindex <= 3)
     return value <= 8 ? 0 : ABORT_VALUE_EXCEEDED;  // switch input: 0 = none, 1..8 = IN1..IN8

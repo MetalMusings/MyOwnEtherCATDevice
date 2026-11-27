@@ -142,9 +142,12 @@ static const char acName1C32_03[] = "Shift time";
 static const char acName1C32_04[] = "Sync modes supported";
 static const char acName1C32_05[] = "Minimum cycle time";
 static const char acName1C32_06[] = "Calc and copy time";
+static const char acName1C32_08[] = "Get cycle time";
 static const char acName1C32_09[] = "Delay time";
+static const char acName1C32_0A[] = "Sync0 cycle time";
 static const char acName1C32_0B[] = "SM event missed";
 static const char acName1C32_0C[] = "Cycle time too small";
+static const char acName1C32_0D[] = "Shift time too short";
 static const char acName1C32_20[] = "Sync error";
 static const char acName1C33[] = "Input SyncManager Parameter";
 static const char acName1C33_00[] = "Max SubIndex";
@@ -154,11 +157,26 @@ static const char acName1C33_03[] = "Shift time";
 static const char acName1C33_04[] = "Sync modes supported";
 static const char acName1C33_05[] = "Minimum cycle time";
 static const char acName1C33_06[] = "Calc and copy time";
+static const char acName1C33_08[] = "Get cycle time";
 static const char acName1C33_09[] = "Delay time";
+static const char acName1C33_0A[] = "Sync0 cycle time";
 static const char acName1C33_0B[] = "SM event missed";
 static const char acName1C33_0C[] = "Cycle time too small";
+static const char acName1C33_0D[] = "Shift time too short";
 static const char acName1C33_20[] = "Sync error";
 static const char acName2000[] = "Base period ns";
+static const char acName2001[] = "Cycle diagnostics";
+static const char acName2001_00[] = "Max SubIndex";
+static const char acName2001_01[] = "Base period ns";
+static const char acName2001_02[] = "Max step frequency Hz";
+static const char acName2001_03[] = "Step interrupt time max ns";
+static const char acName2001_04[] = "Step interrupt load 0.1%";
+static const char acName2001_05[] = "Step interrupt load max 0.1%";
+static const char acName2001_06[] = "Cycle time used 0.1%";
+static const char acName2001_07[] = "Cycle time used max 0.1%";
+static const char acName2001_08[] = "Cycle distance max ns";
+static const char acName2001_09[] = "Late base periods";
+static const char acName2001_0A[] = "Frequency limited axes";
 static const char acName2010[] = "Axis 1 step timing";
 static const char acName2010_00[] = "Max SubIndex";
 static const char acName2010_01[] = "Step length ns";
@@ -557,11 +575,14 @@ const _objd SDO1C32[] =
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_02, 0x00000000, &Obj.SmOutParam.CycleTime},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_03, 0x00000000, &Obj.SmOutParam.ShiftTime},
   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C32_04, 0x00000006, NULL},
-  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_05, 0x0003D090, NULL},
+  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_05, 0x0003D090, &Obj.SmOutParam.MinCycleTime},
   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_06, 0x00000000, &Obj.SmOutParam.CalcCopyTime},
+  {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName1C32_08, 0x00000000, &Obj.SmOutParam.GetCycleTime},
   {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_09, 0x00000000, NULL},
+  {0x0a, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C32_0A, 0x00000000, &Obj.SmOutParam.Sync0CycleTime},
   {0x0b, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C32_0B, 0x00000000, &Obj.SmOutParam.SmEventMissed},
   {0x0c, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C32_0C, 0x00000000, &Obj.SmOutParam.CycleTimeTooSmall},
+  {0x0d, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C32_0D, 0x00000000, NULL},
   {0x20, DTYPE_BOOLEAN, 1, ATYPE_RO, acName1C32_20, 0x00000000, &Obj.SmOutParam.SyncError},
 };
 const _objd SDO1C33[] =
@@ -571,16 +592,33 @@ const _objd SDO1C33[] =
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_02, 0x00000000, &Obj.SmInParam.CycleTime},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_03, 0x00000000, &Obj.SmInParam.ShiftTime},
   {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C33_04, 0x00000006, NULL},
-  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_05, 0x0003D090, NULL},
+  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_05, 0x0003D090, &Obj.SmInParam.MinCycleTime},
   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_06, 0x00000000, &Obj.SmInParam.CalcCopyTime},
+  {0x08, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName1C33_08, 0x00000000, &Obj.SmInParam.GetCycleTime},
   {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_09, 0x00000000, NULL},
+  {0x0a, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName1C33_0A, 0x00000000, &Obj.SmInParam.Sync0CycleTime},
   {0x0b, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C33_0B, 0x00000000, &Obj.SmInParam.SmEventMissed},
   {0x0c, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C33_0C, 0x00000000, &Obj.SmInParam.CycleTimeTooSmall},
+  {0x0d, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C33_0D, 0x00000000, NULL},
   {0x20, DTYPE_BOOLEAN, 1, ATYPE_RO, acName1C33_20, 0x00000000, &Obj.SmInParam.SyncError},
 };
 const _objd SDO2000[] =
 {
   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2000, 0x00002710, &Obj.BasePeriod},
+};
+const _objd SDO2001[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2001_00, 0x0000000A, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_01, 0x00000000, &Obj.CycleDiag.BasePeriod},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_02, 0x00000000, &Obj.CycleDiag.MaxStepFrequency},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_03, 0x00000000, &Obj.CycleDiag.IsrTimeMax},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_04, 0x00000000, &Obj.CycleDiag.IsrLoad},
+  {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_05, 0x00000000, &Obj.CycleDiag.IsrLoadMax},
+  {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_06, 0x00000000, &Obj.CycleDiag.CycleUsed},
+  {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_07, 0x00000000, &Obj.CycleDiag.CycleUsedMax},
+  {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_08, 0x00000000, &Obj.CycleDiag.CycleDistanceMax},
+  {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_09, 0x00000000, &Obj.CycleDiag.LateBasePeriods},
+  {0x0a, DTYPE_UNSIGNED8, 8, ATYPE_RO | ATYPE_TXPDO, acName2001_0A, 0x00000000, &Obj.CycleDiag.FrequencyLimited},
 };
 const _objd SDO2010[] =
 {
@@ -1197,6 +1235,7 @@ const _objectlist SDOobjects[] =
   {0x1C32, OTYPE_RECORD, 32, 0, acName1C32, SDO1C32},
   {0x1C33, OTYPE_RECORD, 32, 0, acName1C33, SDO1C33},
   {0x2000, OTYPE_VAR, 0, 0, acName2000, SDO2000},
+  {0x2001, OTYPE_RECORD, 10, 0, acName2001, SDO2001},
   {0x2010, OTYPE_RECORD, 4, 0, acName2010, SDO2010},
   {0x2011, OTYPE_RECORD, 4, 0, acName2011, SDO2011},
   {0x2012, OTYPE_RECORD, 4, 0, acName2012, SDO2012},

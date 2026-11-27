@@ -692,6 +692,7 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
     addr->freq = 0.0;
     addr->maxvel = 0.0;
     addr->maxaccel = 0.0;
+    addr->freq_limited = 0;
     addr->step_type = step_type;
     addr->pos_mode = pos_mode;
 

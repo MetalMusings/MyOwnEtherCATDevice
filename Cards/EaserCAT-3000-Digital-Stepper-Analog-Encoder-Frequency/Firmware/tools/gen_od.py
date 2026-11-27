@@ -207,6 +207,22 @@ def build_od():
     # Manufacturer specific objects
     od.append(var(0x2000, "Base period ns", "UNSIGNED32", "RW", default=10000,
                   field="Obj.BasePeriod"))
+    # Cycle diagnostics: is the cycle time / base period / speed asked for possible?
+    # Read by SDO or mapped into a TxPDO. Maxima and counters are cleared by 0x1C32:08.
+    d = "Obj.CycleDiag."
+    od.append(Obj(0x2001, "Cycle diagnostics", "RECORD", [
+        Entry(0, "Max SubIndex", "UNSIGNED8", default=10),
+        Entry(1, "Base period ns", "UNSIGNED32", pdo="T", field=d + "BasePeriod"),
+        Entry(2, "Max step frequency Hz", "UNSIGNED32", pdo="T", field=d + "MaxStepFrequency"),
+        Entry(3, "Step interrupt time max ns", "UNSIGNED32", pdo="T", field=d + "IsrTimeMax"),
+        Entry(4, "Step interrupt load 0.1%", "UNSIGNED16", pdo="T", field=d + "IsrLoad"),
+        Entry(5, "Step interrupt load max 0.1%", "UNSIGNED16", pdo="T", field=d + "IsrLoadMax"),
+        Entry(6, "Cycle time used 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsed"),
+        Entry(7, "Cycle time used max 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsedMax"),
+        Entry(8, "Cycle distance max ns", "UNSIGNED32", pdo="T", field=d + "CycleDistanceMax"),
+        Entry(9, "Late base periods", "UNSIGNED32", pdo="T", field=d + "LateBasePeriods"),
+        Entry(10, "Frequency limited axes", "UNSIGNED8", pdo="T", field=d + "FrequencyLimited"),
+    ]))
     for n in range(N_AXES):
         f = f"Obj.StepTiming[{n}]"
         od.append(Obj(0x2010 + n, f"Axis {n + 1} step timing", "RECORD", [
@@ -348,18 +364,24 @@ def assign_obj(idx, name, pdos, field):
 
 
 def sm_param_obj(idx, name, field):
-    # ETG.1020 table 80/81
+    # ETG.1020 table 80/81. :05 is worked out from the base period (CycleModel.h), :06
+    # measured; :08 = 1 starts a new measurement (clears :06 and the maxima in 0x2001),
+    # 2 also clears the counters :0B, :0C and 0x2001:09/:0A.
     return Obj(idx, name, "RECORD", [
         Entry(0, "Max SubIndex", "UNSIGNED8", default=32),
         Entry(1, "Sync mode", "UNSIGNED16", field=field + ".SyncType"),
         Entry(2, "Cycle time", "UNSIGNED32", field=field + ".CycleTime"),
         Entry(3, "Shift time", "UNSIGNED32", field=field + ".ShiftTime"),
         Entry(4, "Sync modes supported", "UNSIGNED16", default=0x0006),
-        Entry(5, "Minimum cycle time", "UNSIGNED32", default=250000),
+        Entry(5, "Minimum cycle time", "UNSIGNED32", default=250000,
+              field=field + ".MinCycleTime"),
         Entry(6, "Calc and copy time", "UNSIGNED32", field=field + ".CalcCopyTime"),
+        Entry(8, "Get cycle time", "UNSIGNED16", "RW", field=field + ".GetCycleTime"),
         Entry(9, "Delay time", "UNSIGNED32", default=0),
+        Entry(10, "Sync0 cycle time", "UNSIGNED32", field=field + ".Sync0CycleTime"),
         Entry(11, "SM event missed", "UNSIGNED16", field=field + ".SmEventMissed"),
         Entry(12, "Cycle time too small", "UNSIGNED16", field=field + ".CycleTimeTooSmall"),
+        Entry(13, "Shift time too short", "UNSIGNED16", default=0),
         Entry(32, "Sync error", "BOOLEAN", field=field + ".SyncError"),
     ])
 
@@ -447,7 +469,10 @@ typedef struct
    uint16_t SyncType;
    uint32_t CycleTime;
    uint32_t ShiftTime;
+   uint32_t MinCycleTime;
    uint32_t CalcCopyTime;
+   uint16_t GetCycleTime;
+   uint32_t Sync0CycleTime;
    uint16_t SmEventMissed;
    uint16_t CycleTimeTooSmall;
    uint8_t SyncError;
@@ -517,6 +542,19 @@ typedef struct
 
    /* Manufacturer specific */
    uint32_t BasePeriod;
+   struct
+   {{
+      uint32_t BasePeriod;           /* :01 actual, after the timer's rounding */
+      uint32_t MaxStepFrequency;     /* :02 Hz, the lowest of the axes' step timing limits */
+      uint32_t IsrTimeMax;           /* :03 ns */
+      uint16_t IsrLoad;              /* :04 0.1 %, last cycle */
+      uint16_t IsrLoadMax;           /* :05 */
+      uint16_t CycleUsed;            /* :06 0.1 % of the cycle time, last cycle */
+      uint16_t CycleUsedMax;         /* :07 */
+      uint32_t CycleDistanceMax;     /* :08 ns between cycle starts */
+      uint32_t LateBasePeriods;      /* :09 base period interrupts > 1.5 periods apart */
+      uint8_t FrequencyLimited;      /* :0A bit n: axis n+1 was held at its step timing limit */
+   }} CycleDiag;
    StepTiming_t StepTiming[N_AXES];
    struct
    {{
