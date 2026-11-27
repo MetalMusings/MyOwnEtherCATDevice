@@ -7,6 +7,7 @@
 
 #include "Cia402Axis.h"
 #include "ObjectHooks.h"
+#include "StepGenChannel.h"
 
 extern "C" {
 #include "ecat_slv.h"
@@ -667,7 +668,171 @@ static void testLimitSwitches() {
   CHECK(fabs(p.vel - 1000) < 1);
 }
 
+// ---------------------------------------------------------------------------
+// Step pulses: stepgenPulseStepDir() against the original make_pulses() algorithm
+// ---------------------------------------------------------------------------
+static void refPulse(stepgen_t *stepgen, long periodns) {
+  long old_addval, target_addval, new_addval, step_now;
+  if (stepgen->timer1 > 0) {
+    if (stepgen->timer1 > (unsigned)periodns) stepgen->timer1 -= periodns;
+    else stepgen->timer1 = 0;
+  }
+  if (stepgen->timer2 > 0) {
+    if (stepgen->timer2 > (unsigned)periodns) stepgen->timer2 -= periodns;
+    else stepgen->timer2 = 0;
+  }
+  if (stepgen->timer3 > 0) {
+    if (stepgen->timer3 > (unsigned)periodns) stepgen->timer3 -= periodns;
+    else {
+      stepgen->timer3 = 0;
+      stepgen->hold_dds = 0;
+    }
+  }
+  if (!stepgen->hold_dds && stepgen->enable) {
+    old_addval = stepgen->addval;
+    target_addval = stepgen->target_addval;
+    if (stepgen->deltalim != 0) {
+      if (target_addval > (old_addval + stepgen->deltalim)) new_addval = old_addval + stepgen->deltalim;
+      else if (target_addval < (old_addval - stepgen->deltalim)) new_addval = old_addval - stepgen->deltalim;
+      else new_addval = target_addval;
+    } else {
+      new_addval = target_addval;
+    }
+    stepgen->addval = new_addval;
+    if (((new_addval >= 0) && (old_addval < 0)) || ((new_addval < 0) && (old_addval >= 0))) {
+      if (stepgen->timer3 != 0) stepgen->hold_dds = 1;
+    }
+  }
+  if (!stepgen->hold_dds && stepgen->enable) {
+    step_now = stepgen->accum;
+    stepgen->accum += stepgen->addval;
+    step_now ^= stepgen->accum;
+    step_now &= (1L << PICKOFF);
+    stepgen->rawcount = stepgen->accum >> PICKOFF;
+  } else {
+    step_now = 0;
+  }
+  if (stepgen->timer2 == 0) {
+    if (stepgen->addval > 0) stepgen->curr_dir = 1;
+    else if (stepgen->addval < 0) stepgen->curr_dir = -1;
+  }
+  if (step_now) {
+    stepgen->timer1 = stepgen->step_len;
+    stepgen->timer2 = stepgen->timer1 + stepgen->dir_hold_dly;
+    stepgen->timer3 = stepgen->timer2 + stepgen->dir_setup;
+  }
+  stepgen->phase[STEP_PIN] = stepgen->timer1 != 0;
+  stepgen->phase[DIR_PIN] = stepgen->curr_dir < 0;
+}
+
+static bool sameChannel(const stepgen_t &a, const stepgen_t &b) {
+  return a.timer1 == b.timer1 && a.timer2 == b.timer2 && a.timer3 == b.timer3 &&
+         a.hold_dds == b.hold_dds && a.addval == b.addval && a.accum == b.accum &&
+         a.rawcount == b.rawcount && a.curr_dir == b.curr_dir &&
+         a.phase[STEP_PIN] == b.phase[STEP_PIN] && a.phase[DIR_PIN] == b.phase[DIR_PIN];
+}
+
+static void testStepPulses() {
+  const long period = 10000;
+  unsigned rnd = 12345;
+  auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
+  int mismatches = 0, steps = 0, reversals = 0;
+  for (int run = 0; run < 20; run++) {
+    stepgen_t a, b;
+    memset((void *)&a, 0, sizeof(a));
+    a.accum = 1 << (PICKOFF - 1);
+    a.enable = 1;
+    a.step_len = 20000;      // 2 base periods
+    a.dir_hold_dly = 10000;  // and other step timing, to exercise the hold logic
+    a.dir_setup = 30000;
+    a.deltalim = (run % 3 == 0) ? 0 : (long)(next() % 2000000);
+    memcpy((void *)&b, (const void *)&a, sizeof(a));
+    for (int k = 0; k < 20000; k++) {
+      if (k % 100 == 0) {  // a new frequency command each "servo cycle"
+        long f = (next() & 1) ? (long)(next() % 16000000) - 8000000    // slow, many reversals
+                               : (long)next() * 8 - 67108864;          // up to 0.25 steps/period
+        if (next() % 7 == 0) f = 0;
+        a.target_addval = b.target_addval = f;
+        if (next() % 50 == 0) a.enable = b.enable = !a.enable;
+      }
+      int oldDir = a.curr_dir;
+      refPulse(&a, period);
+      stepgenPulseStepDir(&b, period);
+      if (!sameChannel(a, b)) mismatches++;
+      if (a.timer1 == (unsigned)a.step_len) steps++;
+      if (a.curr_dir != oldDir) reversals++;
+    }
+  }
+  CHECK_EQ(mismatches, 0);
+  CHECK(steps > 1000);
+  printf("  step pulses: %d steps, %d direction changes\n", steps, reversals);
+  CHECK(reversals > 100);
+}
+
+// ---------------------------------------------------------------------------
+// PDO packing: the byte-aligned fast path and the bit slicing path
+// ---------------------------------------------------------------------------
+static void testPdoPacking() {
+  COE_initDefaultValues();
+  _SMmap map[64];
+  int n = 0;
+  int bytes = sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3);
+  CHECK_EQ(bytes, 75);
+  Obj.Axis[0].Statusword = 0x1237;
+  Obj.Axis[0].ModesOfOperationDisplay = -3;
+  Obj.Axis[0].PositionActual = -123456789;
+  Obj.Axis[3].FollowingErrorActual = 0x01020304;
+  Obj.FrequencyIn = 1.5f;
+  Obj.DigitalIn = 0xA5;
+  alignas(8) uint8_t buf[80];
+  memset(buf, 0xEE, sizeof(buf));
+  COE_pdoPack(buf, n, map);
+  uint16_t sw;
+  memcpy(&sw, &buf[0], 2);
+  CHECK_EQ(sw, 0x1237);
+  CHECK_EQ((int8_t)buf[2], -3);
+  int32_t pos;
+  memcpy(&pos, &buf[3], 4);
+  CHECK_EQ(pos, -123456789);
+  int32_t fe;
+  memcpy(&fe, &buf[3 * 15 + 11], 4);  // axis 4: 3 x 15 bytes before it, then 2+1+4+4
+  CHECK_EQ(fe, 0x01020304);
+  float fq;
+  memcpy(&fq, &buf[4 * 15 + 1 + 1 + 4 + 4], 4);  // after the encoder inputs
+  CHECK(fq == 1.5f);
+  CHECK_EQ(buf[74], 0xA5);
+
+  // Unpack the RxPDO
+  bytes = sizeOfPDO(RX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM2);
+  CHECK_EQ(bytes, 54);
+  memset(buf, 0, sizeof(buf));
+  uint16_t cw = 0x001F;
+  memcpy(&buf[11], &cw, 2);  // axis 2 controlword: after axis 1's 2+1+4+4
+  int32_t tp = -42;
+  memcpy(&buf[11 + 3], &tp, 4);
+  buf[53] = 0x0B;  // digital outputs, the last entry
+  COE_pdoUnpack(buf, n, map);
+  CHECK_EQ(Obj.Axis[1].Controlword, 0x001F);
+  CHECK_EQ(Obj.Axis[1].TargetPosition, -42);
+  CHECK_EQ(Obj.DigitalOut, 0x0B);
+
+  // An entry that is not byte aligned still takes the bit slicing path
+  _SMmap m1 = map[0];
+  m1.offset = 4;  // 16 bit controlword at bit 4
+  alignas(8) uint8_t b2[8] = {0};
+  Obj.Axis[0].Controlword = 0xABCD;
+  COE_pdoPack(b2, 1, &m1);
+  CHECK_EQ(b2[0], 0xD0);
+  CHECK_EQ(b2[1], 0xBC);
+  CHECK_EQ(b2[2], 0x0A);
+  Obj.Axis[0].Controlword = 0;
+  COE_pdoUnpack(b2, 1, &m1);
+  CHECK_EQ(Obj.Axis[0].Controlword, 0xABCD);
+}
+
 int main() {
+  testStepPulses();
+  testPdoPacking();
   testHomingMethods();
   testHomingCurrentPosition();
   testHomingErrors();

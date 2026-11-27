@@ -1087,6 +1087,10 @@ StepGen3::StepGen3(void)
         dirPin[i] = dirs[i];
         stepPinName[i] = digitalPinToPinName(steps[i]);
         dirPinName[i] = digitalPinToPinName(dirs[i]);
+        stepPort[i] = digitalPinToPort(steps[i]);
+        dirPort[i] = digitalPinToPort(dirs[i]);
+        stepMask[i] = digitalPinToBitMask(steps[i]);
+        dirMask[i] = digitalPinToBitMask(dirs[i]);
     }
     rtapi_app_main();
     // Positions are handled in steps, scaling is done by the EtherCAT master
@@ -1220,11 +1224,31 @@ bool StepGen3::allIdle(void) const
 
 void StepGen3::makeAllPulses(void)
 {
-    make_pulses(stepgen_array, basePeriodNs);
+    if (!allStepDir)
+    {
+        make_pulses(stepgen_array, basePeriodNs);
+        for (int i = 0; i < num_chan; i++)
+        {
+            digitalWriteFast((PinName)dirPinName[i], stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
+            digitalWriteFast((PinName)stepPinName[i], stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
+        }
+        return;
+    }
+    // Runs in the base period interrupt. Direction first, then step, one BSRR write each
+    // (the direction output is inverted: phase 1 = negative = low).
+    const unsigned int period = (unsigned int)basePeriodNs;
+    periodns = basePeriodNs;  // as make_pulses() does: update_freq() scales with it
     for (int i = 0; i < num_chan; i++)
     {
-        // Fast GPIO access, this runs in the base period interrupt
-        digitalWriteFast((PinName)dirPinName[i], stepgen_array[i].phase[DIR_PIN] ? LOW : HIGH);
-        digitalWriteFast((PinName)stepPinName[i], stepgen_array[i].phase[STEP_PIN] ? HIGH : LOW);
+        stepgen_t *sg = &stepgen_array[i];
+        // A channel with no timing in progress and no frequency, now or commanded, would
+        // not change at all: skip it (its outputs were written when it last changed).
+        if (outputsWritten[i] && !(sg->timer1 | sg->timer2 | sg->timer3 | sg->hold_dds) &&
+            sg->addval == 0 && sg->target_addval == 0)
+            continue;
+        outputsWritten[i] = true;
+        stepgenPulseStepDir(sg, period);
+        dirPort[i]->BSRR = sg->phase[DIR_PIN] ? dirMask[i] << 16 : dirMask[i];
+        stepPort[i]->BSRR = sg->phase[STEP_PIN] ? stepMask[i] : stepMask[i] << 16;
     }
 }

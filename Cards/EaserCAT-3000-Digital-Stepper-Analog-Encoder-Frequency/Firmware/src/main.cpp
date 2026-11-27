@@ -49,10 +49,8 @@ const uint32_t DAC_RESOLUTION_BITS = 12;
 ////// Step generators and CiA402 axes
 StepGen3 *Step = nullptr;
 Cia402Axis Axes[N_AXES];
-HardwareTimer *baseTimer;           // Step pulse base period timer
 volatile int32_t pulsesLeft = 0;    // Base periods left before the pulse train stops
 uint32_t requestedBasePeriod = 0;   // Last value of 0x2000 applied to the timer
-void basePeriodCB(void);
 
 ///// Switch inputs: filter (0x2107), polarity (0x2106) and a position latch.
 // Every change of an input interrupts (EXTI, both edges) and latches the step count
@@ -83,6 +81,8 @@ struct InputState {
   int32_t latchCount[N_AXES] = {};
 };
 InputState inputState[8];
+GPIO_TypeDef *inputPort[8];  // for direct IDR reads (digitalRead() is about 1 us each)
+uint32_t inputMask[8];
 uint8_t activeInputs = 0;  // after polarity, bit 0 = IN1
 
 void updateInputs(uint32_t now) {
@@ -93,7 +93,7 @@ void updateInputs(uint32_t now) {
     uint32_t edgeT = edgeMicros[i];
     int32_t counts[N_AXES];
     for (int ch = 0; ch < N_AXES; ch++) counts[ch] = edgeCount[i][ch];
-    bool lvl = digitalRead(INPUTS[i]) == HIGH;
+    bool lvl = (inputPort[i]->IDR & inputMask[i]) != 0;
     st.changed = false;
     if (lvl == st.level) {
       st.candidate = lvl;
@@ -183,31 +183,72 @@ static inline bool outputsActive(void) {
 
 ////// Base period timer
 
+////// Step pulse base period timer: TIM11, register level, with its own interrupt
+// handler (vector table copied to RAM), so the interrupt does not go through the
+// HardwareTimer/HAL dispatch (about 1 us of each 10 us base period).
+static uint32_t baseTimerClk = 0;
+alignas(512) static uint32_t ramVectors[16 + 82];  // Cortex-M4 + 82 STM32F407 interrupts
+extern "C" void baseTimerIrq(void);
+
+static void baseTimerInit() {
+  RCC->APB2ENR |= RCC_APB2ENR_TIM11EN;
+  (void)RCC->APB2ENR;
+  uint32_t pclk2 = HAL_RCC_GetPCLK2Freq();
+  baseTimerClk = ((RCC->CFGR & RCC_CFGR_PPRE2) == RCC_CFGR_PPRE2_DIV1) ? pclk2 : 2 * pclk2;
+  TIM11->CR1 = 0;
+  TIM11->PSC = 0;
+  TIM11->ARR = baseTimerClk / 100000 - 1;  // 10 us until setBasePeriod()
+  TIM11->CNT = 0;
+  TIM11->SR = 0;
+  TIM11->DIER = TIM_DIER_UIE;
+
+  memcpy(ramVectors, (const void *)SCB->VTOR, sizeof(ramVectors));
+  ramVectors[16 + TIM1_TRG_COM_TIM11_IRQn] = (uint32_t)baseTimerIrq;
+  __disable_irq();
+  SCB->VTOR = (uint32_t)ramVectors;
+  __DSB();
+  __ISB();
+  __enable_irq();
+  // Same priority as the HardwareTimer used (TIM_IRQ_PRIO): below the EXTI inputs
+  NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 14, 0));
+  NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
+}
+
+static inline void baseTimerStop() { TIM11->CR1 = 0; }
+
+// Restart: the first interrupt comes one full base period from now
+static inline void baseTimerStart() {
+  TIM11->CR1 = 0;
+  TIM11->CNT = 0;
+  TIM11->SR = 0;
+  TIM11->CR1 = TIM_CR1_CEN;
+}
+
 void setBasePeriod(uint32_t ns) {
   requestedBasePeriod = ns;
   if (ns < BASE_PERIOD_MIN_NS) ns = BASE_PERIOD_MIN_NS;
   if (ns > BASE_PERIOD_MAX_NS) ns = BASE_PERIOD_MAX_NS;
-  uint32_t clk = baseTimer->getTimerClkFreq();
+  uint32_t clk = baseTimerClk;
   uint32_t ticks = (uint32_t)(((uint64_t)ns * clk) / 1000000000ULL);
-  baseTimer->setPrescaleFactor(1);
-  baseTimer->setOverflow(ticks, TICK_FORMAT);
+  TIM11->ARR = ticks - 1;
   // Use the period actually produced by the timer in the step generator math
   Step->basePeriodNs = (long)(((uint64_t)ticks * 1000000000ULL) / clk);
 }
 
-void basePeriodCB(void) {
+extern "C" void baseTimerIrq(void) {
+  TIM11->SR = ~TIM_SR_UIF;  // clear first: the work below is far longer than the write
   if (pulsesLeft > 0) {
     pulsesLeft--;
     Step->makeAllPulses();
   } else {
-    baseTimer->pause();
+    baseTimerStop();
   }
 }
 
 // Restart the pulse train in phase with the current cycle
 void restartPulseTrain(uint32_t cycleNs) {
   int32_t n = (int32_t)(cycleNs / (uint32_t)Step->basePeriodNs);
-  baseTimer->pause();
+  baseTimerStop();
   Step->makeAllPulses();  // First base period right now
   if (Step->allIdle()) {
     // Nothing to step on any channel this cycle: leave the timer stopped. The base period
@@ -218,8 +259,7 @@ void restartPulseTrain(uint32_t cycleNs) {
   // Some margin, so a slightly late next cycle does not create a gap. The train always
   // stops by itself if no new cycle arrives.
   pulsesLeft = n - 1 + n / 4 + 2;
-  baseTimer->refresh();
-  baseTimer->resume();
+  baseTimerStart();
 }
 
 ////// SOES callbacks for process data
@@ -277,7 +317,159 @@ void preStateChange(uint8_t *as, uint8_t *an) {
 
 ////// Application cycle
 
+#ifdef CYCLE_PROFILE
+// Cycle profile in CPU cycles (168 MHz), read with the debugger without halting.
+// Build: PLATFORMIO_BUILD_FLAGS=-DCYCLE_PROFILE pio run -e genericSTM32F407VGT6
+#include <SPI.h>
+extern "C" volatile uint8_t spi_use_fast;  // lib/soes/hal/ax58100/spi_utils.cpp
+extern "C" volatile uint8_t coe_pdo_fast;  // lib/soes/esc_coe.c
+extern "C" void spi_fast_transfer(const uint8_t *tx, uint8_t *rx, uint16_t n);
+extern "C" void spi_select(int8_t board);
+extern "C" void spi_unselect(int8_t board);
+struct CycleProfile {
+  uint32_t magic, n;
+  uint32_t alevent, digOut, inputs, axes, stepFreq, restart, digIn, total, maxTotal;
+  uint32_t benchRuns, pulses100;          // 100 x makeAllPulses, called directly
+  uint32_t loopIdle, loopIsr, isrCount;   // busy loop counts without / with the base timer
+  uint32_t spiHal75, spiFast75, spiSame;  // ESC_read of 75 bytes, SPI.transfer / register loop
+  uint32_t rawFast75, rawHal75, csPair, addr2;  // the parts: transfer only, CS low+high, address
+  uint32_t rawPipe75, pipeSame, cr1, cr2, sr;
+  uint32_t pack75, unpack54, core400Active;  // 100 x 4 channels stepping, on copies
+  uint32_t pack75Old, unpack54Old;
+};
+static void spiPipelined(const uint8_t *tx, uint8_t *rx, uint16_t n) {
+  SPI_TypeDef *sp = SPI1;
+  uint16_t sent = 0, got = 0;
+  __disable_irq();
+  while (got < n) {
+    if (sent < n && (sp->SR & SPI_SR_TXE) && sent - got < 2) {
+      *(volatile uint8_t *)&sp->DR = tx ? tx[sent] : 0xFF;
+      sent++;
+    }
+    if (sp->SR & SPI_SR_RXNE) {
+      uint8_t b = *(volatile uint8_t *)&sp->DR;
+      if (rx) rx[got] = b;
+      got++;
+    }
+  }
+  __enable_irq();
+  while (sp->SR & SPI_SR_BSY) {}
+}
+volatile CycleProfile prof = {0xC0FFEE00};
+#define PT() (DWT->CYCCNT)
+static void profileBench() {
+  for (int i = 0; i < N_AXES; i++)
+    if (Step->stepgen_array[i].enable) return;  // only with every channel disabled
+  uint32_t t = PT();
+  for (int k = 0; k < 100; k++) Step->makeAllPulses();
+  prof.pulses100 = PT() - t;  // channels skipped once written
+  {
+    static stepgen_t dummy[N_AXES];
+    for (int i = 0; i < N_AXES; i++) {
+      memcpy((void *)&dummy[i], (const void *)&Step->stepgen_array[i], sizeof(stepgen_t));
+      dummy[i].enable = 1;
+      dummy[i].target_addval = 50000000;  // about 0.2 steps per period
+      dummy[i].deltalim = 1000000;
+    }
+    t = PT();
+    for (int k = 0; k < 100; k++)
+      for (int i = 0; i < N_AXES; i++) stepgenPulseStepDir(&dummy[i], 10000);
+    prof.core400Active = PT() - t;
+  }
+  // CPU taken by the base period interrupt, dispatch included
+  uint32_t c0 = 0, t0 = micros();
+  while (micros() - t0 < 5000) c0++;
+  pulsesLeft = 1000000;
+  baseTimerStart();
+  uint32_t c1 = 0;
+  int32_t left0 = pulsesLeft;
+  t0 = micros();
+  while (micros() - t0 < 5000) c1++;
+  prof.isrCount = left0 - pulsesLeft;
+  pulsesLeft = 0;
+  prof.loopIdle = c0;
+  prof.loopIsr = c1;
+  // SPI: 75 bytes from the ESC's user RAM (0x0F80), as the TxPDO
+  uint8_t a[75], b[75];
+  spi_use_fast = 0;  // SPI.transfer(), as before
+  t = PT();
+  ESC_read(0x0F80, a, sizeof(a));
+  prof.spiHal75 = PT() - t;
+  spi_use_fast = 1;  // the register loop / DMA now in use
+  t = PT();
+  ESC_read(0x0F80, b, sizeof(b));
+  prof.spiFast75 = PT() - t;
+  prof.spiSame = memcmp(a, b, sizeof(a)) == 0;
+  // Parts, with CS high (the ESC ignores the clocks)
+  t = PT();
+  spi_fast_transfer(nullptr, a, sizeof(a));
+  prof.rawFast75 = PT() - t;
+  t = PT();
+  SPI.transfer(static_cast<const void *>(nullptr), static_cast<void *>(a), sizeof(a));
+  prof.rawHal75 = PT() - t;
+  t = PT();
+  spi_select(0);
+  spi_unselect(0);
+  prof.csPair = PT() - t;
+  uint8_t ad[2] = {0, 0}, r2[2];
+  t = PT();
+  spi_fast_transfer(ad, r2, 2);
+  prof.addr2 = PT() - t;
+  uint8_t c[75];
+  t = PT();
+  spiPipelined(nullptr, c, sizeof(c));
+  prof.rawPipe75 = PT() - t;
+  // Compare with the ESC: pipelined ESC_read of 0x0F80 by hand
+  {
+    uint8_t d[75];
+    uint16_t addr = 0x0F80;
+    uint8_t hdr[2] = {(uint8_t)(addr >> 5), (uint8_t)(((addr & 0x1F) << 3) | 0x02)}, ign[2];
+    static uint8_t term[75];
+    term[74] = 0xFF;
+    spi_select(0);
+    spiPipelined(hdr, ign, 2);
+    spiPipelined(term, d, sizeof(d));
+    spi_unselect(0);
+    prof.pipeSame = memcmp(d, b, sizeof(d)) == 0;
+  }
+  {
+    static _SMmap mp[64];
+    alignas(8) static uint8_t pb[80];
+    int nm = 0;
+    sizeOfPDO(TX_PDO_OBJIDX, &nm, mp, MAX_MAPPINGS_SM3);
+    t = PT();
+    COE_pdoPack(pb, nm, mp);
+    prof.pack75 = PT() - t;
+    coe_pdo_fast = 0;
+    t = PT();
+    COE_pdoPack(pb, nm, mp);
+    prof.pack75Old = PT() - t;
+    coe_pdo_fast = 1;
+    sizeOfPDO(RX_PDO_OBJIDX, &nm, mp, MAX_MAPPINGS_SM2);
+    memset(pb, 0, sizeof(pb));  // every axis disabled anyway; unpack writes the RxPDO objects
+    uint8_t saved[sizeof(Obj)];
+    memcpy(saved, (const void *)&Obj, sizeof(Obj));
+    t = PT();
+    COE_pdoUnpack(pb, nm, mp);
+    prof.unpack54 = PT() - t;
+    coe_pdo_fast = 0;
+    t = PT();
+    COE_pdoUnpack(pb, nm, mp);
+    prof.unpack54Old = PT() - t;
+    coe_pdo_fast = 1;
+    memcpy((void *)&Obj, saved, sizeof(Obj));
+  }
+  prof.cr1 = SPI1->CR1;
+  prof.cr2 = SPI1->CR2;
+  prof.sr = SPI1->SR;
+  prof.benchRuns++;
+}
+#else
+#define PT() 0u
+#endif
+
 void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
+  uint32_t p0 = PT();
   double dt = cycleNs * 1e-9;
 
   if (commLostPending) {
@@ -286,6 +478,7 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
   }
 
   updateInputs(micros());
+  uint32_t p1 = PT();
   Step->updatePositions();
   uint8_t errorRegister = 0;
   for (int i = 0; i < N_AXES; i++) {
@@ -322,19 +515,32 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
     }
   }
   Obj.ErrorRegister = errorRegister;
+  uint32_t p2 = PT();
 
   if (Obj.BasePeriod != requestedBasePeriod) setBasePeriod(Obj.BasePeriod);
   Step->updateFrequencies(cycleNs);
+  uint32_t p3 = PT();
   restartPulseTrain(cycleNs);
+#ifdef CYCLE_PROFILE
+  prof.inputs = p1 - p0;
+  prof.axes = p2 - p1;
+  prof.stepFreq = p3 - p2;
+  prof.restart = PT() - p3;
+#else
+  (void)p0; (void)p1; (void)p2; (void)p3;
+#endif
 }
 
 // One complete process data cycle. fromSync: triggered by SYNC0.
 void serveCycle(uint32_t cycleNs, bool fromSync) {
   uint32_t t0 = micros();
+  uint32_t q0 = PT();
   uint32_t ev = ESC_ALeventread();  // also refreshes ESCvar.ALevent
   bool newOutputs = (ev & ESCREG_ALEVENT_SM2) != 0;
+  uint32_t q1 = PT();
 
   DIG_process(DIG_PROCESS_WD_FLAG | DIG_PROCESS_OUTPUTS_FLAG);
+  uint32_t q2 = PT();
   bool outputsValid = outputsActive();
   if (outputsValid) wasInOp = true;
 
@@ -346,7 +552,19 @@ void serveCycle(uint32_t cycleNs, bool fromSync) {
   }
 
   applicationCycle(cycleNs, outputsValid, newOutputs);
+  uint32_t q3 = PT();
   DIG_process(DIG_PROCESS_INPUTS_FLAG);
+#ifdef CYCLE_PROFILE
+  uint32_t q4 = PT();
+  prof.alevent = q1 - q0;
+  prof.digOut = q2 - q1;
+  prof.digIn = q4 - q3;
+  prof.total = q4 - q0;
+  if (prof.total > prof.maxTotal) prof.maxTotal = prof.total;
+  prof.n++;
+#else
+  (void)q0; (void)q1; (void)q2; (void)q3;
+#endif
 
   // ETG.1020 0x1C32:06 / 0x1C33:06, measured worst case
   uint32_t calcNs = (micros() - t0) * 1000;
@@ -361,6 +579,11 @@ void serveCycle(uint32_t cycleNs, bool fromSync) {
 
 void setup(void) {
   DebugSerial.begin(115200);
+#ifdef CYCLE_PROFILE
+  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+  DWT->CYCCNT = 0;
+  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+#endif
   delay(100);
 
   for (int i = 0; i < 4; i++) {
@@ -383,12 +606,13 @@ void setup(void) {
 
   // Position latch on every input change (after Step exists: the ISRs read it)
   for (int i = 0; i < 8; i++) {
+    inputPort[i] = digitalPinToPort(INPUTS[i]);
+    inputMask[i] = digitalPinToBitMask(INPUTS[i]);
     inputState[i].level = inputState[i].candidate = digitalRead(INPUTS[i]) == HIGH;
     attachInterrupt(digitalPinToInterrupt(INPUTS[i]), INPUT_ISRS[i], CHANGE);
   }
 
-  baseTimer = new HardwareTimer(TIM11);
-  baseTimer->attachInterrupt(basePeriodCB);
+  baseTimerInit();
   setBasePeriod(BASE_PERIOD);
 
   ecat_slv_init(&config);  // Also sets the object dictionary default values
@@ -429,6 +653,13 @@ void loop(void) {
     ESC_ALstatusgotoerror((ESCsafeop | ESCerror), ALERR_SYNCERROR);
   }
 
+#ifdef CYCLE_PROFILE
+  static uint32_t lastBench = 0;
+  if (!outputsActive() && now - lastBench > 2000000) {
+    lastBench = now;
+    profileBench();
+  }
+#endif
   ecat_slv_poll();
   bool smEvent = (ESCvar.ALevent & ESCREG_ALEVENT_SM2) != 0;
   if (!ESCvar.dcsync) {

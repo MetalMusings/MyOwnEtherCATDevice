@@ -22,6 +22,10 @@ void spi_unselect (int8_t board);
 void spi_write (int8_t board, uint8_t *data, uint16_t size);
 void spi_read (int8_t board, uint8_t *result, uint16_t size);
 void spi_bidirectionally_transfer (int8_t board, uint8_t *result, uint8_t *data, uint16_t size);
+#ifdef CYCLE_PROFILE
+extern volatile uint8_t spi_use_fast;
+void spi_fast_transfer(const uint8_t *tx, uint8_t *rx, uint16_t n);
+#endif
 
 #ifdef __cplusplus
 }

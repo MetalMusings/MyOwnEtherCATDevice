@@ -7,59 +7,13 @@
 #define MAX_CYCLE 18
 #define USER_STEP_TYPE 13
 
-typedef struct
-{
-    /* stuff that is both read and written by makepulses */
-    volatile unsigned int timer1; /* times out when step pulse should end */
-    volatile unsigned int timer2; /* times out when safe to change dir */
-    volatile unsigned int timer3; /* times out when safe to step in new dir */
-    volatile int hold_dds;        /* prevents accumulator from updating */
-    volatile long addval;         /* actual frequency generator add value */
-    volatile long long accum;     /* frequency generator accumulator */
-    volatile int rawcount;        /* param: position feedback in counts */
-    volatile int curr_dir;        /* current direction */
-    volatile int state;           /* current position in state table */
-    /* stuff that is read but not written by makepulses */
-    volatile int enable;                /* pin for enable stepgen */
-    volatile int target_addval;         /* desired freq generator add value */
-    volatile long deltalim;             /* max allowed change per period */
-    volatile int step_len;              /* parameter: step pulse length */
-    volatile unsigned int dir_hold_dly; /* param: direction hold time or delay */
-    volatile unsigned int dir_setup;    /* param: direction setup time */
-    volatile int step_type;             /* stepping type - see list above */
-    volatile int cycle_max;             /* cycle length for step types 2 and up */
-    volatile int num_phases;            /* number of phases for types 2 and up */
-    volatile int phase[5];              /* pins for output signals */
-    volatile const unsigned char *lut;  /* pointer to state lookup table */
-                                        /* stuff that is not accessed by makepulses */
-    int pos_mode;                       /* 1 = position mode, 0 = velocity mode */
-    unsigned int step_space;            /* parameter: min step pulse spacing */
-    double old_pos_cmd;                 /* previous position command (counts) */
-    int count;                          /* pin: captured feedback in counts */
-    double pos_scale;          /* param: steps per position unit */
-    double old_scale;          /* stored scale value */
-    double scale_recip;        /* reciprocal value used for scaling */
-    double vel_cmd;            /* pin: velocity command (pos units/sec) */
-    double pos_cmd;            /* pin: position command (position units) */
-    double pos_fb;             /* pin: position feedback (position units) */
-    double freq;               /* param: frequency command */
-    double maxvel;             /* param: max velocity, (pos units/sec) */
-    double maxaccel;           /* param: max accel (pos units/sec^2) */
-    unsigned int old_step_len; /* used to detect parameter changes */
-    unsigned int old_step_space;
-    unsigned int old_dir_hold_dly;
-    unsigned int old_dir_setup;
-    int printed_error; /* flag to avoid repeated printing */
-} stepgen_t;
+#include "StepGenChannel.h"
 
 #define MAX_STEP_TYPE 15
 
-#define STEP_PIN 0 /* output phase used for STEP signal */
-#define DIR_PIN 1  /* output phase used for DIR signal */
 #define UP_PIN 0   /* output phase used for UP signal */
 #define DOWN_PIN 1 /* output phase used for DOWN signal */
 
-#define PICKOFF 28 /* bit location in DDS accum */
 
 typedef enum CONTROL
 {
@@ -92,6 +46,12 @@ public:
     long basePeriodNs = 10000; // Actual period of the makeAllPulses() calls in ns
     uint32_t stepPinName[MAX_CHAN] = {0}; // PinName of the step outputs, for fast GPIO
     uint32_t dirPinName[MAX_CHAN] = {0};  // PinName of the direction outputs
+    GPIO_TypeDef *stepPort[MAX_CHAN] = {0}; // GPIO port and bit of the outputs, for BSRR writes
+    GPIO_TypeDef *dirPort[MAX_CHAN] = {0};
+    uint32_t stepMask[MAX_CHAN] = {0};
+    uint32_t dirMask[MAX_CHAN] = {0};
+    bool allStepDir = true;                 // every channel is step type 0: use the fast pulse path
+    bool outputsWritten[MAX_CHAN] = {0};    // the outputs show the channel's state since the last write
     StepGen3(void);
 
     // Set the command of one channel for the next servo period.
@@ -107,7 +67,7 @@ public:
     void updatePositions(void);
     // Run the position/velocity loop of all channels, servoPeriodNs = cycle time
     void updateFrequencies(long servoPeriodNs);
-    void makeAllPulses(void);
+    void makeAllPulses(void) __attribute__((optimize("O2")));
     // True when makeAllPulses() would change nothing on any channel: no step pulse or
     // direction timing in progress, and each channel disabled or at zero frequency.
     // The base period timer can then be stopped until the next cycle.
