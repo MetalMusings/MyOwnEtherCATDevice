@@ -42,7 +42,11 @@ LinuxCNC writes `linuxcnc.var` and `position.txt` here while it runs
    a joint is homed where it stands. For home switches (IN1..IN3 for X, Y, Z),
    set the method and speeds with the commented SDOs in `ethercat-conf.xml`.
    The switch edge becomes `HOME_OFFSET`.
-5. E-stop: `e3000.hal` loops the GUI's enable back; wire a real E-stop to
+5. Acceleration: LinuxCNC limits it, and the board does not by default (0x60C5
+   = 0). Set 0x60C5 of each axis to 1.5-2 x `MAX_ACCELERATION` x `SCALE`
+   steps/s² (example in `ethercat-conf.xml`), so a late or repeated frame from
+   the master does not jerk the axis.
+6. E-stop: `e3000.hal` loops the GUI's enable back; wire a real E-stop to
    `iocontrol.0.emc-enable-in`, for example through a board input.
 
 Then `linuxcnc axis.ini`.
