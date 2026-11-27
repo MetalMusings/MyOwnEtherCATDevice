@@ -18,8 +18,6 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
             sg->old_pos_cmd = sg->pos_cmd;
         /* set velocity to zero */
         sg->freq = 0;
-        sg->addval = 0;
-        sg->target_addval = 0;
         return;
     }
     /* calculate frequency limit */
@@ -125,9 +123,6 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
     }
     sg->freq = new_vel;
     sg->accel = max_ac;
-    /* calculate new addval and deltalim */
-    sg->target_addval = (long)(new_vel * k.freqscale);
-    sg->deltalim = (long)(max_ac * k.accelscale);
 }
 
 void stepAxisCycle(stepgen_t *sg, StepAxisState &ax, StepPlanState &ps, StepQueue &q,

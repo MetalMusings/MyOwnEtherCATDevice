@@ -9,10 +9,9 @@
 //
 // The planner works one window ahead: each cycle it extends the queue to about one
 // cycle plus STEP_LEAD_TICKS after "now". The velocity ramps from where the queue ends to
-// the target velocity of the position loop, at its acceleration limit, as the step
-// generator's DDS did, but every step is placed to the timer tick (12.5 ns) instead of
-// to a base period. Positions are the DDS accumulator's: steps << 28, half a step offset;
-// a step is made where the accumulator crosses a multiple of 2^28.
+// the target velocity of the position loop, at its acceleration limit, and every step is
+// placed to the timer tick (12.5 ns). Positions are fixed point: steps << 28, half a step
+// offset; a step is made where the position crosses a multiple of 2^28.
 #ifndef STEPPLANNER_H
 #define STEPPLANNER_H
 

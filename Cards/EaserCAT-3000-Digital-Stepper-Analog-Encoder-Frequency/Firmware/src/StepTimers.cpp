@@ -197,7 +197,7 @@ void StepTimers::update(uint32_t cycleNs)
     const uint32_t ratio = SystemCoreClock / STEP_TICK_HZ;
     const int64_t cycleTicks = (int64_t)cycleNs * (STEP_TICK_HZ / 1000000u) / 1000;
     const float dt = (float)cycleNs * 1e-9f;
-    const StepLoopTiming k = {dt, 1.0f / dt, 0.0f, 0.0f};
+    const StepLoopTiming k = {dt, 1.0f / dt};
     // The queue holds about a cycle and the lead: limit the rate so that it fits (only
     // long cycles come near it: about 1.3 MHz at 1 ms, 175 kHz at 10 ms). Otherwise the
     // step timing sets the limit, and the CPU time is checked by the cycle time model.

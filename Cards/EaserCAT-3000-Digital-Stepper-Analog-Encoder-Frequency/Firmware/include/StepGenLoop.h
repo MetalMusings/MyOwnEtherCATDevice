@@ -5,7 +5,7 @@
 // more than 100 cycles per operation). float alone is not good enough for absolute
 // positions: at a million steps its resolution is 0.06 steps, which the loop would
 // turn into velocity noise. So absolute positions stay 64 bit fixed point (steps with
-// PICKOFF fraction bits, as the DDS accumulator), and only differences of them,
+// PICKOFF fraction bits), and only differences of them,
 // velocities and accelerations are float.
 #ifndef STEPGENLOOP_H
 #define STEPGENLOOP_H
@@ -16,8 +16,6 @@
 struct StepLoopTiming {
   float dt;          // servo period, s
   float recipDt;     // 1 / dt
-  float freqscale;   // steps/s -> addval (2^PICKOFF x base period)
-  float accelscale;  // steps/s^2 -> deltalim (freqscale x base period)
 };
 
 static const int64_t STEPGEN_FX_ONE = 1LL << PICKOFF;
@@ -27,9 +25,8 @@ static inline int64_t stepgenFxFromSteps(int64_t steps) { return steps * STEPGEN
 static inline int64_t stepgenFxRound(int64_t fx) { return (fx + (STEPGEN_FX_ONE >> 1)) >> PICKOFF; }
 static inline float stepgenFxToFloat(int64_t fx) { return (float)fx * (1.0f / (float)STEPGEN_FX_ONE); }
 
-// One servo cycle of one channel: sets freq, target_addval and deltalim from
-// pos_cmd (position mode) or vel_cmd (velocity mode), maxvel and maxaccel.
-// The timing parameters (step_len, step_space) must already be whole base periods.
+// One servo cycle of one channel: sets freq and accel from pos_cmd (position mode) or
+// vel_cmd (velocity mode), maxvel and maxaccel.
 void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k);
 
 // One cycle of one axis with the step timers: the loop continues from where the queue
@@ -44,16 +41,10 @@ void stepAxisCycle(stepgen_t *sg, StepAxisState &ax, StepPlanState &ps, StepQueu
                    const StepTimingTicks &tm, const StepLoopTiming &k, int64_t nowT,
                    int64_t cycleTicks, float freqCap);
 
-// Position feedback (fixed point steps) from the accumulator
+// Position (fixed point steps) from the accumulator
 static inline int64_t stepgenPosition(const stepgen_t *sg)
 {
-    long long a, b;
-    do
-    {
-        a = sg->accum;  // 64 bit: make_pulses() may change it half-way through a read
-        b = sg->accum;
-    } while (a != b);
-    return a - (1LL << (PICKOFF - 1));
+    return sg->accum - (1LL << (PICKOFF - 1));
 }
 
 #endif

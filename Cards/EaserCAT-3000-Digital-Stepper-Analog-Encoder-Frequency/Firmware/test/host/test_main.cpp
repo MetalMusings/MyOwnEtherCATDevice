@@ -425,7 +425,7 @@ static void testObjectDictionary() {
   CHECK_EQ(sdoWrite(0x2021, 2, 9, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x80, 1), 0);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x01, 1), ABORT_VALUE_EXCEEDED);
-  CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), ABORT_READONLY);  // not the base period any more
+  CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), ABORT_READONLY);  // diagnostics, read only
 }
 
 // ---------------------------------------------------------------------------
@@ -677,107 +677,6 @@ static void testLimitSwitches() {
 }
 
 // ---------------------------------------------------------------------------
-// Step pulses: stepgenPulseStepDir() against the original make_pulses() algorithm
-// ---------------------------------------------------------------------------
-static void refPulse(stepgen_t *stepgen, long periodns) {
-  long old_addval, target_addval, new_addval, step_now;
-  if (stepgen->timer1 > 0) {
-    if (stepgen->timer1 > (unsigned)periodns) stepgen->timer1 -= periodns;
-    else stepgen->timer1 = 0;
-  }
-  if (stepgen->timer2 > 0) {
-    if (stepgen->timer2 > (unsigned)periodns) stepgen->timer2 -= periodns;
-    else stepgen->timer2 = 0;
-  }
-  if (stepgen->timer3 > 0) {
-    if (stepgen->timer3 > (unsigned)periodns) stepgen->timer3 -= periodns;
-    else {
-      stepgen->timer3 = 0;
-      stepgen->hold_dds = 0;
-    }
-  }
-  if (!stepgen->hold_dds && stepgen->enable) {
-    old_addval = stepgen->addval;
-    target_addval = stepgen->target_addval;
-    if (stepgen->deltalim != 0) {
-      if (target_addval > (old_addval + stepgen->deltalim)) new_addval = old_addval + stepgen->deltalim;
-      else if (target_addval < (old_addval - stepgen->deltalim)) new_addval = old_addval - stepgen->deltalim;
-      else new_addval = target_addval;
-    } else {
-      new_addval = target_addval;
-    }
-    stepgen->addval = new_addval;
-    if (((new_addval >= 0) && (old_addval < 0)) || ((new_addval < 0) && (old_addval >= 0))) {
-      if (stepgen->timer3 != 0) stepgen->hold_dds = 1;
-    }
-  }
-  if (!stepgen->hold_dds && stepgen->enable) {
-    step_now = stepgen->accum;
-    stepgen->accum += stepgen->addval;
-    step_now ^= stepgen->accum;
-    step_now &= (1L << PICKOFF);
-    stepgen->rawcount = stepgen->accum >> PICKOFF;
-  } else {
-    step_now = 0;
-  }
-  if (stepgen->timer2 == 0) {
-    if (stepgen->addval > 0) stepgen->curr_dir = 1;
-    else if (stepgen->addval < 0) stepgen->curr_dir = -1;
-  }
-  if (step_now) {
-    stepgen->timer1 = stepgen->step_len;
-    stepgen->timer2 = stepgen->timer1 + stepgen->dir_hold_dly;
-    stepgen->timer3 = stepgen->timer2 + stepgen->dir_setup;
-  }
-  stepgen->phase[STEP_PIN] = stepgen->timer1 != 0;
-  stepgen->phase[DIR_PIN] = stepgen->curr_dir < 0;
-}
-
-static bool sameChannel(const stepgen_t &a, const stepgen_t &b) {
-  return a.timer1 == b.timer1 && a.timer2 == b.timer2 && a.timer3 == b.timer3 &&
-         a.hold_dds == b.hold_dds && a.addval == b.addval && a.accum == b.accum &&
-         a.rawcount == b.rawcount && a.curr_dir == b.curr_dir &&
-         a.phase[STEP_PIN] == b.phase[STEP_PIN] && a.phase[DIR_PIN] == b.phase[DIR_PIN];
-}
-
-static void testStepPulses() {
-  const long period = 10000;
-  unsigned rnd = 12345;
-  auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
-  int mismatches = 0, steps = 0, reversals = 0;
-  for (int run = 0; run < 20; run++) {
-    stepgen_t a, b;
-    memset((void *)&a, 0, sizeof(a));
-    a.accum = 1 << (PICKOFF - 1);
-    a.enable = 1;
-    a.step_len = 20000;      // 2 base periods
-    a.dir_hold_dly = 10000;  // and other step timing, to exercise the hold logic
-    a.dir_setup = 30000;
-    a.deltalim = (run % 3 == 0) ? 0 : (long)(next() % 2000000);
-    memcpy((void *)&b, (const void *)&a, sizeof(a));
-    for (int k = 0; k < 20000; k++) {
-      if (k % 100 == 0) {  // a new frequency command each "servo cycle"
-        long f = (next() & 1) ? (long)(next() % 16000000) - 8000000    // slow, many reversals
-                               : (long)next() * 8 - 67108864;          // up to 0.25 steps/period
-        if (next() % 7 == 0) f = 0;
-        a.target_addval = b.target_addval = f;
-        if (next() % 50 == 0) a.enable = b.enable = !a.enable;
-      }
-      int oldDir = a.curr_dir;
-      refPulse(&a, period);
-      stepgenPulseStepDir(&b, period);
-      if (!sameChannel(a, b)) mismatches++;
-      if (a.timer1 == (unsigned)a.step_len) steps++;
-      if (a.curr_dir != oldDir) reversals++;
-    }
-  }
-  CHECK_EQ(mismatches, 0);
-  CHECK(steps > 1000);
-  printf("  step pulses: %d steps, %d direction changes\n", steps, reversals);
-  CHECK(reversals > 100);
-}
-
-// ---------------------------------------------------------------------------
 // PDO packing: the byte-aligned fast path and the bit slicing path
 // ---------------------------------------------------------------------------
 static void testPdoPacking() {
@@ -839,25 +738,36 @@ static void testPdoPacking() {
 }
 
 // ---------------------------------------------------------------------------
+// An ideal step generator for the loop tests: over one cycle the velocity ramps from
+// v0 to v1 at the acceleration limit acc, then stays; the position (fixed point, as
+// stepgen_t's accum) moves by the area, rounded to the fixed point.
+// ---------------------------------------------------------------------------
+static void idealRamp(long long &accum, double v0, double v1, double acc, double dt) {
+  double tr = (acc > 0) ? fabs(v1 - v0) / acc : 0.0;
+  if (tr > dt) tr = dt;
+  const double dist = (v0 + v1) * 0.5 * tr + v1 * (dt - tr);
+  accum += llround(dist * (double)(1LL << PICKOFF));
+}
+
+static long long idealSteps(long long accum) { return accum >> PICKOFF; }
+
+// ---------------------------------------------------------------------------
 // Position loop: stepgenUpdateFreq() (fixed point + float) against LinuxCNC's
-// update_freq() in double, both driving the pulse core
+// update_freq() in double, both driving the ideal step generator
 // ---------------------------------------------------------------------------
 struct RefLoop {
   double pos_cmd = 0, old_pos_cmd = 0, vel_cmd = 0, freq = 0, maxvel = 0, maxaccel = 0;
   int pos_mode = 1;
 };
 
-static void refUpdateFreq(stepgen_t *sg, RefLoop &r, double dt, double freqscale,
-                          double accelscale) {
+static double refUpdateFreq(stepgen_t *sg, RefLoop &r, double dt) {
   double recip_dt = 1.0 / dt;
   double pos_cmd, vel_cmd, curr_pos, curr_vel, avg_v, max_freq, max_ac;
   double match_ac, match_time, est_out, est_cmd, est_err, dp, dv, new_vel;
   if (sg->enable == 0) {
     if (r.pos_mode) r.old_pos_cmd = r.pos_cmd;
     r.freq = 0;
-    sg->addval = 0;
-    sg->target_addval = 0;
-    return;
+    return 0;
   }
   long min_step_period = sg->step_len + sg->step_space;
   max_freq = 1.0 / (min_step_period * 0.000000001);
@@ -906,17 +816,12 @@ static void refUpdateFreq(stepgen_t *sg, RefLoop &r, double dt, double freqscale
     else new_vel = vel_cmd;
   }
   r.freq = new_vel;
-  sg->target_addval = r.freq * freqscale;
-  sg->deltalim = max_ac * accelscale;
+  return max_ac;
 }
 
 static void testPositionLoop() {
-  const long period = 10000;  // base period, ns
   const double dt = 0.001;    // servo cycle
-  const int pulsesPerCycle = 100;
-  const double freqscale = (1L << PICKOFF) * (period * 1e-9);
-  const double accelscale = freqscale * (period * 1e-9);
-  StepLoopTiming k = {(float)dt, (float)(1.0 / dt), (float)freqscale, (float)accelscale};
+  StepLoopTiming k = {(float)dt, (float)(1.0 / dt)};
   unsigned rnd = 777;
   auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
 
@@ -930,8 +835,6 @@ static void testPositionLoop() {
     a.pos_mode = 1;
     a.step_len = 10000;
     a.step_space = 10000;
-    a.dir_hold_dly = 10000;
-    a.dir_setup = 10000;
     memcpy((void *)&b, (const void *)&a, sizeof(a));
     RefLoop r;
     r.pos_cmd = r.old_pos_cmd = (double)start;
@@ -964,17 +867,18 @@ static void testPositionLoop() {
       b.maxaccel = (float)r.maxaccel;
       r.maxvel = maxVel;
       r.maxaccel = maxAcc;
-      refUpdateFreq(&a, r, dt, freqscale, accelscale);
-      stepgenUpdateFreq(&b, k);
-      for (int i = 0; i < pulsesPerCycle; i++) {
-        stepgenPulseStepDir(&a, period);
-        stepgenPulseStepDir(&b, period);
+      {
+        const double va = r.freq, vb = b.freq;
+        const double accA = refUpdateFreq(&a, r, dt);
+        stepgenUpdateFreq(&b, k);
+        idealRamp(a.accum, va, r.freq, accA, dt);
+        idealRamp(b.accum, vb, b.freq, b.accel, dt);
       }
-      long long d = llabs((long long)a.rawcount - (long long)b.rawcount);
+      long long d = llabs(idealSteps(a.accum) - idealSteps(b.accum));
       if (d > maxDiff) maxDiff = d;
       if (r.pos_mode && maxAcc == 0) {  // no accel limit: both should follow closely
-        long long lagA = llabs((long long)a.rawcount - (long long)cmd);
-        long long lagB = llabs((long long)b.rawcount - (long long)cmd);
+        long long lagA = llabs(idealSteps(a.accum) - (long long)cmd);
+        long long lagB = llabs(idealSteps(b.accum) - (long long)cmd);
         if (c % 500 > 20) {  // not right after a mode change
           if (lagA > maxLagRef) maxLagRef = lagA;
           if (lagB > maxLagNew) maxLagNew = lagB;
@@ -987,12 +891,11 @@ static void testPositionLoop() {
       r.pos_mode = b.pos_mode = 1;
       r.pos_cmd = cmd;
       b.pos_cmd = stepgenFxFromSteps((long long)cmd);
-      refUpdateFreq(&a, r, dt, freqscale, accelscale);
+      const double va = r.freq, vb = b.freq;
+      const double accA = refUpdateFreq(&a, r, dt);
       stepgenUpdateFreq(&b, k);
-      for (int i = 0; i < pulsesPerCycle; i++) {
-        stepgenPulseStepDir(&a, period);
-        stepgenPulseStepDir(&b, period);
-      }
+      idealRamp(a.accum, va, r.freq, accA, dt);
+      idealRamp(b.accum, vb, b.freq, b.accel, dt);
     }
     CHECK_EQ(stepgenFxRound(stepgenPosition(&b)), (long long)cmd);
     CHECK_EQ(stepgenFxRound(stepgenPosition(&a)), (long long)cmd);
@@ -1071,8 +974,7 @@ static void testCycleDiagnostics() {
   CHECK_EQ(Obj.StepTiming[3].DirHold, 5000u);
 
   // The frequency limit flag: set when the command is faster than the step timing
-  StepLoopTiming k = {0.001f, 1000.0f, (float)((1L << PICKOFF) * 1e-5),
-                      (float)((1L << PICKOFF) * 1e-10)};
+  StepLoopTiming k = {0.001f, 1000.0f};
   stepgen_t g;
   memset((void *)&g, 0, sizeof(g));
   g.enable = 1;
@@ -1328,7 +1230,7 @@ static void testStepAxisLoop() {
   for (int run = 0; run < 6; run++) {
     const int64_t cycleTicks = (run % 2) ? 40000 : 80000;  // 0.5 / 1 ms
     const float dt = (float)cycleTicks / (float)STEP_TICK_HZ;
-    const StepLoopTiming k = {dt, 1.0f / dt, 0.0f, 0.0f};
+    const StepLoopTiming k = {dt, 1.0f / dt};
     StepTimingTicks tm = {400, 400, 400, 400};  // 5 us each, the default
     StepQueue q;
     stepQueueInit(q, buf, 8000);
@@ -1341,15 +1243,9 @@ static void testStepAxisLoop() {
     g.step_len = 5000;
     g.step_space = 5000;
     StepAxisState ax;
-    // The old way for comparison: the DDS at a 5 us base period, same loop
-    const long base = 5000;
-    const int pulses = (int)(cycleTicks * 1000 / 80 / base);
-    const float fs = (float)((1L << PICKOFF) * (base * 1e-9));
-    const StepLoopTiming kOld = {dt, 1.0f / dt, fs, fs * (float)(base * 1e-9)};
+    // For comparison: the same loop driving the ideal step generator, without the lead
     stepgen_t o;
     memcpy((void *)&o, (const void *)&g, sizeof(g));
-    o.dir_hold_dly = 5000;
-    o.dir_setup = 5000;
     // Command: a trajectory with an acceleration limit below the step generators'
     const double trajAcc = 1e6, genAcc = (run < 2) ? 0.0 : 2e6;
     double cmd = 0, v = 0, vel = 0;
@@ -1372,19 +1268,21 @@ static void testStepAxisLoop() {
       g.pos_cmd = o.pos_cmd = pc;
       g.maxaccel = o.maxaccel = (float)genAcc;
       g.enable = o.enable = c >= 3;
-      // Lag behind the command, both at this cycle's start (the DDS's pulses of this
-      // cycle are made below, all at once)
+      // Lag behind the command, both at this cycle's start (the ideal one moves below)
       if (c > 10) {
         long long lagNew = llabs((long long)q.emitted - (long long)floor(cmd));
-        long long lagOld = llabs((long long)o.rawcount - (long long)floor(cmd));
+        long long lagOld = llabs(idealSteps(o.accum) - (long long)floor(cmd));
         if (lagNew > worstNew) worstNew = lagNew;
         if (lagOld > worstOld) worstOld = lagOld;
-        long long extra = llabs((long long)q.emitted - (long long)o.rawcount);
+        long long extra = llabs((long long)q.emitted - idealSteps(o.accum));
         if (extra > worstExtra) worstExtra = extra;
       }
       stepAxisCycle(&g, ax, ps, q, tm, k, now, cycleTicks, 250000.0f);
-      stepgenUpdateFreq(&o, kOld);
-      for (int i = 0; i < pulses; i++) stepgenPulseStepDir(&o, base);
+      {
+        const double v0 = o.freq;
+        stepgenUpdateFreq(&o, k);
+        idealRamp(o.accum, v0, o.freq, o.accel, dt);
+      }
       now += cycleTicks + (int64_t)(next() % 1600) - 800;
     }
     // Stand still: the axis ends exactly on the command
@@ -1403,7 +1301,7 @@ static void testStepAxisLoop() {
     CHECK_EQ((int64_t)q.emitted, ps.accum >> 28);
     CHECK_EQ(sim.badSpacing + sim.badHold + sim.badSetup + sim.badPeriods, 0);
   }
-  printf("  step axis loop: worst lag %lld steps (DDS %lld), worst difference to the DDS %lld\n",
+  printf("  step axis loop: worst lag %lld steps (ideal %lld), worst difference to the ideal %lld\n",
          worstNew, worstOld, worstExtra);
   CHECK(worstNew <= worstOld + 20);
 }
@@ -1412,7 +1310,6 @@ int main() {
   testStepPlanner();
   testStepAxisLoop();
   testPositionLoop();
-  testStepPulses();
   testPdoPacking();
   testHomingMethods();
   testHomingCurrentPosition();
