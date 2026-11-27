@@ -30,13 +30,11 @@
     <slave idx="4" type="generic" vid="0xd0bed1d0" pid="0x00003402" name="E3000" configPdos="true">
       <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
 
-      <!-- Step generator base period in ns (0x2000): 10000 = 100 kHz, the
-           highest step rate is half of it. -->
-      <sdoConfig idx="2000" subIdx="0"><sdoDataRaw data="10 27 00 00"/></sdoConfig>
       <!-- Step timing of axis 1..4 (0x2010..0x2013, sub 1..4: step length,
-           step space, direction setup, direction hold, ns; 0 = one base period).
-           Example: 5 us step pulses on axis 1:
-      <sdoConfig idx="2010" subIdx="1"><sdoDataRaw data="88 13 00 00"/></sdoConfig>
+           step space, direction setup, direction hold, ns; default 5000 each,
+           length and space at least 1000). The highest step rate is
+           1 / (length + space). Example: 2 us step pulses on axis 1:
+      <sdoConfig idx="2010" subIdx="1"><sdoDataRaw data="D0 07 00 00"/></sdoConfig>
       -->
       <!-- Direction of an axis: polarity 0x607E (axis 1), 0x687E, 0x707E,
            0x787E; 0xC0 turns position and velocity round. Example, axis 3:

@@ -3,10 +3,14 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include <vector>
 
 #include "Cia402Axis.h"
 #include "CycleModel.h"
+#include "StepPlanner.h"
 #include "ObjectHooks.h"
 #include "StepGenChannel.h"
 #include "StepGenLoop.h"
@@ -367,7 +371,6 @@ static void testObjectDictionary() {
   CHECK_EQ(Obj.Axis[3].ModesOfOperation, 8);
   CHECK_EQ(Obj.Axis[1].InterpolationTimeIndex, -3);
   CHECK_EQ(Obj.Axis[0].FollowingErrorWindow, 0xFFFFFFFF);
-  CHECK_EQ(Obj.BasePeriod, 10000);
   CHECK(fabs(Obj.EncoderOut.Scale - 1.0f) < 1e-9);
 
   // Axis objects are at 0x6000 + 0x800 * axis
@@ -420,8 +423,7 @@ static void testObjectDictionary() {
   CHECK_EQ(sdoWrite(0x2021, 2, 9, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x80, 1), 0);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x01, 1), ABORT_VALUE_EXCEEDED);
-  CHECK_EQ(sdoWrite(0x2000, 0, 1000, 4), ABORT_VALUE_EXCEEDED);
-  CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), 0);
+  CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), ABORT_NOOBJECT);  // the base period is gone
 }
 
 // ---------------------------------------------------------------------------
@@ -1004,21 +1006,15 @@ static void testPositionLoop() {
 // Cycle time model, diagnostics objects and the frequency limit flag
 // ---------------------------------------------------------------------------
 static void testCycleDiagnostics() {
-  // The model against the OP measurements (four axes, 160 MHz): 10 us -> 231 us measured,
-  // 7 us -> 380 us; 7 us fits 0.5 ms, 6 us fits 1 ms but not 0.5 ms, 5.5 us nothing
-  CHECK(cycleModelMinCycle(10000) >= 231000 && cycleModelMinCycle(10000) <= 300000);
-  CHECK(cycleModelMinCycle(7000) >= 380000 && cycleModelMinCycle(7000) <= 500000);
-  CHECK(cycleModelMinCycle(6000) > 500000 && cycleModelMinCycle(6000) <= 1000000);
-  CHECK_EQ(cycleModelMinCycle(5500), CYCLE_IMPOSSIBLE);
-  CHECK_EQ(cycleModelMinCycle(5000), CYCLE_IMPOSSIBLE);
-  CHECK(cycleModelMinCycle(200000) == 400000);  // at least two base periods
-  CHECK(cycleModelMinBasePeriod() > 5500 && cycleModelMinBasePeriod() <= 6000);
-  CHECK_EQ(cycleModelIsrLoad(9800), 500);
-  // Step rate: length and space at least one base period each, rounded up
-  CHECK_EQ(cycleModelMaxStepFrequency(10000, 0, 0), 50000);
-  CHECK_EQ(cycleModelMaxStepFrequency(10000, 2500, 0), 50000);
-  CHECK_EQ(cycleModelMaxStepFrequency(10000, 15000, 5000), 33333);
-  CHECK_EQ(cycleModelMaxStepFrequency(5000, 5000, 5000), 100000);
+  // The model: cycle work plus CPU per step, over all axes
+  CHECK_EQ(cycleModelStepLoad(0), 0u);
+  CHECK_EQ(cycleModelStepLoad(400000), (uint32_t)(400000ull * CYCLE_STEP_NS / 1000000u));
+  CHECK(cycleModelMinCycle(0) >= CYCLE_WORK_NS && cycleModelMinCycle(0) <= 2 * CYCLE_WORK_NS);
+  CHECK(cycleModelMinCycle(400000) > cycleModelMinCycle(0));       // 4 x 100 kHz
+  CHECK(cycleModelMinCycle(400000) <= 500000);
+  CHECK(cycleModelMinCycle(1000000) <= 1000000 || cycleModelMinCycle(1000000) == CYCLE_IMPOSSIBLE);
+  CHECK_EQ(cycleModelMinCycle(4000000), CYCLE_IMPOSSIBLE);
+  CHECK_EQ(cycleModelMinCycle(0) % 10000, 0u);
 
   // Objects: 0x1C32/0x1C33 :05, :08, :0A, :0D, and 0x2001
   COE_initDefaultValues();
@@ -1032,12 +1028,12 @@ static void testCycleDiagnostics() {
   nidx = SDO_findobject(0x2001);
   CHECK(nidx >= 0);
   CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 10);
-  int16_t sub = SDO_findsubindex(nidx, 10);
+  int16_t sub = SDO_findsubindex(nidx, 9);
   CHECK(sub >= 0 && SDOobjects[nidx].objdesc[sub].data == &Obj.CycleDiag.FrequencyLimited);
   CHECK((SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 4)].flags & ATYPE_TXPDO) != 0);
   // and it can be mapped
   CHECK_EQ(sdoWrite(0x1A04, 0, 0, 1), 0);
-  CHECK_EQ(sdoWrite(0x1A04, 7, 0x20010610, 4), 0);  // cycle time used, 16 bit
+  CHECK_EQ(sdoWrite(0x1A04, 7, 0x20010510, 4), 0);  // cycle time used, 16 bit
   CHECK_EQ(sdoWrite(0x1A04, 0, 7, 1), 0);
   _SMmap map[64];
   int n = 0;
@@ -1049,24 +1045,16 @@ static void testCycleDiagnostics() {
   CHECK_EQ(sdoWrite(0x1C33, 8, 1, 2), 0);
   CHECK_EQ(sdoWrite(0x1C32, 8, 3, 2), ABORT_VALUE_EXCEEDED);
 
-  // Base period: range always; on SYNC0 not shorter than the cycle time allows
-  Obj.SmOutParam.SyncType = 1;
-  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), 0);
-  CHECK_EQ(sdoWrite(0x2000, 0, 4000, 4), ABORT_VALUE_EXCEEDED);
-  Obj.SmOutParam.SyncType = 2;
-  Obj.SmOutParam.CycleTime = 500000;
-  ESCvar.ALstatus = ESCpreop;  // back in PREOP the old values do not count
-  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), 0);
-  ESCvar.ALstatus = ESCop;
-  CHECK_EQ(sdoWrite(0x2000, 0, 7000, 4), 0);
-  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), ABORT_VALUE_TOO_LOW);
-  Obj.SmOutParam.CycleTime = 1000000;
-  CHECK_EQ(sdoWrite(0x2000, 0, 6000, 4), 0);
-  CHECK_EQ(sdoWrite(0x2000, 0, 5500, 4), ABORT_VALUE_TOO_LOW);
-  Obj.SmOutParam.SyncType = 0;
-  Obj.SmOutParam.CycleTime = 0;
-  ESCvar.ALstatus = 0;
+  // Step timing: 0 or 1 us .. 200 us
+  CHECK_EQ(sdoWrite(0x2010, 1, 0, 4), 0);
+  CHECK_EQ(sdoWrite(0x2010, 1, 999, 4), ABORT_VALUE_TOO_LOW);
+  CHECK_EQ(sdoWrite(0x2011, 2, 1000, 4), 0);
+  CHECK_EQ(sdoWrite(0x2012, 3, 0, 4), 0);
+  CHECK_EQ(sdoWrite(0x2012, 3, 10, 4), 0);  // direction setup may be short
+  CHECK_EQ(sdoWrite(0x2013, 4, 200001, 4), ABORT_VALUE_TOO_HIGH);
+  CHECK_EQ(Obj.StepTiming[0].StepLength, 0u);
   COE_initDefaultValues();
+  CHECK_EQ(Obj.StepTiming[3].DirHold, 5000u);
 
   // The frequency limit flag: set when the command is faster than the step timing
   StepLoopTiming k = {0.001f, 1000.0f, (float)((1L << PICKOFF) * 1e-5),
@@ -1101,7 +1089,295 @@ static void testCycleDiagnostics() {
   CHECK_EQ(g.freq_limited, 1);
 }
 
+// ---------------------------------------------------------------------------
+// Step planner and the timer queue: a simulated timer runs the queue as the hardware
+// does; every pulse and direction change is checked against the step timing
+// ---------------------------------------------------------------------------
+struct TimerSim {
+  StepQueue &q;
+  const StepTimingTicks &tm;
+  int64_t nextUpdate;
+  int64_t lastRise = -1000000000, lastDir = -1000000000;
+  int32_t dir = 1;
+  bool pendingDirCheck = false;
+  int64_t dirTime = 0;
+  long rises = 0, dirChanges = 0, badPeriods = 0, badSpacing = 0, badHold = 0, badSetup = 0;
+  std::vector<int64_t> riseTimes;
+  bool record = false;
+  TimerSim(StepQueue &qq, const StepTimingTicks &t, uint32_t idle) : q(qq), tm(t), nextUpdate(idle) {}
+  void runUntil(int64_t now) {
+    while (nextUpdate <= now) {
+      const uint32_t act = q.preload;  // becomes active at this update
+      uint32_t da;
+      stepQueueAdvance(q, &da);
+      const int64_t st = nextUpdate;
+      const uint32_t len = stepEntryTicks(act), pulse = stepEntryPulse(act);
+      if (len < STEP_MIN_PERIOD_TICKS || len > STEP_MAX_PERIOD_TICKS || (pulse && pulse >= len))
+        badPeriods++;
+      if (da) {
+        if (st - lastRise < (int64_t)(tm.len + tm.hold)) badHold++;
+        dir = (da == 1) ? 1 : -1;
+        dirTime = st;
+        pendingDirCheck = true;
+        dirChanges++;
+      }
+      if (pulse) {
+        if (st - lastRise < (int64_t)(tm.len + tm.space)) badSpacing++;
+        if (pendingDirCheck && st - dirTime < (int64_t)tm.setup) badSetup++;
+        pendingDirCheck = false;
+        lastRise = st;
+        rises++;
+        if (record) riseTimes.push_back(st);
+      }
+      nextUpdate = st + len;
+    }
+  }
+};
+
+static void testStepPlanner() {
+  static uint32_t buf[STEP_QUEUE_LEN];
+  unsigned rnd = 4242;
+  auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
+  long totalSteps = 0, totalRev = 0;
+  for (int run = 0; run < 10; run++) {
+    // 5 us / 5 us (100 kHz), or 2 / 2 us (250 kHz); direction setup and hold
+    StepTimingTicks tm = (run % 2) ? StepTimingTicks{160, 160, 240, 160}
+                                   : StepTimingTicks{400, 400, 400, 400};
+    const float maxF = (float)STEP_TICK_HZ / (float)(tm.len + tm.space);
+    const uint32_t cycles[3] = {80000, 20000, 320000};  // 1 ms, 250 us, 4 ms
+    const uint32_t cyc = cycles[run % 3];
+    StepQueue q;
+    stepQueueInit(q, buf, 8000);
+    StepPlanState st;
+    stepPlanInit(st, q, 1LL << 27);
+    TimerSim sim(q, tm, 8000);
+    int64_t now = 20000;
+    uint32_t underrunsAfterStart = 0;
+    float v = 0;
+    for (int c = 0; c < 1500; c++) {
+      sim.runUntil(now);
+      uint32_t u = q.underrunTicks;
+      q.underrunTicks = 0;
+      if (c > 2 && u) underrunsAfterStart++;
+      stepPlanTakeUnderrun(st, u);
+      if (c % (run >= 6 ? 3 : 40) == 0) {  // the last runs: reversals all the time
+        int r = (int)(next() % 10);
+        v = r == 0 ? 0.0f : ((float)((int)(next() % 2001) - 1000) / 1000.0f) * 0.95f * maxF;
+        if (r == 1) v = 3.0f;  // very slow
+      }
+      float accel = (c % 80 < 40) ? 2e6f : (float)(1e5 + next() % 50000000);
+      stepPlanWindow(st, q, tm, v, accel, now + cyc + STEP_LEAD_TICKS);
+      now += cyc + (int64_t)(next() % 1600) - 800;  // +-10 us of cycle jitter
+    }
+    // Stop and drain
+    for (int c = 0; c < 400; c++) {
+      sim.runUntil(now);
+      uint32_t u = q.underrunTicks;
+      q.underrunTicks = 0;
+      stepPlanTakeUnderrun(st, u);
+      stepPlanWindow(st, q, tm, 0.0f, 2e6f, now + cyc + STEP_LEAD_TICKS);
+      now += cyc;
+    }
+    sim.runUntil(now + 10 * (int64_t)cyc);
+    CHECK_EQ(sim.badPeriods, 0);
+    CHECK_EQ(sim.badSpacing, 0);
+    CHECK_EQ(sim.badHold, 0);
+    CHECK_EQ(sim.badSetup, 0);
+    CHECK_EQ(underrunsAfterStart, 0u);
+    CHECK_EQ((int64_t)q.emitted, st.accum >> 28);  // every planned step came out
+    CHECK(fabsf(st.vel) < 1.0f);
+    totalSteps += sim.rises;
+    totalRev += sim.dirChanges;
+  }
+  printf("  step planner: %ld steps, %ld direction changes\n", totalSteps, totalRev);
+  CHECK(totalSteps > 100000);
+  CHECK(totalRev > 300);
+
+  // Constant speed: every interval within a tick of the ideal, across window boundaries
+  for (int k = 0; k < 3; k++) {
+    StepTimingTicks tm = {400, 400, 400, 400};
+    const float v = k == 0 ? 33333.3f : (k == 1 ? -77777.0f : 1234.5f);
+    StepQueue q;
+    stepQueueInit(q, buf, 8000);
+    StepPlanState st;
+    stepPlanInit(st, q, 1LL << 27);
+    TimerSim sim(q, tm, 8000);
+    int64_t now = 20000;
+    for (int c = 0; c < 300; c++) {
+      sim.record = c > 100;
+      sim.runUntil(now);
+      stepPlanWindow(st, q, tm, v, 1e12f, now + 80000 + STEP_LEAD_TICKS);
+      now += 80000 + (int64_t)(next() % 1600) - 800;
+    }
+    const double ideal = (double)STEP_TICK_HZ / fabs((double)v);
+    double worst = 0;
+    for (size_t i = 1; i < sim.riseTimes.size(); i++) {
+      double d = fabs((double)(sim.riseTimes[i] - sim.riseTimes[i - 1]) - ideal);
+      if (d > worst) worst = d;
+    }
+    printf("  constant %.1f steps/s: %zu steps, worst interval error %.2f ticks\n", v,
+           sim.riseTimes.size(), worst);
+    CHECK(sim.riseTimes.size() > 100);
+    CHECK(worst <= 1.5);
+  }
+
+  // A late cycle: the queue runs empty, the interrupt idles, nothing is lost
+  {
+    StepTimingTicks tm = {400, 400, 400, 400};
+    StepQueue q;
+    stepQueueInit(q, buf, 8000);
+    StepPlanState st;
+    stepPlanInit(st, q, 1LL << 27);
+    TimerSim sim(q, tm, 8000);
+    int64_t now = 20000;
+    for (int c = 0; c < 200; c++) {
+      sim.runUntil(now);
+      uint32_t u = q.underrunTicks;
+      q.underrunTicks = 0;
+      stepPlanTakeUnderrun(st, u);
+      stepPlanWindow(st, q, tm, c < 150 ? 50000.0f : 0.0f, 5e6f, now + 80000 + STEP_LEAD_TICKS);
+      now += (c == 60) ? 400000 : 80000;  // one cycle 4 ms late
+    }
+    sim.runUntil(now + 1000000);
+    CHECK(q.underruns > 0);
+    CHECK_EQ((int64_t)q.emitted, st.accum >> 28);
+    CHECK_EQ(sim.badSpacing, 0);
+  }
+
+  // Flush: stops after the preload period, the plan continues from there
+  {
+    StepTimingTicks tm = {400, 400, 400, 400};
+    StepQueue q;
+    stepQueueInit(q, buf, 8000);
+    StepPlanState st;
+    stepPlanInit(st, q, 1LL << 27);
+    TimerSim sim(q, tm, 8000);
+    int64_t now = 20000;
+    for (int c = 0; c < 50; c++) {
+      sim.runUntil(now);
+      stepPlanWindow(st, q, tm, 60000.0f, 1e12f, now + 80000 + STEP_LEAD_TICKS);
+      now += 80000;
+    }
+    sim.runUntil(now);
+    stepQueueFlush(q, st);
+    long before = sim.rises;
+    sim.runUntil(now + 80000);
+    CHECK(sim.rises - before <= 1);
+    CHECK_EQ((int64_t)q.emitted, st.accum >> 28);
+    for (int c = 0; c < 20; c++) {
+      now += 80000;
+      sim.runUntil(now);
+      uint32_t u = q.underrunTicks;
+      q.underrunTicks = 0;
+      stepPlanTakeUnderrun(st, u);
+      stepPlanWindow(st, q, tm, -20000.0f, 1e12f, now + 80000 + STEP_LEAD_TICKS);
+    }
+    for (int c = 0; c < 20; c++) {
+      now += 80000;
+      sim.runUntil(now);
+      stepPlanWindow(st, q, tm, 0.0f, 1e12f, now + 80000 + STEP_LEAD_TICKS);
+    }
+    sim.runUntil(now + 1000000);
+    CHECK_EQ((int64_t)q.emitted, st.accum >> 28);
+    CHECK_EQ(sim.badSpacing + sim.badHold + sim.badSetup + sim.badPeriods, 0);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The whole chain on the host: position loop, extrapolation, planner and the
+// simulated timer, in csp and csv, as StepTimers::update() runs it
+// ---------------------------------------------------------------------------
+static void testStepAxisLoop() {
+  static uint32_t buf[STEP_QUEUE_LEN];
+  unsigned rnd = 999;
+  auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
+  long long worstNew = 0, worstOld = 0, worstExtra = 0;
+  for (int run = 0; run < 6; run++) {
+    const int64_t cycleTicks = (run % 2) ? 40000 : 80000;  // 0.5 / 1 ms
+    const float dt = (float)cycleTicks / (float)STEP_TICK_HZ;
+    const StepLoopTiming k = {dt, 1.0f / dt, 0.0f, 0.0f};
+    StepTimingTicks tm = {400, 400, 400, 400};  // 5 us each: 100 kHz
+    StepQueue q;
+    stepQueueInit(q, buf, 8000);
+    StepPlanState ps;
+    stepPlanInit(ps, q, 1LL << 27);
+    TimerSim sim(q, tm, 8000);
+    stepgen_t g;
+    memset((void *)&g, 0, sizeof(g));
+    g.accum = 1LL << 27;
+    g.step_len = 5000;
+    g.step_space = 5000;
+    StepAxisState ax;
+    // The old way for comparison: the DDS at a 5 us base period, same loop
+    const long base = 5000;
+    const int pulses = (int)(cycleTicks * 1000 / 80 / base);
+    const float fs = (float)((1L << PICKOFF) * (base * 1e-9));
+    const StepLoopTiming kOld = {dt, 1.0f / dt, fs, fs * (float)(base * 1e-9)};
+    stepgen_t o;
+    memcpy((void *)&o, (const void *)&g, sizeof(g));
+    o.dir_hold_dly = 5000;
+    o.dir_setup = 5000;
+    // Command: a trajectory with an acceleration limit below the step generators'
+    const double trajAcc = 1e6, genAcc = (run < 2) ? 0.0 : 2e6;
+    double cmd = 0, v = 0, vel = 0;
+    int64_t now = 20000;
+    for (int c = 0; c < 4000; c++) {
+      sim.runUntil(now);
+      uint32_t u = q.underrunTicks;
+      q.underrunTicks = 0;
+      stepPlanTakeUnderrun(ps, u);
+      if (c > 5 && u) CHECK_EQ(u, 0u);
+      if (c % 50 == 0) vel = (double)((long)(next() % 160000) - 80000);  // up to 80 kHz
+      if (c % 400 > 300) vel = 0;                                         // and stand still
+      if (vel > v + trajAcc * dt) v += trajAcc * dt;
+      else if (vel < v - trajAcc * dt) v -= trajAcc * dt;
+      else v = vel;
+      cmd += v * dt;
+      const int64_t pc = stepgenFxFromSteps((long long)floor(cmd));
+      g.pos_mode = o.pos_mode = 1;
+      if (c == 3) g.old_pos_cmd = o.old_pos_cmd = pc;
+      g.pos_cmd = o.pos_cmd = pc;
+      g.maxaccel = o.maxaccel = (float)genAcc;
+      g.enable = o.enable = c >= 3;
+      // Lag behind the command, both at this cycle's start (the DDS's pulses of this
+      // cycle are made below, all at once)
+      if (c > 10) {
+        long long lagNew = llabs((long long)q.emitted - (long long)floor(cmd));
+        long long lagOld = llabs((long long)o.rawcount - (long long)floor(cmd));
+        if (lagNew > worstNew) worstNew = lagNew;
+        if (lagOld > worstOld) worstOld = lagOld;
+        long long extra = llabs((long long)q.emitted - (long long)o.rawcount);
+        if (extra > worstExtra) worstExtra = extra;
+      }
+      stepAxisCycle(&g, ax, ps, q, tm, k, now, cycleTicks, 250000.0f);
+      stepgenUpdateFreq(&o, kOld);
+      for (int i = 0; i < pulses; i++) stepgenPulseStepDir(&o, base);
+      now += cycleTicks + (int64_t)(next() % 1600) - 800;
+    }
+    // Stand still: the axis ends exactly on the command
+    long long target = (long long)floor(cmd);
+    for (int c = 0; c < 1500; c++) {
+      sim.runUntil(now);
+      uint32_t u = q.underrunTicks;
+      q.underrunTicks = 0;
+      stepPlanTakeUnderrun(ps, u);
+      g.pos_cmd = stepgenFxFromSteps(target);
+      stepAxisCycle(&g, ax, ps, q, tm, k, now, cycleTicks, 250000.0f);
+      now += cycleTicks;
+    }
+    sim.runUntil(now + 10 * cycleTicks);
+    CHECK_EQ((long long)q.emitted, target);
+    CHECK_EQ((int64_t)q.emitted, ps.accum >> 28);
+    CHECK_EQ(sim.badSpacing + sim.badHold + sim.badSetup + sim.badPeriods, 0);
+  }
+  printf("  step axis loop: worst lag %lld steps (DDS %lld), worst difference to the DDS %lld\n",
+         worstNew, worstOld, worstExtra);
+  CHECK(worstNew <= worstOld + 20);
+}
+
 int main() {
+  testStepPlanner();
+  testStepAxisLoop();
   testPositionLoop();
   testStepPulses();
   testPdoPacking();

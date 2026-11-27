@@ -1,63 +1,45 @@
-// What cycle time a base period allows, and the step rate it gives. Free of Arduino
-// headers, so it can be tested on the host.
+// What cycle time the step rates allow. Free of Arduino headers, so it can be tested on
+// the host.
 //
-// The cycle's work runs in the main loop; the base period interrupt (step generator)
-// preempts it. With all four axes stepping, the interrupt takes CYCLE_ISR_NS every base
-// period, and the cycle's own work (SPI, PDO, the axes) CYCLE_WORK_NS. The cycle then
-// takes CYCLE_WORK_NS / (1 - CYCLE_ISR_NS / base period). Measured in OP at 160 MHz,
-// 2026-11-27: 4.8 us per interrupt, 120 us of work; at a 10 us base period the model
-// gives 231 us, the cycle measured 231 us. Measured with four axes at 90 % of their step
-// rate (cycle, share of a 1 ms / 0.5 ms cycle):
-//   base 10 us 231 us, 9 us 260, 8 us 290, 7 us 380 (38 % / 76 %), 6 us 657 (66 % / fails),
-//   5.5 us fails at both.
+// The cycle's work runs in the main loop (SPI, PDO, the axes: CYCLE_WORK_NS). The step
+// timers (StepTimers.h) cost CPU per step: an update interrupt for every step, and the
+// planning of it in the cycle (CYCLE_STEP_NS together). With R steps per second over all
+// axes the cycle then takes CYCLE_WORK_NS / (1 - R * CYCLE_STEP_NS), plus margin.
+// Measured in OP, 2026-11-27, four axes in csv, 2 us step length and space (cycle used):
+//   1 ms: 4 x 100 kHz 39 %, 150 kHz 58 %, 175 kHz 71 %, 200 kHz 89 % (one late step)
+//   0.5 ms: 4 x 100 kHz 65 %, 125 kHz 76 %, 150 kHz 94 % (99 % at most)
+//   0.25 ms: 4 x 45 kHz 84 %
+// The model accepts each of these but 0.5 ms at 4 x 150 kHz and 1 ms at 4 x 200 kHz.
 #ifndef CYCLEMODEL_H
 #define CYCLEMODEL_H
 
 #include <stdint.h>
 
-#define CYCLE_ISR_NS 4900            // base period interrupt, four axes stepping
-#define CYCLE_WORK_NS 120000         // one cycle without the interrupt
-#define CYCLE_MARGIN_PERCENT 20      // for the mailbox, jitter and the other interrupts
-#define CYCLE_MAX_ISR_LOAD_PERMILLE 820  // 6 us (817) worked, 5.5 us (890) did not
+#define CYCLE_WORK_NS 160000          // one cycle without the steps (incl. planning's fixed part)
+#define CYCLE_STEP_NS 1100            // CPU per step: interrupt (0.45 us) and planning
+#define CYCLE_MARGIN_PERCENT 20       // for the mailbox, jitter and the other interrupts
+#define CYCLE_MAX_STEP_LOAD_PERMILLE 900
+#define CYCLE_MIN_NS 100000           // shortest cycle accepted at all
 #define CYCLE_IMPOSSIBLE 0xFFFFFFFFu
 
-// Share of the CPU the interrupt takes at this base period, in 0.1 %
-static inline uint32_t cycleModelIsrLoad(uint32_t basePeriodNs)
+// Share of the CPU the step generation takes at R steps/s over all axes, in 0.1 %
+static inline uint32_t cycleModelStepLoad(uint32_t totalStepRateHz)
 {
-    if (basePeriodNs == 0) return 1000;
-    uint32_t l = (uint32_t)((uint64_t)CYCLE_ISR_NS * 1000u / basePeriodNs);
-    return l > 1000 ? 1000 : l;
+    uint64_t l = (uint64_t)totalStepRateHz * CYCLE_STEP_NS / 1000000u;
+    return l > 1000 ? 1000u : (uint32_t)l;
 }
 
-// Shortest cycle time (ns) that works at this base period with all axes stepping,
-// rounded up to 10 us; CYCLE_IMPOSSIBLE when the base period itself is too short.
-static inline uint32_t cycleModelMinCycle(uint32_t basePeriodNs)
+// Shortest cycle time (ns) with the axes at these step rates, rounded up to 10 us;
+// CYCLE_IMPOSSIBLE when the steps alone would take too much of the CPU
+static inline uint32_t cycleModelMinCycle(uint32_t totalStepRateHz)
 {
-    uint32_t load = cycleModelIsrLoad(basePeriodNs);
-    if (load > CYCLE_MAX_ISR_LOAD_PERMILLE) return CYCLE_IMPOSSIBLE;
+    uint32_t load = cycleModelStepLoad(totalStepRateHz);
+    if (load > CYCLE_MAX_STEP_LOAD_PERMILLE) return CYCLE_IMPOSSIBLE;
     uint64_t need = (uint64_t)CYCLE_WORK_NS * 1000u / (1000u - load);
     need = need * (100u + CYCLE_MARGIN_PERCENT) / 100u;
     need = (need + 9999u) / 10000u * 10000u;
-    if (need < 2ull * basePeriodNs) need = 2ull * basePeriodNs;
-    return need > 0xFFFFFFF0ull ? CYCLE_IMPOSSIBLE : (uint32_t)need;
-}
-
-// Shortest base period (ns) the interrupt allows at all
-static inline uint32_t cycleModelMinBasePeriod(void)
-{
-    return (uint32_t)(((uint64_t)CYCLE_ISR_NS * 1000u + CYCLE_MAX_ISR_LOAD_PERMILLE - 1) /
-                      CYCLE_MAX_ISR_LOAD_PERMILLE);
-}
-
-// Highest step rate (Hz) of step/dir with these timings (ns), each rounded up to whole
-// base periods, step length and space at least one base period each
-static inline uint32_t cycleModelMaxStepFrequency(uint32_t basePeriodNs, uint32_t stepLen,
-                                                  uint32_t stepSpace)
-{
-    if (basePeriodNs == 0) return 0;
-    uint32_t len = stepLen ? (stepLen + basePeriodNs - 1) / basePeriodNs : 1;
-    uint32_t space = stepSpace ? (stepSpace + basePeriodNs - 1) / basePeriodNs : 1;
-    return (uint32_t)(1000000000ull / ((uint64_t)(len + space) * basePeriodNs));
+    if (need < CYCLE_MIN_NS) need = CYCLE_MIN_NS;
+    return (uint32_t)need;
 }
 
 #endif

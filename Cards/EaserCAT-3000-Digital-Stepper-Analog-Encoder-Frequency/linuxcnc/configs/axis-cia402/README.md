@@ -32,8 +32,9 @@ LinuxCNC writes `linuxcnc.var` and `position.txt` here while it runs
    bus (`ethercat slaves`). It is 4 here, on a test bus with other slaves in
    front of it.
 2. `[JOINT_n]SCALE` in `axis.ini`: steps per mm of each axis. The board's step
-   generator runs at most half its base frequency (0x2000, 10 us: 50 kHz), so
-   `MAX_VELOCITY * SCALE` must stay below that.
+   rate is at most 1 / (step length + step space): 100 kHz with the default
+   5 us + 5 us (0x2010..0x2013, down to 1 us each), so `MAX_VELOCITY * SCALE`
+   must stay below that (and below what the drives take).
 3. Directions: a negative `SCALE`, or the axis' polarity object (example in
    `ethercat-conf.xml`).
 4. Homing: the board does it (CiA402 homing mode). LinuxCNC starts it as

@@ -11,6 +11,7 @@
 #define STEPGENLOOP_H
 
 #include "StepGenChannel.h"
+#include "StepPlanner.h"
 
 struct StepLoopTiming {
   float dt;          // servo period, s
@@ -30,6 +31,18 @@ static inline float stepgenFxToFloat(int64_t fx) { return (float)fx * (1.0f / (f
 // pos_cmd (position mode) or vel_cmd (velocity mode), maxvel and maxaccel.
 // The timing parameters (step_len, step_space) must already be whole base periods.
 void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k);
+
+// One cycle of one axis with the step timers: the loop continues from where the queue
+// ends (STEP_LEAD_TICKS after now, so a position command is extrapolated by that much),
+// then the next window is planned. nowT: the axis' timer time now. Underruns and the
+// flush on disable are done by the caller, with interrupts off.
+struct StepAxisState {
+    int64_t prevCmd = 0;   // the last raw position command
+    bool prevValid = false;
+};
+void stepAxisCycle(stepgen_t *sg, StepAxisState &ax, StepPlanState &ps, StepQueue &q,
+                   const StepTimingTicks &tm, const StepLoopTiming &k, int64_t nowT,
+                   int64_t cycleTicks, float freqCap);
 
 // Position feedback (fixed point steps) from the accumulator
 static inline int64_t stepgenPosition(const stepgen_t *sg)

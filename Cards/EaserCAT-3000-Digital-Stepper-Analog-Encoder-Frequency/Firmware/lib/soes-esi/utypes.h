@@ -99,19 +99,18 @@ typedef struct
    SmParam_t SmInParam;
 
    /* Manufacturer specific */
-   uint32_t BasePeriod;
    struct
    {
-      uint32_t BasePeriod;           /* :01 actual, after the timer's rounding */
-      uint32_t MaxStepFrequency;     /* :02 Hz, the lowest of the axes' step timing limits */
-      uint32_t IsrTimeMax;           /* :03 ns */
-      uint16_t IsrLoad;              /* :04 0.1 %, last cycle */
-      uint16_t IsrLoadMax;           /* :05 */
-      uint16_t CycleUsed;            /* :06 0.1 % of the cycle time, last cycle */
-      uint16_t CycleUsedMax;         /* :07 */
-      uint32_t CycleDistanceMax;     /* :08 ns between cycle starts */
-      uint32_t LateBasePeriods;      /* :09 base period interrupts > 1.5 periods apart */
-      uint8_t FrequencyLimited;      /* :0A bit n: axis n+1 was held at its step timing limit */
+      uint32_t MaxStepFrequency;     /* :01 Hz, the lowest of the axes */
+      uint32_t IsrTimeMax;           /* :02 ns, longest step timer interrupt */
+      uint16_t StepLoad;             /* :03 0.1 % of the CPU: interrupts and planning */
+      uint16_t StepLoadMax;          /* :04 */
+      uint16_t CycleUsed;            /* :05 0.1 % of the cycle time, last cycle */
+      uint16_t CycleUsedMax;         /* :06 */
+      uint32_t CycleDistanceMax;     /* :07 ns between cycle starts */
+      uint32_t LateSteps;            /* :08 the step queue ran empty while moving */
+      uint8_t FrequencyLimited;      /* :09 bit n: axis n+1 was held at its step rate limit */
+      uint32_t QueueLeadMin;         /* :0A us, shortest time the queue was ahead */
    } CycleDiag;
    StepTiming_t StepTiming[N_AXES];
    struct

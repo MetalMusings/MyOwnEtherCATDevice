@@ -205,32 +205,30 @@ def build_od():
     od.append(sm_param_obj(0x1C33, "Input SyncManager Parameter", "Obj.SmInParam"))
 
     # Manufacturer specific objects
-    od.append(var(0x2000, "Base period ns", "UNSIGNED32", "RW", default=10000,
-                  field="Obj.BasePeriod"))
-    # Cycle diagnostics: is the cycle time / base period / speed asked for possible?
+    # Cycle diagnostics: is the cycle time / step rate asked for possible?
     # Read by SDO or mapped into a TxPDO. Maxima and counters are cleared by 0x1C32:08.
     d = "Obj.CycleDiag."
     od.append(Obj(0x2001, "Cycle diagnostics", "RECORD", [
         Entry(0, "Max SubIndex", "UNSIGNED8", default=10),
-        Entry(1, "Base period ns", "UNSIGNED32", pdo="T", field=d + "BasePeriod"),
-        Entry(2, "Max step frequency Hz", "UNSIGNED32", pdo="T", field=d + "MaxStepFrequency"),
-        Entry(3, "Step interrupt time max ns", "UNSIGNED32", pdo="T", field=d + "IsrTimeMax"),
-        Entry(4, "Step interrupt load 0.1%", "UNSIGNED16", pdo="T", field=d + "IsrLoad"),
-        Entry(5, "Step interrupt load max 0.1%", "UNSIGNED16", pdo="T", field=d + "IsrLoadMax"),
-        Entry(6, "Cycle time used 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsed"),
-        Entry(7, "Cycle time used max 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsedMax"),
-        Entry(8, "Cycle distance max ns", "UNSIGNED32", pdo="T", field=d + "CycleDistanceMax"),
-        Entry(9, "Late base periods", "UNSIGNED32", pdo="T", field=d + "LateBasePeriods"),
-        Entry(10, "Frequency limited axes", "UNSIGNED8", pdo="T", field=d + "FrequencyLimited"),
+        Entry(1, "Max step frequency Hz", "UNSIGNED32", pdo="T", field=d + "MaxStepFrequency"),
+        Entry(2, "Step interrupt time max ns", "UNSIGNED32", pdo="T", field=d + "IsrTimeMax"),
+        Entry(3, "Step generation load 0.1%", "UNSIGNED16", pdo="T", field=d + "StepLoad"),
+        Entry(4, "Step generation load max 0.1%", "UNSIGNED16", pdo="T", field=d + "StepLoadMax"),
+        Entry(5, "Cycle time used 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsed"),
+        Entry(6, "Cycle time used max 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsedMax"),
+        Entry(7, "Cycle distance max ns", "UNSIGNED32", pdo="T", field=d + "CycleDistanceMax"),
+        Entry(8, "Late steps", "UNSIGNED32", pdo="T", field=d + "LateSteps"),
+        Entry(9, "Frequency limited axes", "UNSIGNED8", pdo="T", field=d + "FrequencyLimited"),
+        Entry(10, "Step queue lead min us", "UNSIGNED32", pdo="T", field=d + "QueueLeadMin"),
     ]))
     for n in range(N_AXES):
         f = f"Obj.StepTiming[{n}]"
         od.append(Obj(0x2010 + n, f"Axis {n + 1} step timing", "RECORD", [
             Entry(0, "Max SubIndex", "UNSIGNED8", default=4),
-            Entry(1, "Step length ns", "UNSIGNED32", "RW", default=0, field=f + ".StepLength"),
-            Entry(2, "Step space ns", "UNSIGNED32", "RW", default=0, field=f + ".StepSpace"),
-            Entry(3, "Direction setup ns", "UNSIGNED32", "RW", default=0, field=f + ".DirSetup"),
-            Entry(4, "Direction hold ns", "UNSIGNED32", "RW", default=0, field=f + ".DirHold"),
+            Entry(1, "Step length ns", "UNSIGNED32", "RW", default=5000, field=f + ".StepLength"),
+            Entry(2, "Step space ns", "UNSIGNED32", "RW", default=5000, field=f + ".StepSpace"),
+            Entry(3, "Direction setup ns", "UNSIGNED32", "RW", default=5000, field=f + ".DirSetup"),
+            Entry(4, "Direction hold ns", "UNSIGNED32", "RW", default=5000, field=f + ".DirHold"),
         ]))
     od.append(Obj(0x2100, "Encoder inputs", "RECORD", [
         Entry(0, "Max SubIndex", "UNSIGNED8", default=4),
@@ -364,7 +362,7 @@ def assign_obj(idx, name, pdos, field):
 
 
 def sm_param_obj(idx, name, field):
-    # ETG.1020 table 80/81. :05 is worked out from the base period (CycleModel.h), :06
+    # ETG.1020 table 80/81. :05 is worked out from the step rates (CycleModel.h), :06
     # measured; :08 = 1 starts a new measurement (clears :06 and the maxima in 0x2001),
     # 2 also clears the counters :0B, :0C and 0x2001:09/:0A.
     return Obj(idx, name, "RECORD", [
@@ -541,19 +539,18 @@ typedef struct
    SmParam_t SmInParam;
 
    /* Manufacturer specific */
-   uint32_t BasePeriod;
    struct
    {{
-      uint32_t BasePeriod;           /* :01 actual, after the timer's rounding */
-      uint32_t MaxStepFrequency;     /* :02 Hz, the lowest of the axes' step timing limits */
-      uint32_t IsrTimeMax;           /* :03 ns */
-      uint16_t IsrLoad;              /* :04 0.1 %, last cycle */
-      uint16_t IsrLoadMax;           /* :05 */
-      uint16_t CycleUsed;            /* :06 0.1 % of the cycle time, last cycle */
-      uint16_t CycleUsedMax;         /* :07 */
-      uint32_t CycleDistanceMax;     /* :08 ns between cycle starts */
-      uint32_t LateBasePeriods;      /* :09 base period interrupts > 1.5 periods apart */
-      uint8_t FrequencyLimited;      /* :0A bit n: axis n+1 was held at its step timing limit */
+      uint32_t MaxStepFrequency;     /* :01 Hz, the lowest of the axes */
+      uint32_t IsrTimeMax;           /* :02 ns, longest step timer interrupt */
+      uint16_t StepLoad;             /* :03 0.1 % of the CPU: interrupts and planning */
+      uint16_t StepLoadMax;          /* :04 */
+      uint16_t CycleUsed;            /* :05 0.1 % of the cycle time, last cycle */
+      uint16_t CycleUsedMax;         /* :06 */
+      uint32_t CycleDistanceMax;     /* :07 ns between cycle starts */
+      uint32_t LateSteps;            /* :08 the step queue ran empty while moving */
+      uint8_t FrequencyLimited;      /* :09 bit n: axis n+1 was held at its step rate limit */
+      uint32_t QueueLeadMin;         /* :0A us, shortest time the queue was ahead */
    }} CycleDiag;
    StepTiming_t StepTiming[N_AXES];
    struct

@@ -49,6 +49,8 @@ typedef struct
     float maxvel;              /* max velocity (steps/sec), 0 = step timing only */
     float maxaccel;            /* max accel (steps/sec^2), 0 = unlimited */
     int freq_limited;          /* set when held at the step timing limit; cleared by the user */
+    float freq_cap;            /* further limit of the step rate (steps/sec), 0 = none */
+    float accel;               /* the acceleration limit used in the last cycle (steps/sec^2) */
     unsigned int old_step_len; /* used to detect parameter changes */
     unsigned int old_step_space;
     unsigned int old_dir_hold_dly;

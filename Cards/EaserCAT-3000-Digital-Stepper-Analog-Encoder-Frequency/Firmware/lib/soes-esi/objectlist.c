@@ -164,19 +164,18 @@ static const char acName1C33_0B[] = "SM event missed";
 static const char acName1C33_0C[] = "Cycle time too small";
 static const char acName1C33_0D[] = "Shift time too short";
 static const char acName1C33_20[] = "Sync error";
-static const char acName2000[] = "Base period ns";
 static const char acName2001[] = "Cycle diagnostics";
 static const char acName2001_00[] = "Max SubIndex";
-static const char acName2001_01[] = "Base period ns";
-static const char acName2001_02[] = "Max step frequency Hz";
-static const char acName2001_03[] = "Step interrupt time max ns";
-static const char acName2001_04[] = "Step interrupt load 0.1%";
-static const char acName2001_05[] = "Step interrupt load max 0.1%";
-static const char acName2001_06[] = "Cycle time used 0.1%";
-static const char acName2001_07[] = "Cycle time used max 0.1%";
-static const char acName2001_08[] = "Cycle distance max ns";
-static const char acName2001_09[] = "Late base periods";
-static const char acName2001_0A[] = "Frequency limited axes";
+static const char acName2001_01[] = "Max step frequency Hz";
+static const char acName2001_02[] = "Step interrupt time max ns";
+static const char acName2001_03[] = "Step generation load 0.1%";
+static const char acName2001_04[] = "Step generation load max 0.1%";
+static const char acName2001_05[] = "Cycle time used 0.1%";
+static const char acName2001_06[] = "Cycle time used max 0.1%";
+static const char acName2001_07[] = "Cycle distance max ns";
+static const char acName2001_08[] = "Late steps";
+static const char acName2001_09[] = "Frequency limited axes";
+static const char acName2001_0A[] = "Step queue lead min us";
 static const char acName2010[] = "Axis 1 step timing";
 static const char acName2010_00[] = "Max SubIndex";
 static const char acName2010_01[] = "Step length ns";
@@ -602,55 +601,51 @@ const _objd SDO1C33[] =
   {0x0d, DTYPE_UNSIGNED16, 16, ATYPE_RO, acName1C33_0D, 0x00000000, NULL},
   {0x20, DTYPE_BOOLEAN, 1, ATYPE_RO, acName1C33_20, 0x00000000, &Obj.SmInParam.SyncError},
 };
-const _objd SDO2000[] =
-{
-  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2000, 0x00002710, &Obj.BasePeriod},
-};
 const _objd SDO2001[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2001_00, 0x0000000A, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_01, 0x00000000, &Obj.CycleDiag.BasePeriod},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_02, 0x00000000, &Obj.CycleDiag.MaxStepFrequency},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_03, 0x00000000, &Obj.CycleDiag.IsrTimeMax},
-  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_04, 0x00000000, &Obj.CycleDiag.IsrLoad},
-  {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_05, 0x00000000, &Obj.CycleDiag.IsrLoadMax},
-  {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_06, 0x00000000, &Obj.CycleDiag.CycleUsed},
-  {0x07, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_07, 0x00000000, &Obj.CycleDiag.CycleUsedMax},
-  {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_08, 0x00000000, &Obj.CycleDiag.CycleDistanceMax},
-  {0x09, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_09, 0x00000000, &Obj.CycleDiag.LateBasePeriods},
-  {0x0a, DTYPE_UNSIGNED8, 8, ATYPE_RO | ATYPE_TXPDO, acName2001_0A, 0x00000000, &Obj.CycleDiag.FrequencyLimited},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_01, 0x00000000, &Obj.CycleDiag.MaxStepFrequency},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_02, 0x00000000, &Obj.CycleDiag.IsrTimeMax},
+  {0x03, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_03, 0x00000000, &Obj.CycleDiag.StepLoad},
+  {0x04, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_04, 0x00000000, &Obj.CycleDiag.StepLoadMax},
+  {0x05, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_05, 0x00000000, &Obj.CycleDiag.CycleUsed},
+  {0x06, DTYPE_UNSIGNED16, 16, ATYPE_RO | ATYPE_TXPDO, acName2001_06, 0x00000000, &Obj.CycleDiag.CycleUsedMax},
+  {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_07, 0x00000000, &Obj.CycleDiag.CycleDistanceMax},
+  {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_08, 0x00000000, &Obj.CycleDiag.LateSteps},
+  {0x09, DTYPE_UNSIGNED8, 8, ATYPE_RO | ATYPE_TXPDO, acName2001_09, 0x00000000, &Obj.CycleDiag.FrequencyLimited},
+  {0x0a, DTYPE_UNSIGNED32, 32, ATYPE_RO | ATYPE_TXPDO, acName2001_0A, 0x00000000, &Obj.CycleDiag.QueueLeadMin},
 };
 const _objd SDO2010[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2010_00, 0x00000004, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_01, 0x00000000, &Obj.StepTiming[0].StepLength},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_02, 0x00000000, &Obj.StepTiming[0].StepSpace},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_03, 0x00000000, &Obj.StepTiming[0].DirSetup},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_04, 0x00000000, &Obj.StepTiming[0].DirHold},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_01, 0x00001388, &Obj.StepTiming[0].StepLength},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_02, 0x00001388, &Obj.StepTiming[0].StepSpace},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_03, 0x00001388, &Obj.StepTiming[0].DirSetup},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2010_04, 0x00001388, &Obj.StepTiming[0].DirHold},
 };
 const _objd SDO2011[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2011_00, 0x00000004, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_01, 0x00000000, &Obj.StepTiming[1].StepLength},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_02, 0x00000000, &Obj.StepTiming[1].StepSpace},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_03, 0x00000000, &Obj.StepTiming[1].DirSetup},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_04, 0x00000000, &Obj.StepTiming[1].DirHold},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_01, 0x00001388, &Obj.StepTiming[1].StepLength},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_02, 0x00001388, &Obj.StepTiming[1].StepSpace},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_03, 0x00001388, &Obj.StepTiming[1].DirSetup},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2011_04, 0x00001388, &Obj.StepTiming[1].DirHold},
 };
 const _objd SDO2012[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2012_00, 0x00000004, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_01, 0x00000000, &Obj.StepTiming[2].StepLength},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_02, 0x00000000, &Obj.StepTiming[2].StepSpace},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_03, 0x00000000, &Obj.StepTiming[2].DirSetup},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_04, 0x00000000, &Obj.StepTiming[2].DirHold},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_01, 0x00001388, &Obj.StepTiming[2].StepLength},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_02, 0x00001388, &Obj.StepTiming[2].StepSpace},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_03, 0x00001388, &Obj.StepTiming[2].DirSetup},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2012_04, 0x00001388, &Obj.StepTiming[2].DirHold},
 };
 const _objd SDO2013[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2013_00, 0x00000004, NULL},
-  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_01, 0x00000000, &Obj.StepTiming[3].StepLength},
-  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_02, 0x00000000, &Obj.StepTiming[3].StepSpace},
-  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_03, 0x00000000, &Obj.StepTiming[3].DirSetup},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_04, 0x00000000, &Obj.StepTiming[3].DirHold},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_01, 0x00001388, &Obj.StepTiming[3].StepLength},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_02, 0x00001388, &Obj.StepTiming[3].StepSpace},
+  {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_03, 0x00001388, &Obj.StepTiming[3].DirSetup},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_04, 0x00001388, &Obj.StepTiming[3].DirHold},
 };
 const _objd SDO2020[] =
 {
@@ -1234,7 +1229,6 @@ const _objectlist SDOobjects[] =
   {0x1C13, OTYPE_ARRAY, 5, 0, acName1C13, SDO1C13},
   {0x1C32, OTYPE_RECORD, 32, 0, acName1C32, SDO1C32},
   {0x1C33, OTYPE_RECORD, 32, 0, acName1C33, SDO1C33},
-  {0x2000, OTYPE_VAR, 0, 0, acName2000, SDO2000},
   {0x2001, OTYPE_RECORD, 10, 0, acName2001, SDO2001},
   {0x2010, OTYPE_RECORD, 4, 0, acName2010, SDO2010},
   {0x2011, OTYPE_RECORD, 4, 0, acName2011, SDO2011},

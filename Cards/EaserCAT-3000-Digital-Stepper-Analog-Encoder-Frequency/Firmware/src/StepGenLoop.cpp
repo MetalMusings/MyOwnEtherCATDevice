@@ -25,6 +25,8 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
     /* calculate frequency limit */
     const long min_step_period = sg->step_len + sg->step_space;
     float max_freq = 1.0e9f / (float)min_step_period;
+    if (sg->freq_cap > 0.0f && max_freq > sg->freq_cap)
+        max_freq = sg->freq_cap;         /* the step generator's own limit */
     const float timing_freq = max_freq;  /* what the step timing allows at all */
     /* check for user specified frequency limit parameter */
     if (sg->maxvel <= 0.0f)
@@ -122,7 +124,37 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
             new_vel = vel_cmd;
     }
     sg->freq = new_vel;
+    sg->accel = max_ac;
     /* calculate new addval and deltalim */
     sg->target_addval = (long)(new_vel * k.freqscale);
     sg->deltalim = (long)(max_ac * k.accelscale);
+}
+
+void stepAxisCycle(stepgen_t *sg, StepAxisState &ax, StepPlanState &ps, StepQueue &q,
+                   const StepTimingTicks &tm, const StepLoopTiming &k, int64_t nowT,
+                   int64_t cycleTicks, float freqCap)
+{
+    /* the loop continues from where the queue ends ... */
+    sg->accum = ps.accum;
+    sg->freq = ps.vel;
+    sg->freq_cap = freqCap;
+    /* ... which is STEP_LEAD_TICKS after now: extrapolate the command by that much */
+    if (sg->pos_mode)
+    {
+        const int64_t raw = sg->pos_cmd;
+        if (ax.prevValid)
+            sg->pos_cmd = raw + (int64_t)((float)(raw - ax.prevCmd) *
+                                          ((float)STEP_LEAD_TICKS / (float)cycleTicks));
+        ax.prevCmd = raw;
+        ax.prevValid = true;
+    }
+    else
+    {
+        ax.prevValid = false;
+    }
+    stepgenUpdateFreq(sg, k);
+    const float vTarget = sg->enable ? sg->freq : 0.0f;
+    stepPlanWindow(ps, q, tm, vTarget, sg->accel > 0.0f ? sg->accel : 1e12f,
+                   nowT + cycleTicks + STEP_LEAD_TICKS);
+    sg->freq = ps.vel;
 }

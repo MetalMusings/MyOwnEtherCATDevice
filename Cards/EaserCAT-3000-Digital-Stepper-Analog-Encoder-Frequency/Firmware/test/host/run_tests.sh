@@ -11,6 +11,6 @@ for f in esc.c esc_coe.c ecat_slv.c; do
 done
 gcc -c -g -O0 -Wall $INC "$FW/lib/soes-esi/objectlist.c" -o "$OUT/objectlist.o"
 g++ -g -O0 -Wall -Wextra $INC \
-  "$FW/test/host/test_main.cpp" "$FW/src/Cia402Axis.cpp" "$FW/src/ObjectHooks.cpp" "$FW/src/StepGenLoop.cpp" \
+  "$FW/test/host/test_main.cpp" "$FW/src/Cia402Axis.cpp" "$FW/src/ObjectHooks.cpp" "$FW/src/StepGenLoop.cpp" "$FW/src/StepPlanner.cpp" \
   "$OUT"/esc.o "$OUT"/esc_coe.o "$OUT"/ecat_slv.o "$OUT"/objectlist.o -lm -o "$OUT/tests"
 "$OUT/tests"

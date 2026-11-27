@@ -3,12 +3,9 @@
 // - PDO mapping objects 0x16xx/0x1Axx and PDO assignment 0x1C12/0x1C13 are checked
 //   according to ETG.1020 chapter 10 "Change of Mapping Objects".
 // - CiA402 option codes and other parameters are range checked.
-// - The base period 0x2000 is refused in SAFEOP/OP if the cycle time could not take it
-//   (CycleModel.h).
+// - Step timing 0x2010..0x2013 is range checked.
 
 #include "ObjectHooks.h"
-
-#include "CycleModel.h"
 
 extern "C" {
 #include "ecat_slv.h"
@@ -108,14 +105,11 @@ uint32_t ObjectHooks_preDownload(uint16_t index, uint8_t subindex, void *data, s
   if (index == 0x1C12) return checkAssignObject(&Obj.Sm2Assign, true, subindex, value);
   if (index == 0x1C13) return checkAssignObject(&Obj.Sm3Assign, false, subindex, value);
 
-  if (index == 0x2000) {  // Base period ns
-    if (value < BASE_PERIOD_MIN_NS || value > BASE_PERIOD_MAX_NS) return ABORT_VALUE_EXCEEDED;
-    // Running on SYNC0 in SAFEOP/OP: not a base period that the cycle time cannot take.
-    // (SyncType and CycleTime keep their values after going back to PREOP.)
-    uint8_t state = ESCvar.ALstatus & 0x0F;
-    if ((state == ESCsafeop || state == ESCop) && Obj.SmOutParam.SyncType == 2 &&
-        Obj.SmOutParam.CycleTime != 0 && cycleModelMinCycle(value) > Obj.SmOutParam.CycleTime)
-      return ABORT_VALUE_TOO_LOW;
+  if (index >= 0x2010 && index < 0x2010 + N_AXES && subindex >= 1 && subindex <= 4) {
+    // Step timing in ns, 0 = the default (5 us). Length and space at least 1 us.
+    if (value == 0) return 0;
+    if (value > STEP_TIMING_MAX_NS) return ABORT_VALUE_TOO_HIGH;
+    if (subindex <= 2 && value < STEP_PULSE_MIN_NS) return ABORT_VALUE_TOO_LOW;
     return 0;
   }
 
