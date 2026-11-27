@@ -101,7 +101,8 @@ net z-target-vel    cia402.z.drv-target-velocity      => lcec.0.E3000.ax3-target
 # net coolant-flood  iocontrol.0.coolant-flood => lcec.0.E3000.out-1
 # net home-x         lcec.0.E3000.in-1         => joint.0.home-sw-in
 #
-# Spindle speed as 0..3.3 V on the DAC pin (scale it to your VFD's input):
+# Spindle speed as 0..3.3 V on the DAC pin. The board has no amplifier: a VFD's
+# 0..10 V input needs an external one (a gain of 3.03 gives 10 V at 3.3 V).
 # loadrt scale names=spindle-volts
 # addf spindle-volts servo-thread
 # setp spindle-volts.gain 0.000275      # 3.3 V at 12000 rpm

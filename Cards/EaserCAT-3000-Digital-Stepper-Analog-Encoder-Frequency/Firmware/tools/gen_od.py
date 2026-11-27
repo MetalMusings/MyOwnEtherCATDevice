@@ -135,8 +135,6 @@ def default_rx_mapping(n):
          map_val(b + 0x60, 0, 8),    # Modes of operation
          map_val(b + 0x7A, 0, 32),   # Target position
          map_val(b + 0xFF, 0, 32)]   # Target velocity
-    if n == 0:
-        m.append(map_val(b + 0xFE, 1, 32))   # Digital outputs (board outputs)
     return m
 
 
@@ -147,14 +145,16 @@ def default_tx_mapping(n):
          map_val(b + 0x64, 0, 32),   # Position actual value
          map_val(b + 0x6C, 0, 32),   # Velocity actual value
          map_val(b + 0xF4, 0, 32)]   # Following error actual value
-    if n == 0:
-        m.append(map_val(b + 0xFD, 0, 32))   # Digital inputs (board inputs)
     return m
 
 
-IO_RX_MAPPING = [map_val(0x2101, 1, 8), map_val(0x2101, 2, 32), map_val(0x2102, 0, 32)]
+# The board's own I/O: encoder, analog output, THCAD frequency and the digital
+# inputs/outputs (bit 0 = terminal 1). The digital I/O can also be mapped as
+# CiA402 0x60FD / 0x60FE (bits 16..), for masters that expect it there.
+IO_RX_MAPPING = [map_val(0x2101, 1, 8), map_val(0x2101, 2, 32), map_val(0x2102, 0, 32),
+                 map_val(0x2105, 0, 8)]
 IO_TX_MAPPING = [map_val(0x2100, 1, 8), map_val(0x2100, 2, 8), map_val(0x2100, 3, 32),
-                 map_val(0x2100, 4, 32)]
+                 map_val(0x2100, 4, 32), map_val(0x2103, 0, 32), map_val(0x2104, 0, 8)]
 
 RX_PDOS = [(0x1600 + n, f"Axis {n + 1} RxPDO", default_rx_mapping(n)) for n in range(N_AXES)]
 RX_PDOS.append((IO_RXPDO, "IO RxPDO", IO_RX_MAPPING))
@@ -231,6 +231,9 @@ def build_od():
               field="Obj.EncoderOut.Scale"),
     ]))
     od.append(var(0x2102, "Analog output V", "REAL32", "RW", pdo="R", field="Obj.AnalogOut"))
+    od.append(var(0x2103, "Frequency input Hz", "REAL32", pdo="T", field="Obj.FrequencyIn"))
+    od.append(var(0x2104, "Digital inputs", "UNSIGNED8", pdo="T", field="Obj.DigitalIn"))
+    od.append(var(0x2105, "Digital outputs", "UNSIGNED8", "RW", pdo="R", field="Obj.DigitalOut"))
 
     # CiA402 axis objects
     for n in range(N_AXES):
@@ -489,6 +492,9 @@ typedef struct
       float Scale;
    }} EncoderOut;
    float AnalogOut;
+   float FrequencyIn;
+   uint8_t DigitalIn;
+   uint8_t DigitalOut;
 
    /* CiA402 */
    Cia402Axis_t Axis[N_AXES];

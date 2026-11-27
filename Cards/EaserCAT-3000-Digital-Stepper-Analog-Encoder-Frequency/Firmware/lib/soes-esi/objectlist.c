@@ -194,6 +194,9 @@ static const char acName2101_00[] = "Max SubIndex";
 static const char acName2101_01[] = "Index latch enable";
 static const char acName2101_02[] = "Scale";
 static const char acName2102[] = "Analog output V";
+static const char acName2103[] = "Frequency input Hz";
+static const char acName2104[] = "Digital inputs";
+static const char acName2105[] = "Digital outputs";
 static const char acName6007[] = "Abort connection option code";
 static const char acName603F[] = "Error code";
 static const char acName6040[] = "Controlword";
@@ -349,12 +352,12 @@ const _objd SDO1018[] =
 };
 const _objd SDO1600[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1600_00, 0x00000005, &Obj.RxPdoMap[0].Count},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1600_00, 0x00000004, &Obj.RxPdoMap[0].Count},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_01, 0x60400010, &Obj.RxPdoMap[0].Entry[0]},
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_02, 0x60600008, &Obj.RxPdoMap[0].Entry[1]},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_03, 0x607A0020, &Obj.RxPdoMap[0].Entry[2]},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_04, 0x60FF0020, &Obj.RxPdoMap[0].Entry[3]},
-  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_05, 0x60FE0120, &Obj.RxPdoMap[0].Entry[4]},
+  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_05, 0x00000000, &Obj.RxPdoMap[0].Entry[4]},
   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_06, 0x00000000, &Obj.RxPdoMap[0].Entry[5]},
   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_07, 0x00000000, &Obj.RxPdoMap[0].Entry[6]},
   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1600_08, 0x00000000, &Obj.RxPdoMap[0].Entry[7]},
@@ -397,11 +400,11 @@ const _objd SDO1603[] =
 };
 const _objd SDO1604[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1604_00, 0x00000003, &Obj.RxPdoMap[4].Count},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1604_00, 0x00000004, &Obj.RxPdoMap[4].Count},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_01, 0x21010108, &Obj.RxPdoMap[4].Entry[0]},
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_02, 0x21010220, &Obj.RxPdoMap[4].Entry[1]},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_03, 0x21020020, &Obj.RxPdoMap[4].Entry[2]},
-  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_04, 0x00000000, &Obj.RxPdoMap[4].Entry[3]},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_04, 0x21050008, &Obj.RxPdoMap[4].Entry[3]},
   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_05, 0x00000000, &Obj.RxPdoMap[4].Entry[4]},
   {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_06, 0x00000000, &Obj.RxPdoMap[4].Entry[5]},
   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1604_07, 0x00000000, &Obj.RxPdoMap[4].Entry[6]},
@@ -409,13 +412,13 @@ const _objd SDO1604[] =
 };
 const _objd SDO1A00[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1A00_00, 0x00000006, &Obj.TxPdoMap[0].Count},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1A00_00, 0x00000005, &Obj.TxPdoMap[0].Count},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_01, 0x60410010, &Obj.TxPdoMap[0].Entry[0]},
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_02, 0x60610008, &Obj.TxPdoMap[0].Entry[1]},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_03, 0x60640020, &Obj.TxPdoMap[0].Entry[2]},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_04, 0x606C0020, &Obj.TxPdoMap[0].Entry[3]},
   {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_05, 0x60F40020, &Obj.TxPdoMap[0].Entry[4]},
-  {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_06, 0x60FD0020, &Obj.TxPdoMap[0].Entry[5]},
+  {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_06, 0x00000000, &Obj.TxPdoMap[0].Entry[5]},
   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_07, 0x00000000, &Obj.TxPdoMap[0].Entry[6]},
   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A00_08, 0x00000000, &Obj.TxPdoMap[0].Entry[7]},
 };
@@ -457,13 +460,13 @@ const _objd SDO1A03[] =
 };
 const _objd SDO1A04[] =
 {
-  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1A04_00, 0x00000004, &Obj.TxPdoMap[4].Count},
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RWpre, acName1A04_00, 0x00000006, &Obj.TxPdoMap[4].Count},
   {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_01, 0x21000108, &Obj.TxPdoMap[4].Entry[0]},
   {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_02, 0x21000208, &Obj.TxPdoMap[4].Entry[1]},
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_03, 0x21000320, &Obj.TxPdoMap[4].Entry[2]},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_04, 0x21000420, &Obj.TxPdoMap[4].Entry[3]},
-  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_05, 0x00000000, &Obj.TxPdoMap[4].Entry[4]},
-  {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_06, 0x00000000, &Obj.TxPdoMap[4].Entry[5]},
+  {0x05, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_05, 0x21030020, &Obj.TxPdoMap[4].Entry[4]},
+  {0x06, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_06, 0x21040008, &Obj.TxPdoMap[4].Entry[5]},
   {0x07, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_07, 0x00000000, &Obj.TxPdoMap[4].Entry[6]},
   {0x08, DTYPE_UNSIGNED32, 32, ATYPE_RWpre, acName1A04_08, 0x00000000, &Obj.TxPdoMap[4].Entry[7]},
 };
@@ -574,6 +577,18 @@ const _objd SDO2101[] =
 const _objd SDO2102[] =
 {
   {0x00, DTYPE_REAL32, 32, ATYPE_RW | ATYPE_RXPDO, acName2102, 0x00000000, &Obj.AnalogOut},
+};
+const _objd SDO2103[] =
+{
+  {0x00, DTYPE_REAL32, 32, ATYPE_RO | ATYPE_TXPDO, acName2103, 0x00000000, &Obj.FrequencyIn},
+};
+const _objd SDO2104[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO | ATYPE_TXPDO, acName2104, 0x00000000, &Obj.DigitalIn},
+};
+const _objd SDO2105[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW | ATYPE_RXPDO, acName2105, 0x00000000, &Obj.DigitalOut},
 };
 const _objd SDO6007[] =
 {
@@ -1023,6 +1038,9 @@ const _objectlist SDOobjects[] =
   {0x2100, OTYPE_RECORD, 4, 0, acName2100, SDO2100},
   {0x2101, OTYPE_RECORD, 2, 0, acName2101, SDO2101},
   {0x2102, OTYPE_VAR, 0, 0, acName2102, SDO2102},
+  {0x2103, OTYPE_VAR, 0, 0, acName2103, SDO2103},
+  {0x2104, OTYPE_VAR, 0, 0, acName2104, SDO2104},
+  {0x2105, OTYPE_VAR, 0, 0, acName2105, SDO2105},
   {0x6007, OTYPE_VAR, 0, 0, acName6007, SDO6007},
   {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
   {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},

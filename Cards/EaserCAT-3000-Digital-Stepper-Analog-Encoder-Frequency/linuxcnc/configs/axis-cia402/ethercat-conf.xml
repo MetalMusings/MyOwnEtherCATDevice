@@ -8,6 +8,10 @@
   - The PDOs below are the firmware's default mapping (Firmware/CiA402.md).
     configPdos="true" writes them anyway; the firmware takes another mapping
     in PREOP if you change it here.
+  - The board's I/O is in the IO PDOs (0x1604, 0x1A04): in-1..in-8 and
+    out-1..out-4 are numbered as the terminals, thcad-frequency is the THCAD
+    input (J5) in Hz. The CiA402 objects 0x60FD / 0x60FE carry the same I/O
+    in bits 16.. and can be mapped instead.
   - Units: positions in steps, velocities in steps/s. cia402.<axis>.pos-scale
     turns them into machine units ([JOINT_n]SCALE in axis.ini).
   - idx is the board's position on the bus (0 = the first slave after the
@@ -48,15 +52,6 @@
           <pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="ax1-opmode" halType="s32"/>
           <pdoEntry idx="607A" subIdx="00" bitLen="32" halPin="ax1-target-position" halType="s32"/>
           <pdoEntry idx="60FF" subIdx="00" bitLen="32" halPin="ax1-target-velocity" halType="s32"/>
-          <!-- Digital outputs OUT1..OUT4 in bits 16..19 of 0x60FE:01 -->
-          <pdoEntry idx="60FE" subIdx="01" bitLen="32" halType="complex">
-            <complexEntry bitLen="16"/>
-            <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
-            <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
-            <complexEntry bitLen="1" halPin="out-3" halType="bit"/>
-            <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
-            <complexEntry bitLen="12"/>
-          </pdoEntry>
         </pdo>
         <pdo idx="1601">
           <pdoEntry idx="6840" subIdx="00" bitLen="16" halPin="ax2-controlword" halType="u32"/>
@@ -77,10 +72,18 @@
           <pdoEntry idx="78FF" subIdx="00" bitLen="32" halPin="ax4-target-velocity" halType="s32"/>
         </pdo>
         <pdo idx="1604">
-          <!-- Spindle encoder: index latch enable and scale; analog output (V at the DAC pin, 0..3.3) -->
+          <!-- Spindle encoder: index latch enable and scale; analog output (V at the DAC pin, 0..3.3);
+               digital outputs OUT1..OUT4 (0x2105, bit 0 = OUT1) -->
           <pdoEntry idx="2101" subIdx="01" bitLen="8" halPin="enc-index-latch-enable" halType="u32"/>
           <pdoEntry idx="2101" subIdx="02" bitLen="32" halPin="enc-scale" halType="float-ieee"/>
           <pdoEntry idx="2102" subIdx="00" bitLen="32" halPin="analog-out-v" halType="float-ieee"/>
+          <pdoEntry idx="2105" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
+            <complexEntry bitLen="4"/>
+          </pdoEntry>
         </pdo>
       </syncManager>
 
@@ -91,19 +94,6 @@
           <pdoEntry idx="6064" subIdx="00" bitLen="32" halPin="ax1-actual-position" halType="s32"/>
           <pdoEntry idx="606C" subIdx="00" bitLen="32" halPin="ax1-actual-velocity" halType="s32"/>
           <pdoEntry idx="60F4" subIdx="00" bitLen="32" halPin="ax1-following-error" halType="s32"/>
-          <!-- Digital inputs IN1..IN8 in bits 16..23 of 0x60FD -->
-          <pdoEntry idx="60FD" subIdx="00" bitLen="32" halType="complex">
-            <complexEntry bitLen="16"/>
-            <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
-            <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
-            <complexEntry bitLen="8"/>
-          </pdoEntry>
         </pdo>
         <pdo idx="1a01">
           <pdoEntry idx="6841" subIdx="00" bitLen="16" halPin="ax2-statusword" halType="u32"/>
@@ -127,11 +117,23 @@
           <pdoEntry idx="78F4" subIdx="00" bitLen="32" halPin="ax4-following-error" halType="s32"/>
         </pdo>
         <pdo idx="1a04">
-          <!-- Spindle encoder: index status and pin, position and velocity (scaled by enc-scale) -->
+          <!-- Spindle encoder: index status and pin, position and velocity (scaled by enc-scale);
+               THCAD frequency in Hz (0x2103); digital inputs IN1..IN8 (0x2104, bit 0 = IN1) -->
           <pdoEntry idx="2100" subIdx="01" bitLen="8" halPin="enc-index-status" halType="u32"/>
           <pdoEntry idx="2100" subIdx="02" bitLen="8" halPin="enc-index-pin" halType="u32"/>
           <pdoEntry idx="2100" subIdx="03" bitLen="32" halPin="enc-position" halType="float-ieee"/>
           <pdoEntry idx="2100" subIdx="04" bitLen="32" halPin="enc-velocity" halType="float-ieee"/>
+          <pdoEntry idx="2103" subIdx="00" bitLen="32" halPin="thcad-frequency" halType="float-ieee"/>
+          <pdoEntry idx="2104" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
+          </pdoEntry>
         </pdo>
       </syncManager>
     </slave>

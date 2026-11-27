@@ -101,6 +101,9 @@ typedef struct
       float Scale;
    } EncoderOut;
    float AnalogOut;
+   float FrequencyIn;
+   uint8_t DigitalIn;
+   uint8_t DigitalOut;
 
    /* CiA402 */
    Cia402Axis_t Axis[N_AXES];

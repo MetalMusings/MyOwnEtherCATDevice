@@ -51,7 +51,7 @@ The main thing was that it lacked optocouplers and isolation for the external si
 
 This card is an evolution of the EaserCAT 2000 and was intended to be used in my plasma cutter.
 It features four stepper driver outputs, input for a THCAD arc voltage card, an encoder, 
-an analog output (for spindle +- 10V), eight digital inputs, four digital outputs, 
+an analog output (0-3.3 V from the MCU's DAC; a spindle's 0-10 V or +-10 V input needs an external amplifier), eight digital inputs, four digital outputs, 
 plus some 12 I/O for any possible extension. The IOs are isolated from the MCU.
 
 However, I couldn't get this card to work, almost at all. The Ax58100 didn't even load the eeprom. 

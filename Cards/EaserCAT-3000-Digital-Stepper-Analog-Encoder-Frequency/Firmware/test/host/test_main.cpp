@@ -352,10 +352,10 @@ static void testObjectDictionary() {
   COE_initDefaultValues();
   _SMmap map[64];
   int n = 0;
-  CHECK_EQ(sizeOfPDO(RX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM2), 57);
-  CHECK_EQ(n, 4 * 4 + 1 + 3);
-  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 74);
-  CHECK_EQ(n, 4 * 5 + 1 + 4);
+  CHECK_EQ(sizeOfPDO(RX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM2), 54);
+  CHECK_EQ(n, 4 * 4 + 4);
+  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 75);
+  CHECK_EQ(n, 4 * 5 + 6);
 
   // Default values
   CHECK_EQ(Obj.Axis[2].QuickStopOption, 2);
@@ -385,7 +385,12 @@ static void testObjectDictionary() {
   CHECK_EQ(sdoWrite(0x1A00, 6, 0x60620020, 4), 0);  // position demand value
   CHECK_EQ(sdoWrite(0x1A00, 0, 9, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x1A00, 0, 6, 1), 0);
-  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 74 - 4 + 4);
+  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 75 + 4);
+  // The board inputs can also be mapped the CiA402 way
+  CHECK_EQ(sdoWrite(0x1A00, 0, 0, 1), 0);
+  CHECK_EQ(sdoWrite(0x1A00, 7, 0x60FD0020, 4), 0);
+  CHECK_EQ(sdoWrite(0x1A00, 0, 7, 1), 0);
+  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 75 + 4 + 4);
 
   // Remap like linuxcnc-ethercat does: only some PDOs assigned
   CHECK_EQ(sdoWrite(0x1C13, 1, 0x1A01, 2), ABORT_SUBINDEX0_NOT_ZERO);

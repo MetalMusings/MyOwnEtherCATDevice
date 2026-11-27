@@ -1704,7 +1704,7 @@
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
-                    <Info><DefaultData>05</DefaultData></Info>
+                    <Info><DefaultData>04</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 1</Name>
@@ -1724,7 +1724,7 @@
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 5</Name>
-                    <Info><DefaultData>2001fe60</DefaultData></Info>
+                    <Info><DefaultData>00000000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 6</Name>
@@ -1884,7 +1884,7 @@
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
-                    <Info><DefaultData>03</DefaultData></Info>
+                    <Info><DefaultData>04</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 1</Name>
@@ -1900,7 +1900,7 @@
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 4</Name>
-                    <Info><DefaultData>00000000</DefaultData></Info>
+                    <Info><DefaultData>08000521</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 5</Name>
@@ -1929,7 +1929,7 @@
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
-                    <Info><DefaultData>06</DefaultData></Info>
+                    <Info><DefaultData>05</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 1</Name>
@@ -1953,7 +1953,7 @@
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 6</Name>
-                    <Info><DefaultData>2000fd60</DefaultData></Info>
+                    <Info><DefaultData>00000000</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 7</Name>
@@ -2109,7 +2109,7 @@
                 <Info>
                   <SubItem>
                     <Name>Max SubIndex</Name>
-                    <Info><DefaultData>04</DefaultData></Info>
+                    <Info><DefaultData>06</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 1</Name>
@@ -2129,11 +2129,11 @@
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 5</Name>
-                    <Info><DefaultData>00000000</DefaultData></Info>
+                    <Info><DefaultData>20000321</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 6</Name>
-                    <Info><DefaultData>00000000</DefaultData></Info>
+                    <Info><DefaultData>08000421</DefaultData></Info>
                   </SubItem>
                   <SubItem>
                     <Name>Mapped object 7</Name>
@@ -2527,6 +2527,30 @@
                 <Type>REAL</Type>
                 <BitSize>32</BitSize>
                 <Info><DefaultData>00000000</DefaultData></Info>
+                <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
+              </Object>
+              <Object>
+                <Index>#x2103</Index>
+                <Name>Frequency input Hz</Name>
+                <Type>REAL</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>00000000</DefaultData></Info>
+                <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+              </Object>
+              <Object>
+                <Index>#x2104</Index>
+                <Name>Digital inputs</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>00</DefaultData></Info>
+                <Flags><Access>ro</Access><PdoMapping>T</PdoMapping></Flags>
+              </Object>
+              <Object>
+                <Index>#x2105</Index>
+                <Name>Digital outputs</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>00</DefaultData></Info>
                 <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
               </Object>
               <Object>
@@ -3474,13 +3498,6 @@
             <Name>Target velocity</Name>
             <DataType>DINT</DataType>
           </Entry>
-          <Entry>
-            <Index>#x60FE</Index>
-            <SubIndex>1</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>Physical outputs</Name>
-            <DataType>UDINT</DataType>
-          </Entry>
         </RxPdo>
         <RxPdo Sm="2">
           <Index>#x1601</Index>
@@ -3602,6 +3619,13 @@
             <Name>Analog output V</Name>
             <DataType>REAL</DataType>
           </Entry>
+          <Entry>
+            <Index>#x2105</Index>
+            <SubIndex>0</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>Digital outputs</Name>
+            <DataType>USINT</DataType>
+          </Entry>
         </RxPdo>
         <TxPdo Sm="3">
           <Index>#x1A00</Index>
@@ -3640,13 +3664,6 @@
             <BitLen>32</BitLen>
             <Name>Following error actual value</Name>
             <DataType>DINT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x60FD</Index>
-            <SubIndex>0</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>Digital inputs</Name>
-            <DataType>UDINT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Sm="3">
@@ -3796,6 +3813,20 @@
             <BitLen>32</BitLen>
             <Name>Velocity</Name>
             <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x2103</Index>
+            <SubIndex>0</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>Frequency input Hz</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x2104</Index>
+            <SubIndex>0</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>Digital inputs</Name>
+            <DataType>USINT</DataType>
           </Entry>
         </TxPdo>
         <Mailbox DataLinkLayer="true">

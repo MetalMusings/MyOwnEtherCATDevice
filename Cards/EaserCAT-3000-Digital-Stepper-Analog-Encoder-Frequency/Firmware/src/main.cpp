@@ -28,9 +28,18 @@ _Objects Obj;
 HardwareSerial DebugSerial(PA10, PA9);
 
 ////// Digital IO
-const uint32_t INPUTS[8] = {PE8, PE9, PE10, PE11, PE12, PE13, PE14, PE15};
+// In terminal order: IN1 (J6.1) .. IN8 (J7.4). The optocouplers are wired in
+// reverse within each group of four: IN1 -> U4 channel 4 -> PE11, IN4 -> PE8,
+// IN5 -> U5 channel 4 -> PE15, IN8 -> PE12.
+const uint32_t INPUTS[8] = {PE11, PE10, PE9, PE8, PE15, PE14, PE13, PE12};
+// OUT1 (J8 1+/1-) .. OUT4 (J9 4+/4-)
 const uint32_t OUTPUTS[4] = {PC5, PB0, PB1, PE7};
-const uint32_t DIGITAL_IO_SHIFT = 16;  // Board IO in bits 16.. of 0x60FD / 0x60FE:01
+// Bit 0 = terminal 1 in 0x2104 / 0x2105; bits 16.. in CiA402 0x60FD / 0x60FE:01
+const uint32_t DIGITAL_IO_SHIFT = 16;
+
+///// Frequency input (THCAD, J5 -> MAX3485 -> PA2)
+#include "FreqCounter.h"
+FreqCounter Freq;
 
 ///// Analog out
 const uint32_t DAC1_pin = PA4;
@@ -147,11 +156,11 @@ void restartPulseTrain(uint32_t cycleNs) {
 
 // Master outputs -> hardware. Called by DIG_process when new outputs have arrived.
 void cb_set_outputs(void) {
-  uint32_t outs = 0;
+  // 0x2105 OR the CiA402 outputs of every axis (0x60FE:01 masked by 0x60FE:02)
+  uint32_t outs = Obj.DigitalOut;
   for (int i = 0; i < N_AXES; i++)
-    outs |= Obj.Axis[i].DigitalOutputs & Obj.Axis[i].DigitalOutputsMask;
-  for (int i = 0; i < 4; i++)
-    digitalWrite(OUTPUTS[i], (outs >> (DIGITAL_IO_SHIFT + i)) & 1 ? HIGH : LOW);
+    outs |= (Obj.Axis[i].DigitalOutputs & Obj.Axis[i].DigitalOutputsMask) >> DIGITAL_IO_SHIFT;
+  for (int i = 0; i < 4; i++) digitalWrite(OUTPUTS[i], (outs >> i) & 1 ? HIGH : LOW);
 
   float v = Obj.AnalogOut;
   if (!(v > 0.0f)) v = 0.0f;  // also catches NaN
@@ -168,7 +177,9 @@ void cb_get_inputs(void) {
   uint32_t in = 0;
   for (int i = 0; i < 8; i++)
     if (digitalRead(INPUTS[i]) == HIGH) in |= 1u << i;
+  Obj.DigitalIn = (uint8_t)in;
   for (int i = 0; i < N_AXES; i++) Obj.Axis[i].DigitalInputs = in << DIGITAL_IO_SHIFT;
+  Obj.FrequencyIn = Freq.read(micros());
 
   Obj.EncoderIn.IndexStatus = Encoder1.indexHappened();
   Obj.EncoderIn.Position = Encoder1.currentPos();
@@ -276,6 +287,7 @@ void setup(void) {
   analogWrite(DAC1_pin, 0);
 
   encoder_config();  // Must be done before the step outputs are configured
+  Freq.begin();
 
   Step = new StepGen3;
   for (int i = 0; i < N_AXES; i++) {

@@ -46,9 +46,11 @@ Then `linuxcnc axis.ini`.
 lcec makes `lcec.0.E3000.*`: per board axis `axN-controlword`, `axN-opmode`,
 `axN-target-position`, `axN-target-velocity`, `axN-statusword`,
 `axN-opmode-display`, `axN-actual-position`, `axN-actual-velocity`,
-`axN-following-error`; the board's `in-1`..`in-8` and `out-1`..`out-4`; the
-spindle encoder (`enc-*`) and the analog output `analog-out-v` (volts at the
-DAC pin, 0..3.3). Examples for the I/O are at the end of `e3000.hal`.
+`axN-following-error`; the board's `in-1`..`in-8` and `out-1`..`out-4`
+(numbered as the terminals); the spindle encoder (`enc-*`); the THCAD
+frequency `thcad-frequency` in Hz; and the analog output `analog-out-v`
+(volts at the DAC pin, 0..3.3: a VFD's 0..10 V input needs an external
+amplifier). Examples for the I/O are at the end of `e3000.hal`.
 
 ## Notes
 
