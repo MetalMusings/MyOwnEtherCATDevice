@@ -37,12 +37,13 @@
       <sdoConfig idx="2010" subIdx="1"><sdoDataRaw data="D0 07 00 00"/></sdoConfig>
       -->
       <!-- Max acceleration of axis 1..4 in steps/s² (0x60C5, 0x68C5, 0x70C5,
-           0x78C5; 0 = unlimited, the default). LinuxCNC limits the acceleration,
-           but a limit on the board keeps a late or repeated frame from jerking
-           the axis. Use 1.5-2 x MAX_ACCELERATION x SCALE. Example, 500 mm/s²
-           and 320 steps/mm: 320000 steps/s² on axis 1:
+           0x78C5; 0 = unlimited, the board's default). LinuxCNC limits the
+           acceleration, but a limit on the board keeps a late or repeated frame
+           from jerking the axis. 2 x MAX_ACCELERATION x SCALE of axis.ini:
+           X, Y 2 x 500 x 320 = 320000, Z 2 x 250 x 320 = 160000 steps/s². -->
       <sdoConfig idx="60C5" subIdx="0"><sdoDataRaw data="00 E2 04 00"/></sdoConfig>
-      -->
+      <sdoConfig idx="68C5" subIdx="0"><sdoDataRaw data="00 E2 04 00"/></sdoConfig>
+      <sdoConfig idx="70C5" subIdx="0"><sdoDataRaw data="00 71 02 00"/></sdoConfig>
       <!-- Direction of an axis: polarity 0x607E (axis 1), 0x687E, 0x707E,
            0x787E; 0xC0 turns position and velocity round. Example, axis 3:
       <sdoConfig idx="707E" subIdx="0"><sdoDataRaw data="C0"/></sdoConfig>
