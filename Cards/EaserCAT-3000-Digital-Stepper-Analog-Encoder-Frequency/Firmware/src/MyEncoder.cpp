@@ -50,27 +50,24 @@ uint8_t MyEncoder::indexHappened()
     return 0;
 }
 
-double MyEncoder::currentPos()
+float MyEncoder::currentPos()
 {
-    curPos = unwrapEncoder(tim_base->CNT) * PosScaleRes;
-    return curPos;
+    curCount = unwrapEncoder(tim_base->CNT);
+    return (float)curCount * PosScaleRes;
 }
 
-double MyEncoder::frequency(uint64_t time)
+float MyEncoder::frequency(uint64_t time)
 {
-
-    double diffT = 0;
-    double diffPos = 0;
-    double frequency;
     TDelta.push(time); // Running average over the length of the circular buffer
-    Pos.push(curPos);
+    Pos.push(curCount);
     if (Pos.size() == RINGBUFFERLEN)
     {
-        diffT = 1.0e-6 * (TDelta.last() - TDelta.first()); // Time is in microseconds
-        diffPos = fabs(Pos.last() - Pos.first());
-        frequency = diffPos / diffT;
+        // Differences in integers first, then float
+        float diffT = 1.0e-6f * (float)(uint32_t)(TDelta.last() - TDelta.first()); // microseconds
+        float diffPos = (float)(int32_t)(Pos.last() - Pos.first()) * PosScaleRes; // signed
+        float frequency = diffT > 0.0f ? diffPos / diffT : 0.0f;
         oldFrequency = frequency;
-        return frequency; // Revolutions per second
+        return frequency; // Position units (e.g. revolutions) per second
     }
     else
         return oldFrequency;
@@ -80,12 +77,12 @@ uint8_t MyEncoder::getIndexState()
     return digitalRead(indexPin);
 }
 
-void MyEncoder::setScale(double scale)
+void MyEncoder::setScale(float scale)
 {
-    if (CurPosScale != scale && scale != 0)
+    if (CurPosScale != scale && scale != 0.0f)
     {
         CurPosScale = scale;
-        PosScaleRes = 1.0 / double(scale);
+        PosScaleRes = 1.0f / scale;
     }
 }
 

@@ -1,0 +1,165 @@
+<!--
+  EaserCAT 3000 CiA402 (product code 0x3402) with LinuxCNC's linuxcnc-ethercat
+  (lcec) and the IgH kernel master. Read by `loadusr -W lcec_conf ethercat-conf.xml`.
+
+  - The board is a four-axis CiA402 stepper drive (ETG.6010): axis n has its
+    objects at 0x6000 + 0x800 * (n - 1). The state machine (controlword,
+    statusword) runs in HAL, in the cia402 component (e3000.hal).
+  - The PDOs below are the firmware's default mapping (Firmware/CiA402.md).
+    configPdos="true" writes them anyway; the firmware takes another mapping
+    in PREOP if you change it here.
+  - The board's I/O is in the IO PDOs (0x1604, 0x1A04): in-1..in-8 and
+    out-1..out-4 are numbered as the terminals, thcad-frequency is the THCAD
+    input (J5) in Hz. The CiA402 objects 0x60FD / 0x60FE carry the same I/O
+    in bits 16.. and can be mapped instead.
+  - Units: positions in steps, velocities in steps/s. cia402.<axis>.pos-scale
+    turns them into machine units ([JOINT_n]SCALE in axis.ini).
+  - idx is the board's position on the bus (0 = the first slave after the
+    computer). Here it is the only slave the configuration uses; other slaves
+    on the bus are left alone in PREOP.
+  - DC: SYNC0 every servo cycle. 1 ms is what the board has been tried with:
+    its own work per cycle (0x1C32:06) was about 0.2 ms with the axes still and
+    up to 0.6 ms while they moved. appTimePeriod must equal [EMCMOT]SERVO_PERIOD.
+  - The DC reference clock is the first slave on the bus that has DC; this
+    lcec cannot choose another. Put the board first on the bus, or make the
+    first DC slave one the configuration uses: one that is left out stays in
+    PREOP with the master's error flag.
+-->
+<masters>
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="-1000">
+    <slave idx="4" type="generic" vid="0xd0bed1d0" pid="0x00003402" name="E3000" configPdos="true">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+
+      <!-- Step timing of axis 1..4 (0x2010..0x2013, sub 1..4: step length,
+           step space, direction setup, direction hold, ns; default 5000 each,
+           length and space at least 1000). The highest step rate is
+           1 / (length + space). Example: 2 us step pulses on axis 1:
+      <sdoConfig idx="2010" subIdx="1"><sdoDataRaw data="D0 07 00 00"/></sdoConfig>
+      -->
+      <!-- Max acceleration of axis 1..4 in steps/s² (0x60C5, 0x68C5, 0x70C5,
+           0x78C5; 0 = unlimited, the board's default). LinuxCNC limits the
+           acceleration, but a limit on the board keeps a late or repeated frame
+           from jerking the axis. 2 x MAX_ACCELERATION x SCALE of axis.ini:
+           X, Y 2 x 500 x 320 = 320000, Z 2 x 250 x 320 = 160000 steps/s². -->
+      <sdoConfig idx="60C5" subIdx="0"><sdoDataRaw data="00 E2 04 00"/></sdoConfig>
+      <sdoConfig idx="68C5" subIdx="0"><sdoDataRaw data="00 E2 04 00"/></sdoConfig>
+      <sdoConfig idx="70C5" subIdx="0"><sdoDataRaw data="00 71 02 00"/></sdoConfig>
+      <!-- Direction of an axis: polarity 0x607E (axis 1), 0x687E, 0x707E,
+           0x787E; 0xC0 turns position and velocity round. Example, axis 3:
+      <sdoConfig idx="707E" subIdx="0"><sdoDataRaw data="C0"/></sdoConfig>
+      -->
+      <!-- Homing by the board (LinuxCNC starts it through index-enable, axis.ini).
+           Defaults: method 37 (home where the axis stands), home switch of axis n
+           on IN n (0x2020+n-1:01), no limit switches, inputs normally open.
+           Home switches with method 21 (switch on the negative side, home where it
+           releases moving positive) on axis 1..3, 10000 steps/s to find the switch,
+           1000 steps/s to the edge:
+      <sdoConfig idx="6098" subIdx="0"><sdoDataRaw data="15"/></sdoConfig>
+      <sdoConfig idx="6898" subIdx="0"><sdoDataRaw data="15"/></sdoConfig>
+      <sdoConfig idx="7098" subIdx="0"><sdoDataRaw data="15"/></sdoConfig>
+      <sdoConfig idx="6099" subIdx="1"><sdoDataRaw data="10 27 00 00"/></sdoConfig>
+      <sdoConfig idx="6099" subIdx="2"><sdoDataRaw data="E8 03 00 00"/></sdoConfig>
+           (and 0x6899, 0x7099 the same). Normally closed switches on IN1..IN3
+           (0x2106, bit = 1 normally open):
+      <sdoConfig idx="2106" subIdx="0"><sdoDataRaw data="F8"/></sdoConfig>
+           Limit switches, e.g. axis 1 positive on IN5 and negative on IN6:
+      <sdoConfig idx="2020" subIdx="2"><sdoDataRaw data="05"/></sdoConfig>
+      <sdoConfig idx="2020" subIdx="3"><sdoDataRaw data="06"/></sdoConfig>
+      -->
+      <!-- Following error window in steps (0x6065, 0xFFFFFFFF = off) and its
+           time in ms (0x6066). The step generator follows the command, so the
+           default is off. -->
+
+      <syncManager idx="2" dir="out">
+        <pdo idx="1600">
+          <pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="ax1-controlword" halType="u32"/>
+          <pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="ax1-opmode" halType="s32"/>
+          <pdoEntry idx="607A" subIdx="00" bitLen="32" halPin="ax1-target-position" halType="s32"/>
+          <pdoEntry idx="60FF" subIdx="00" bitLen="32" halPin="ax1-target-velocity" halType="s32"/>
+        </pdo>
+        <pdo idx="1601">
+          <pdoEntry idx="6840" subIdx="00" bitLen="16" halPin="ax2-controlword" halType="u32"/>
+          <pdoEntry idx="6860" subIdx="00" bitLen="8" halPin="ax2-opmode" halType="s32"/>
+          <pdoEntry idx="687A" subIdx="00" bitLen="32" halPin="ax2-target-position" halType="s32"/>
+          <pdoEntry idx="68FF" subIdx="00" bitLen="32" halPin="ax2-target-velocity" halType="s32"/>
+        </pdo>
+        <pdo idx="1602">
+          <pdoEntry idx="7040" subIdx="00" bitLen="16" halPin="ax3-controlword" halType="u32"/>
+          <pdoEntry idx="7060" subIdx="00" bitLen="8" halPin="ax3-opmode" halType="s32"/>
+          <pdoEntry idx="707A" subIdx="00" bitLen="32" halPin="ax3-target-position" halType="s32"/>
+          <pdoEntry idx="70FF" subIdx="00" bitLen="32" halPin="ax3-target-velocity" halType="s32"/>
+        </pdo>
+        <pdo idx="1603">
+          <pdoEntry idx="7840" subIdx="00" bitLen="16" halPin="ax4-controlword" halType="u32"/>
+          <pdoEntry idx="7860" subIdx="00" bitLen="8" halPin="ax4-opmode" halType="s32"/>
+          <pdoEntry idx="787A" subIdx="00" bitLen="32" halPin="ax4-target-position" halType="s32"/>
+          <pdoEntry idx="78FF" subIdx="00" bitLen="32" halPin="ax4-target-velocity" halType="s32"/>
+        </pdo>
+        <pdo idx="1604">
+          <!-- Spindle encoder: index latch enable and scale; analog output (V at the DAC pin, 0..3.3);
+               digital outputs OUT1..OUT4 (0x2105, bit 0 = OUT1) -->
+          <pdoEntry idx="2101" subIdx="01" bitLen="8" halPin="enc-index-latch-enable" halType="u32"/>
+          <pdoEntry idx="2101" subIdx="02" bitLen="32" halPin="enc-scale" halType="float-ieee"/>
+          <pdoEntry idx="2102" subIdx="00" bitLen="32" halPin="analog-out-v" halType="float-ieee"/>
+          <pdoEntry idx="2105" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="out-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="out-4" halType="bit"/>
+            <complexEntry bitLen="4"/>
+          </pdoEntry>
+        </pdo>
+      </syncManager>
+
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a00">
+          <pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="ax1-statusword" halType="u32"/>
+          <pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="ax1-opmode-display" halType="s32"/>
+          <pdoEntry idx="6064" subIdx="00" bitLen="32" halPin="ax1-actual-position" halType="s32"/>
+          <pdoEntry idx="606C" subIdx="00" bitLen="32" halPin="ax1-actual-velocity" halType="s32"/>
+          <pdoEntry idx="60F4" subIdx="00" bitLen="32" halPin="ax1-following-error" halType="s32"/>
+        </pdo>
+        <pdo idx="1a01">
+          <pdoEntry idx="6841" subIdx="00" bitLen="16" halPin="ax2-statusword" halType="u32"/>
+          <pdoEntry idx="6861" subIdx="00" bitLen="8" halPin="ax2-opmode-display" halType="s32"/>
+          <pdoEntry idx="6864" subIdx="00" bitLen="32" halPin="ax2-actual-position" halType="s32"/>
+          <pdoEntry idx="686C" subIdx="00" bitLen="32" halPin="ax2-actual-velocity" halType="s32"/>
+          <pdoEntry idx="68F4" subIdx="00" bitLen="32" halPin="ax2-following-error" halType="s32"/>
+        </pdo>
+        <pdo idx="1a02">
+          <pdoEntry idx="7041" subIdx="00" bitLen="16" halPin="ax3-statusword" halType="u32"/>
+          <pdoEntry idx="7061" subIdx="00" bitLen="8" halPin="ax3-opmode-display" halType="s32"/>
+          <pdoEntry idx="7064" subIdx="00" bitLen="32" halPin="ax3-actual-position" halType="s32"/>
+          <pdoEntry idx="706C" subIdx="00" bitLen="32" halPin="ax3-actual-velocity" halType="s32"/>
+          <pdoEntry idx="70F4" subIdx="00" bitLen="32" halPin="ax3-following-error" halType="s32"/>
+        </pdo>
+        <pdo idx="1a03">
+          <pdoEntry idx="7841" subIdx="00" bitLen="16" halPin="ax4-statusword" halType="u32"/>
+          <pdoEntry idx="7861" subIdx="00" bitLen="8" halPin="ax4-opmode-display" halType="s32"/>
+          <pdoEntry idx="7864" subIdx="00" bitLen="32" halPin="ax4-actual-position" halType="s32"/>
+          <pdoEntry idx="786C" subIdx="00" bitLen="32" halPin="ax4-actual-velocity" halType="s32"/>
+          <pdoEntry idx="78F4" subIdx="00" bitLen="32" halPin="ax4-following-error" halType="s32"/>
+        </pdo>
+        <pdo idx="1a04">
+          <!-- Spindle encoder: index status and pin, position and velocity (scaled by enc-scale);
+               THCAD frequency in Hz (0x2103); digital inputs IN1..IN8 (0x2104, bit 0 = IN1) -->
+          <pdoEntry idx="2100" subIdx="01" bitLen="8" halPin="enc-index-status" halType="u32"/>
+          <pdoEntry idx="2100" subIdx="02" bitLen="8" halPin="enc-index-pin" halType="u32"/>
+          <pdoEntry idx="2100" subIdx="03" bitLen="32" halPin="enc-position" halType="float-ieee"/>
+          <pdoEntry idx="2100" subIdx="04" bitLen="32" halPin="enc-velocity" halType="float-ieee"/>
+          <pdoEntry idx="2103" subIdx="00" bitLen="32" halPin="thcad-frequency" halType="float-ieee"/>
+          <pdoEntry idx="2104" subIdx="00" bitLen="8" halType="complex">
+            <complexEntry bitLen="1" halPin="in-1" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-2" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-3" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-4" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-5" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-6" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-7" halType="bit"/>
+            <complexEntry bitLen="1" halPin="in-8" halType="bit"/>
+          </pdoEntry>
+        </pdo>
+      </syncManager>
+    </slave>
+  </master>
+</masters>

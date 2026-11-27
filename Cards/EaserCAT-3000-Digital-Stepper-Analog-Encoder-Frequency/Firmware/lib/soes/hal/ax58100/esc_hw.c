@@ -16,7 +16,7 @@
 #include "spi_utils.h"
 #include "rst.h"
 
-#define MAX_READ_SIZE 128
+#define MAX_READ_SIZE 512 /* >= MBXSIZE and MAX_RXPDO_SIZE: ESC_read drops longer reads */
 
 #define ESC_CMD_READ 0x02
 #define ESC_CMD_READWS 0x03

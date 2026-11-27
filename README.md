@@ -51,7 +51,7 @@ The main thing was that it lacked optocouplers and isolation for the external si
 
 This card is an evolution of the EaserCAT 2000 and was intended to be used in my plasma cutter.
 It features four stepper driver outputs, input for a THCAD arc voltage card, an encoder, 
-an analog output (for spindle +- 10V), eight digital inputs, four digital outputs, 
+an analog output (0-3.3 V from the MCU's DAC; a spindle's 0-10 V or +-10 V input needs an external amplifier), eight digital inputs, four digital outputs, 
 plus some 12 I/O for any possible extension. The IOs are isolated from the MCU.
 
 However, I couldn't get this card to work, almost at all. The Ax58100 didn't even load the eeprom. 
@@ -60,7 +60,10 @@ I gave up and let it sit for over half a year. It was first when someone came an
 questions around it I had another look. I built a new board, and it all started to work.
 At time of writing it all seems to work.
 
-The latest vesion of the firmware has all parameters for step generators as PDOs.
+The firmware now makes it a four-axis CiA402 stepper drive (ETG.6010, csp and csv, product code
+0x3402): see [CiA402.md](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/Firmware/CiA402.md).
+A LinuxCNC configuration for linuxcnc-ethercat and the IgH kernel master is in
+[linuxcnc/configs/axis-cia402](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/linuxcnc/configs/axis-cia402/).
 
 [Link here](Cards/EaserCAT-3000-Digital-Stepper-Analog-Encoder-Frequency/)
 

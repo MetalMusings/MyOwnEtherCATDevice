@@ -1,0 +1,10 @@
+# LinuxCNC writes these while it runs
+position.txt
+position_mm.txt
+linuxcnc.var
+linuxcnc.var.bak
+sim*.var
+sim*.var.bak
+autosave.halscope
+halshow.preferences
+*~

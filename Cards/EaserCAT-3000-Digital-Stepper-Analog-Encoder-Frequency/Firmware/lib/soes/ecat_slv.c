@@ -13,7 +13,9 @@
 #define IS_TXPDO(index) ((index) >= 0x1A00 && (index) < 0x1C00)
 
 /* Global variables used by the stack */
-uint8_t     MBX[MBXBUFFERS * MAX(MBXSIZE,MBXSIZEBOOT)];
+/* The mailbox structs (_COEsdo, _COEobjdesc) are CC_ALIGNED(4): the compiler may use
+   STRD/LDRD on them, which fault on unaligned addresses. */
+uint8_t     MBX[MBXBUFFERS * MAX(MBXSIZE,MBXSIZEBOOT)] CC_ALIGNED(4);
 _MBXcontrol MBXcontrol[MBXBUFFERS];
 _SMmap      SMmap2[MAX_MAPPINGS_SM2];
 _SMmap      SMmap3[MAX_MAPPINGS_SM3];

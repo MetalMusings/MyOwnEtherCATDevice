@@ -1784,6 +1784,44 @@ void COE_initDefaultValues (void)
  * @param[in] nmappings  = number of mappings in sync manager
  * @param[in] mappings   = list of mapped objects in sync manager
  */
+/* Fast path for an entry that starts on a byte and is 8, 16, 32 or 64 bits long (all
+ * the EaserCAT 3000 entries): a little endian copy instead of 64 bit bit slicing. The
+ * object is read or written with one access of its own size, as COE_getValue() and
+ * COE_setValue() do. Returns 0 for any other entry, which then takes the general path.
+ */
+#ifdef CYCLE_PROFILE
+volatile uint8_t coe_pdo_fast = 1;  /* 0: the general path only, for comparison */
+#define COE_FAST_OFF (!coe_pdo_fast)
+#else
+#define COE_FAST_OFF 0
+#endif
+
+static int COE_pdoPackFast (uint8_t * buffer, const _objd * obj, uint32_t offset)
+{
+   if (COE_FAST_OFF || (offset & 7) != 0) return 0;
+   uint8_t * p = &buffer[offset >> 3];
+   switch (obj->bitlength)
+   {
+   case 8:  *p = *(const uint8_t *)obj->data; return 1;
+   case 16: { uint16_t v = *(const uint16_t *)obj->data; memcpy (p, &v, 2); return 1; }
+   case 32: { uint32_t v = *(const uint32_t *)obj->data; memcpy (p, &v, 4); return 1; }
+   default: return 0;
+   }
+}
+
+static int COE_pdoUnpackFast (const uint8_t * buffer, const _objd * obj, uint32_t offset)
+{
+   if (COE_FAST_OFF || (offset & 7) != 0) return 0;
+   const uint8_t * p = &buffer[offset >> 3];
+   switch (obj->bitlength)
+   {
+   case 8:  *(uint8_t *)obj->data = *p; return 1;
+   case 16: { uint16_t v; memcpy (&v, p, 2); *(uint16_t *)obj->data = v; return 1; }
+   case 32: { uint32_t v; memcpy (&v, p, 4); *(uint32_t *)obj->data = v; return 1; }
+   default: return 0;
+   }
+}
+
 void COE_pdoPack (uint8_t * buffer, int nmappings, _SMmap * mappings)
 {
    int ix;
@@ -1798,7 +1836,10 @@ void COE_pdoPack (uint8_t * buffer, int nmappings, _SMmap * mappings)
 
       if (obj != NULL)
       {
-         if (obj->bitlength > 64)
+         if (COE_pdoPackFast (buffer, obj, offset))
+         {
+         }
+         else if (obj->bitlength > 64)
          {
             memcpy (
                &buffer[BITSPOS2BYTESOFFSET (offset)],
@@ -1845,7 +1886,10 @@ void COE_pdoUnpack (uint8_t * buffer, int nmappings, _SMmap * mappings)
 
       if (obj != NULL)
       {
-         if (obj->bitlength > 64)
+         if (COE_pdoUnpackFast (buffer, obj, offset))
+         {
+         }
+         else if (obj->bitlength > 64)
          {
             memcpy (
                obj->data,
