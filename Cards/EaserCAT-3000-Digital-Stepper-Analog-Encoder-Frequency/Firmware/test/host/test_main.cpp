@@ -373,7 +373,10 @@ static void testObjectDictionary() {
   CHECK(nidx >= 0);
   CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 0x00040192);
   nidx = SDO_findobject(0x6502);
-  CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 0x180);
+  CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 0x1A0);
+  CHECK_EQ(Obj.Axis[0].HomingMethod, 37);
+  CHECK_EQ(Obj.Axis[2].HomeInput, 3);
+  CHECK_EQ(Obj.InputPolarity, 0xFF);
 
   // ETG.1020 chapter 10: entries only changeable while subindex 0 = 0
   CHECK_EQ(sdoWrite(0x1A00, 6, 0x60770010, 4), ABORT_SUBINDEX0_NOT_ZERO);
@@ -405,13 +408,270 @@ static void testObjectDictionary() {
   CHECK_EQ(sdoWrite(0x705A, 0, 6, 2), 0);
   CHECK_EQ(sdoWrite(0x6860, 0, 1, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x6860, 0, 9, 1), 0);
+  CHECK_EQ(sdoWrite(0x6860, 0, 6, 1), 0);
+  CHECK_EQ(sdoWrite(0x6098, 0, 21, 1), 0);
+  CHECK_EQ(sdoWrite(0x6098, 0, 3, 1), ABORT_VALUE_EXCEEDED);  // needs an index pulse
+  CHECK_EQ(sdoWrite(0x2021, 1, 8, 1), 0);
+  CHECK_EQ(sdoWrite(0x2021, 2, 9, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x80, 1), 0);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x01, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x2000, 0, 1000, 4), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), 0);
 }
 
+// ---------------------------------------------------------------------------
+// Homing and limit switches
+// ---------------------------------------------------------------------------
+
+// A home switch that is active on one side of an edge, like a cam on the axis
+struct Switch {
+  double edge = 1000;   // steps
+  bool positiveSide = true;
+  bool last = false;
+  bool active(double pos) const { return positiveSide ? pos >= edge : pos <= edge; }
+};
+
+static MotionCommand stepIn(Cia402Axis &ax, Cia402Axis_t &od, Plant &p, uint16_t cw,
+                            Switch &sw, bool posLim = false, bool negLim = false) {
+  od.Controlword = cw;
+  AxisInputs in;
+  in.home = sw.active(p.pos);
+  in.homeChanged = in.home != sw.last;
+  in.homeChangePosition = sw.edge;  // the latch gives the edge to one step
+  sw.last = in.home;
+  in.posLimit = posLim;
+  in.negLimit = negLim;
+  MotionCommand c = ax.cycle(p.fb(), DT, true, true, in);
+  p.apply(c);
+  return c;
+}
+
+static void homingOd(Cia402Axis_t &od, int8_t method) {
+  resetAxisOd(od);
+  od.ModesOfOperation = CIA402_MODE_HOMING;
+  od.HomingMethod = method;
+  od.HomingSpeedSwitch = 10000;
+  od.HomingSpeedZero = 1000;
+  od.HomingAcceleration = 100000;
+  od.QuickStopDeceleration = 200000;
+  od.HomeOffset = 500;
+  od.HomeInput = 1;
+  od.HomingTimeLimit = 60000;
+}
+
+// Run homing to the end; returns the cycles used, or -1
+static int runHoming(Cia402Axis &ax, Cia402Axis_t &od, Plant &p, Switch &sw,
+                     int maxCycles = 20000) {
+  sw.last = sw.active(p.pos);
+  for (int i = 0; i < 3; i++) stepIn(ax, od, p, 0x000F, sw);  // enabled, mode 6
+  for (int i = 0; i < maxCycles; i++) {
+    stepIn(ax, od, p, 0x001F, sw);
+    if (od.Statusword & SW_TARGET_REACHED) return i;
+  }
+  return -1;
+}
+
+static void testHomingMethods() {
+  struct Case {
+    int8_t method;
+    bool positiveSide;
+    double start;
+  } cases[] = {
+      {19, true, 0},    {19, true, 2000},  // switch inactive / active at the start
+      {20, true, 0},    {20, true, 2000},  {21, false, 2000}, {21, false, 0},
+      {22, false, 2000}, {22, false, 0},
+  };
+  for (const Case &k : cases) {
+    Cia402Axis_t od;
+    homingOd(od, k.method);
+    Cia402Axis ax;
+    Plant p;
+    p.pos = k.start;
+    ax.init(&od);
+    step(ax, od, p, 0x0006);
+    step(ax, od, p, 0x0007);
+    Switch sw;
+    sw.positiveSide = k.positiveSide;
+    int n = runHoming(ax, od, p, sw);
+    CHECK(n > 0);
+    CHECK_EQ(od.ModesOfOperationDisplay, CIA402_MODE_HOMING);
+    CHECK_EQ(od.Statusword & (SW_TARGET_REACHED | SW_HOMING_ATTAINED | SW_HOMING_ERROR),
+             SW_TARGET_REACHED | SW_HOMING_ATTAINED);
+    CHECK(ax.homingAttained());
+    // The edge is the home offset; the axis is homed where it stopped
+    CHECK_EQ(od.PositionActual, 500 + llround(p.pos) - (long long)sw.edge);
+    // It stopped close to the edge (slow final approach), on the side the method says
+    bool endActive = sw.active(p.pos);
+    bool wantActive = (k.method == 20 || k.method == 22);
+    CHECK(endActive == wantActive);
+    CHECK(fabs(p.pos - sw.edge) < 20);
+  }
+}
+
+static void testHomingCurrentPosition() {
+  Cia402Axis_t od;
+  homingOd(od, 37);
+  Cia402Axis ax;
+  Plant p;
+  p.pos = 1234;
+  ax.init(&od);
+  step(ax, od, p, 0x0006);
+  step(ax, od, p, 0x0007);
+  Switch sw;
+  int n = runHoming(ax, od, p, sw);
+  CHECK_EQ(n, 0);
+  CHECK_EQ(od.PositionActual, 500);
+  CHECK(od.Statusword & SW_HOMING_ATTAINED);
+
+  // Back to csp with a target still in the old frame (as hal-cia402 sends for one
+  // cycle): the axis holds until the target is near the actual position
+  od.ModesOfOperation = CIA402_MODE_CSP;
+  od.TargetPosition = 1234;
+  for (int i = 0; i < 5; i++) stepIn(ax, od, p, 0x000F, sw);
+  CHECK(fabs(p.pos - 1234) < 1e-6);
+  CHECK_EQ(od.Statusword & SW_FOLLOWS_COMMAND, 0);
+  od.TargetPosition = 500;
+  stepIn(ax, od, p, 0x000F, sw);
+  stepIn(ax, od, p, 0x000F, sw);
+  CHECK(od.Statusword & SW_FOLLOWS_COMMAND);
+  CHECK_EQ(od.PositionActual, 500);
+  CHECK(fabs(p.pos - 1234) < 1e-6);
+  od.TargetPosition = 600;
+  stepIn(ax, od, p, 0x000F, sw);
+  stepIn(ax, od, p, 0x000F, sw);  // the position actual value is from the cycle's start
+  CHECK_EQ(od.PositionActual, 600);
+  CHECK(fabs(p.pos - 1334) < 1e-6);
+}
+
+static void testHomingErrors() {
+  // A limit switch during homing: error, stop
+  {
+    Cia402Axis_t od;
+    homingOd(od, 19);
+    od.PosLimitInput = 2;
+    Cia402Axis ax;
+    Plant p;
+    ax.init(&od);
+    step(ax, od, p, 0x0006);
+    step(ax, od, p, 0x0007);
+    Switch sw;
+    for (int i = 0; i < 3; i++) stepIn(ax, od, p, 0x000F, sw);
+    for (int i = 0; i < 20; i++) stepIn(ax, od, p, 0x001F, sw);
+    CHECK(p.vel > 0);
+    for (int i = 0; i < 200; i++) stepIn(ax, od, p, 0x001F, sw, true);
+    CHECK(fabs(p.vel) < 1);
+    CHECK_EQ(od.Statusword & (SW_TARGET_REACHED | SW_HOMING_ATTAINED | SW_HOMING_ERROR),
+             SW_TARGET_REACHED | SW_HOMING_ERROR);
+    CHECK(od.Statusword & SW_INTERNAL_LIMIT);
+    CHECK(ax.state() == Cia402State::OperationEnabled);
+    // A new start clears the error
+    stepIn(ax, od, p, 0x000F, sw);
+    stepIn(ax, od, p, 0x001F, sw);
+    CHECK_EQ(od.Statusword & (SW_TARGET_REACHED | SW_HOMING_ERROR), 0);
+  }
+  // The home switch never found: time limit
+  {
+    Cia402Axis_t od;
+    homingOd(od, 21);
+    od.HomingTimeLimit = 100;
+    Cia402Axis ax;
+    Plant p;
+    ax.init(&od);
+    step(ax, od, p, 0x0006);
+    step(ax, od, p, 0x0007);
+    Switch sw;
+    sw.edge = -1e9;
+    sw.positiveSide = false;
+    int n = runHoming(ax, od, p, sw, 1000);
+    CHECK(n > 100 && n < 200);
+    CHECK(od.Statusword & SW_HOMING_ERROR);
+  }
+  // Bit 4 back to 0: interrupted, not homed
+  {
+    Cia402Axis_t od;
+    homingOd(od, 19);
+    Cia402Axis ax;
+    Plant p;
+    ax.init(&od);
+    step(ax, od, p, 0x0006);
+    step(ax, od, p, 0x0007);
+    Switch sw;
+    for (int i = 0; i < 3; i++) stepIn(ax, od, p, 0x000F, sw);
+    for (int i = 0; i < 20; i++) stepIn(ax, od, p, 0x001F, sw);
+    CHECK_EQ(od.Statusword & SW_TARGET_REACHED, 0);
+    for (int i = 0; i < 300; i++) stepIn(ax, od, p, 0x000F, sw);
+    CHECK(fabs(p.vel) < 1);
+    CHECK_EQ(od.Statusword & (SW_TARGET_REACHED | SW_HOMING_ATTAINED | SW_HOMING_ERROR),
+             SW_TARGET_REACHED);
+  }
+  // A method that is not supported: error at once
+  {
+    Cia402Axis_t od;
+    homingOd(od, 19);
+    od.HomingSpeedZero = 0;
+    Cia402Axis ax;
+    Plant p;
+    ax.init(&od);
+    step(ax, od, p, 0x0006);
+    step(ax, od, p, 0x0007);
+    Switch sw;
+    CHECK_EQ(runHoming(ax, od, p, sw), 0);
+    CHECK(od.Statusword & SW_HOMING_ERROR);
+  }
+}
+
+static void testLimitSwitches() {
+  // csp: the positive limit stops the axis; it follows again when the target comes back
+  Cia402Axis_t od;
+  resetAxisOd(od);
+  od.QuickStopDeceleration = 1000000;
+  Cia402Axis ax;
+  Plant p;
+  ax.init(&od);
+  Switch sw;
+  sw.edge = 1e9;
+  od.TargetPosition = 0;
+  enableAxis(ax, od, p);
+  int32_t t = 0;
+  for (int i = 0; i < 100; i++) {
+    t += 10;
+    od.TargetPosition = t;
+    stepIn(ax, od, p, 0x000F, sw);
+  }
+  CHECK(fabs(p.pos - t) < 1e-6);
+  for (int i = 0; i < 100; i++) {
+    t += 10;
+    od.TargetPosition = t;
+    stepIn(ax, od, p, 0x000F, sw, true);
+  }
+  double stopped = p.pos;
+  CHECK(fabs(p.vel) < 1);
+  CHECK(stopped < t - 500);
+  CHECK(od.Statusword & SW_INTERNAL_LIMIT);
+  CHECK_EQ(od.Statusword & SW_FOLLOWS_COMMAND, 0);
+  // The target comes back below where the axis stopped: follows again
+  t = (int32_t)stopped - 50;
+  od.TargetPosition = t;
+  stepIn(ax, od, p, 0x000F, sw, true);
+  stepIn(ax, od, p, 0x000F, sw, true);
+  CHECK(od.Statusword & SW_FOLLOWS_COMMAND);
+  CHECK(fabs(p.pos - t) < 1e-6);
+
+  // csv: motion towards the negative limit is blocked, away from it allowed
+  od.ModesOfOperation = CIA402_MODE_CSV;
+  od.TargetVelocity = -1000;
+  for (int i = 0; i < 10; i++) stepIn(ax, od, p, 0x000F, sw, false, true);
+  CHECK(fabs(p.vel) < 1);
+  od.TargetVelocity = 1000;
+  for (int i = 0; i < 10; i++) stepIn(ax, od, p, 0x000F, sw, false, true);
+  CHECK(fabs(p.vel - 1000) < 1);
+}
+
 int main() {
+  testHomingMethods();
+  testHomingCurrentPosition();
+  testHomingErrors();
+  testLimitSwitches();
   testStateMachine();
   testCspFollowsAndWraps();
   testMissedFrameExtrapolation();

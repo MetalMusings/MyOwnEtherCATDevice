@@ -54,6 +54,76 @@ volatile int32_t pulsesLeft = 0;    // Base periods left before the pulse train 
 uint32_t requestedBasePeriod = 0;   // Last value of 0x2000 applied to the timer
 void basePeriodCB(void);
 
+///// Switch inputs: filter (0x2107), polarity (0x2106) and a position latch.
+// Every change of an input interrupts (EXTI, both edges) and latches the step count
+// of all step generators, so a home switch edge is known to one step whatever the
+// cycle time. The first edge after a stable period is kept: with a bouncing contact
+// that is the true edge. A change is accepted once the input has kept its new level
+// for the filter time (sampled every cycle).
+const uint32_t LATCH_KEEP_US = 20000;  // a latch older than filter + this is a glitch
+volatile bool edgePending[8] = {};
+volatile uint32_t edgeMicros[8] = {};
+volatile int32_t edgeCount[8][N_AXES] = {};
+template <int I>
+void inputEdgeIsr(void) {
+  if (edgePending[I]) return;
+  for (int ch = 0; ch < N_AXES; ch++) edgeCount[I][ch] = Step->stepgen_array[ch].rawcount;
+  edgeMicros[I] = micros();
+  edgePending[I] = true;
+}
+void (*const INPUT_ISRS[8])(void) = {inputEdgeIsr<0>, inputEdgeIsr<1>, inputEdgeIsr<2>,
+                                     inputEdgeIsr<3>, inputEdgeIsr<4>, inputEdgeIsr<5>,
+                                     inputEdgeIsr<6>, inputEdgeIsr<7>};
+struct InputState {
+  bool level = false;      // accepted electrical level (high = optocoupler on)
+  bool candidate = false;  // level seen but not yet accepted
+  uint32_t candidateSince = 0;
+  bool changed = false;    // accepted a change this cycle
+  bool latched = false;    // ... and the latch below belongs to it
+  int32_t latchCount[N_AXES] = {};
+};
+InputState inputState[8];
+uint8_t activeInputs = 0;  // after polarity, bit 0 = IN1
+
+void updateInputs(uint32_t now) {
+  uint8_t active = 0;
+  for (int i = 0; i < 8; i++) {
+    InputState &st = inputState[i];
+    bool pending = edgePending[i];
+    uint32_t edgeT = edgeMicros[i];
+    int32_t counts[N_AXES];
+    for (int ch = 0; ch < N_AXES; ch++) counts[ch] = edgeCount[i][ch];
+    bool lvl = digitalRead(INPUTS[i]) == HIGH;
+    st.changed = false;
+    if (lvl == st.level) {
+      st.candidate = lvl;
+      if (pending && now - edgeT > (uint32_t)Obj.InputFilterTime + LATCH_KEEP_US)
+        edgePending[i] = false;  // a glitch shorter than the filter
+    } else {
+      if (st.candidate != lvl) {
+        st.candidate = lvl;
+        st.candidateSince = now;
+      }
+      if (now - st.candidateSince >= Obj.InputFilterTime) {
+        st.level = lvl;
+        st.changed = true;
+        st.latched = pending;
+        for (int ch = 0; ch < N_AXES; ch++) st.latchCount[ch] = counts[ch];
+        edgePending[i] = false;
+      }
+    }
+    bool normallyOpen = (Obj.InputPolarity >> i) & 1;
+    if (st.level == normallyOpen) active |= 1u << i;
+  }
+  activeInputs = active;
+}
+
+// Input 1..8 active, 0 = not used
+inline bool inputActive(uint8_t input) {
+  return input >= 1 && input <= 8 && ((activeInputs >> (input - 1)) & 1);
+}
+
+
 ///////// Spindle encoder
 #include "MyEncoder.h"
 void indexPulseEncoderCB1(void);
@@ -174,11 +244,16 @@ void cb_set_outputs(void) {
 
 // Hardware -> master inputs. Called by DIG_process before the TxPDO is written.
 void cb_get_inputs(void) {
-  uint32_t in = 0;
-  for (int i = 0; i < 8; i++)
-    if (digitalRead(INPUTS[i]) == HIGH) in |= 1u << i;
-  Obj.DigitalIn = (uint8_t)in;
-  for (int i = 0; i < N_AXES; i++) Obj.Axis[i].DigitalInputs = in << DIGITAL_IO_SHIFT;
+  // The inputs are read in applicationCycle(): filtered, polarity applied
+  Obj.DigitalIn = activeInputs;
+  for (int i = 0; i < N_AXES; i++) {
+    const Cia402Axis_t &a = Obj.Axis[i];
+    // 0x60FD: bit 0 negative limit, bit 1 positive limit, bit 2 home switch, 16.. IN1..IN8
+    Obj.Axis[i].DigitalInputs = ((uint32_t)activeInputs << DIGITAL_IO_SHIFT) |
+                                (inputActive(a.NegLimitInput) ? 1u : 0u) |
+                                (inputActive(a.PosLimitInput) ? 2u : 0u) |
+                                (inputActive(a.HomeInput) ? 4u : 0u);
+  }
   Obj.FrequencyIn = Freq.read(micros());
 
   Obj.EncoderIn.IndexStatus = Encoder1.indexHappened();
@@ -210,12 +285,23 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
     for (int i = 0; i < N_AXES; i++) Axes[i].communicationLost();
   }
 
+  updateInputs(micros());
   Step->updatePositions();
   uint8_t errorRegister = 0;
   for (int i = 0; i < N_AXES; i++) {
     stepgen_t &sg = Step->stepgen_array[i];
     MotionFeedback fb = {sg.pos_fb, sg.freq};
-    MotionCommand cmd = Axes[i].cycle(fb, dt, outputsValid, newOutputs);
+    const Cia402Axis_t &a = Obj.Axis[i];
+    AxisInputs in;
+    in.home = inputActive(a.HomeInput);
+    in.posLimit = inputActive(a.PosLimitInput);
+    in.negLimit = inputActive(a.NegLimitInput);
+    if (a.HomeInput >= 1 && a.HomeInput <= 8) {
+      const InputState &st = inputState[a.HomeInput - 1];
+      in.homeChanged = st.changed;
+      in.homeChangePosition = st.latched ? (double)st.latchCount[i] : sg.pos_fb;
+    }
+    MotionCommand cmd = Axes[i].cycle(fb, dt, outputsValid, newOutputs, in);
     StepTiming_t &t = Obj.StepTiming[i];
     Step->setTiming(i, t.StepLength, t.StepSpace, t.DirSetup, t.DirHold);
     Step->setChannel(i, cmd.enable, cmd.positionMode, cmd.position, cmd.velocity,
@@ -293,6 +379,12 @@ void setup(void) {
   for (int i = 0; i < N_AXES; i++) {
     pinMode(Step->stepPin[i], OUTPUT);
     pinMode(Step->dirPin[i], OUTPUT);
+  }
+
+  // Position latch on every input change (after Step exists: the ISRs read it)
+  for (int i = 0; i < 8; i++) {
+    inputState[i].level = inputState[i].candidate = digitalRead(INPUTS[i]) == HIGH;
+    attachInterrupt(digitalPinToInterrupt(INPUTS[i]), INPUT_ISRS[i], CHANGE);
   }
 
   baseTimer = new HardwareTimer(TIM11);

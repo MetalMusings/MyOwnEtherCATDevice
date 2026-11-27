@@ -15,6 +15,10 @@ inline bool cmdQuickStop(uint16_t cw) { return (cw & 0x0086) == 0x0002; }
 inline bool cwFaultReset(uint16_t cw) { return (cw & 0x0080) != 0; }
 
 const double STOPPED_VELOCITY = 0.5;  // steps/s, below this the axis is considered stopped
+// csp after a mode change (e.g. the end of homing, where the position has just been
+// re-referenced) follows the target only once it is this close to the actual position,
+// so that a target still in the old frame does not make the axis jump.
+const int64_t CSP_SYNC_STEPS = 10;
 
 inline int32_t clampToInt32(int64_t v) {
   if (v > INT32_MAX) return INT32_MAX;
@@ -33,7 +37,131 @@ void Cia402Axis::init(Cia402Axis_t *axisOd) {
   resyncNext = true;
   od->ErrorCode = CIA402_ERR_NONE;
   od->ModesOfOperationDisplay = CIA402_MODE_NONE;
-  updateStatusword(false, false);
+  homingPhase = HomingPhase::Idle;
+  homed = false;
+  homingFailed = false;
+  homeShift = 0;
+  limitHold = false;
+  updateStatusword(false, false, 0);
+}
+
+// ---------------------------------------------------------------------------
+// Homing (mode 6). Methods 19..22: home switch without index pulse, as in
+// IEC 61800-7-201 and the A6/ECT manuals; 35 and 37: the current position.
+//   19: switch active on the positive side, home = edge where it goes off moving negative
+//   20: switch active on the positive side, home = edge where it comes on moving positive
+//   21, 22: the same with the switch on the negative side
+// The search for the switch runs at 0x6099:01, every move that ends at the home edge
+// at 0x6099:02. The axis brakes at the switch with the quick stop deceleration
+// (0x6085), as the ECT drives do, accelerates with 0x609A, and is homed where it
+// stands: the edge gets the position 0x607C.
+// ---------------------------------------------------------------------------
+
+void Cia402Axis::startHoming(const AxisInputs &in, double posSign, const MotionFeedback &fb) {
+  homed = false;
+  homingFailed = false;
+  homingElapsed = 0.0;
+  moveIdx = 0;
+  nMoves = 0;
+  int8_t method = od->HomingMethod;
+
+  if (method == 35 || method == 37) {  // the current position is home
+    homeShift = (int64_t)od->HomeOffset - (int64_t)llround(posSign * fb.position);
+    homed = true;
+    homingPhase = HomingPhase::Done;
+    return;
+  }
+  if (method < 19 || method > 22 || od->HomingSpeedSwitch == 0 || od->HomingSpeedZero == 0) {
+    homingFailed = true;
+    homingPhase = HomingPhase::Failed;
+    return;
+  }
+  int8_t toSwitch = (method == 19 || method == 20) ? 1 : -1;  // where the switch is active
+  bool edgeComingOn = (method == 20 || method == 22);
+  if (!edgeComingOn) {
+    // 19, 21: into the switch (fast), out of it (slow): home where it goes off
+    if (!in.home) moves[nMoves++] = {toSwitch, true, true};
+    moves[nMoves++] = {(int8_t)-toSwitch, false, false};
+  } else {
+    // 20, 22: into the switch (fast), back out (slow), in again (slow): home where it comes on
+    if (!in.home) moves[nMoves++] = {toSwitch, true, true};
+    moves[nMoves++] = {(int8_t)-toSwitch, false, false};
+    moves[nMoves++] = {toSwitch, false, true};
+  }
+  homingPhase = HomingPhase::Moving;
+}
+
+void Cia402Axis::brakeHoming(BrakeReason why) {
+  brakeReason = why;
+  homingPhase = HomingPhase::Braking;
+}
+
+void Cia402Axis::homingCycle(const MotionFeedback &fb, double dt, const AxisInputs &in,
+                             double posSign, bool startBit, bool halt, MotionCommand &cmd) {
+  bool startEdge = startBit && !lastHomingStart;
+  if (startEdge && !halt && !homingActive()) startHoming(in, posSign, fb);
+  else if (homingActive() && (!startBit || halt) && homingPhase == HomingPhase::Moving)
+    brakeHoming(BrakeReason::Interrupt);  // bit 4 back to 0, or halt: decelerate and stop
+
+  double accel = (double)od->HomingAcceleration;
+  double quick = od->QuickStopDeceleration ? (double)od->QuickStopDeceleration : accel;
+
+  if (homingPhase == HomingPhase::Moving) {
+    homingElapsed += dt;
+    // A limit switch ends homing with an error, unless it is the home switch itself
+    bool posLim = in.posLimit && od->PosLimitInput != od->HomeInput;
+    bool negLim = in.negLimit && od->NegLimitInput != od->HomeInput;
+    const HomingMove &m = moves[moveIdx];
+    if (od->HomingTimeLimit != 0 && homingElapsed * 1000.0 > (double)od->HomingTimeLimit) {
+      homingFailed = true;
+      brakeHoming(BrakeReason::Error);
+    } else if (posLim || negLim) {
+      homingFailed = true;
+      brakeHoming(BrakeReason::Error);
+    } else if (in.home == m.untilActive) {
+      if (moveIdx + 1 >= nMoves) {
+        homeEdge = in.homeChanged ? in.homeChangePosition : fb.position;
+        brakeHoming(BrakeReason::Home);
+      } else {
+        brakeHoming(BrakeReason::NextMove);
+      }
+    } else {
+      double speed = (double)(m.fast ? od->HomingSpeedSwitch : od->HomingSpeedZero);
+      if (cmd.maxVelocity > 0.0 && speed > cmd.maxVelocity) speed = cmd.maxVelocity;
+      cmd.velocity = posSign * m.dir * speed;
+      cmd.maxAccel = accel;
+      return;
+    }
+  }
+
+  if (homingPhase == HomingPhase::Braking) {
+    cmd.velocity = 0.0;
+    cmd.maxAccel = (brakeReason == BrakeReason::Interrupt) ? accel : quick;
+    if (cmd.maxAccel <= 0.0 || fabs(fb.velocity) < STOPPED_VELOCITY) {
+      switch (brakeReason) {
+        case BrakeReason::NextMove:
+          moveIdx++;
+          homingPhase = HomingPhase::Moving;
+          break;
+        case BrakeReason::Home:
+          homeShift = (int64_t)od->HomeOffset - (int64_t)llround(posSign * homeEdge);
+          homed = true;
+          homingPhase = HomingPhase::Done;
+          break;
+        case BrakeReason::Interrupt:
+          homingPhase = HomingPhase::Idle;
+          break;
+        case BrakeReason::Error:
+          homingPhase = HomingPhase::Failed;
+          break;
+      }
+    }
+    return;
+  }
+
+  // Not homing: stand still
+  cmd.velocity = 0.0;
+  cmd.maxAccel = accel;
 }
 
 void Cia402Axis::communicationLost() { pendingCommLost = true; }
@@ -78,6 +206,7 @@ void Cia402Axis::enterFault(uint16_t errorCode) {
 
 void Cia402Axis::enterOperationEnabled() {
   fsaState = Cia402State::OperationEnabled;
+  cspSyncWait = false;
   stopKind = StopKind::None;
   resyncNext = true;
   followingErrorTime = 0.0;
@@ -140,11 +269,11 @@ void Cia402Axis::processControlword(uint16_t cw) {
 }
 
 MotionCommand Cia402Axis::cycle(const MotionFeedback &fb, double dt, bool outputsValid,
-                                bool newOutputs) {
+                                bool newOutputs, const AxisInputs &in) {
   const double posSign = (od->Polarity & 0x80) ? -1.0 : 1.0;  // 0x607E bit 7
   const double velSign = (od->Polarity & 0x40) ? -1.0 : 1.0;  // 0x607E bit 6
 
-  actual = (int64_t)llround(posSign * fb.position);
+  actual = (int64_t)llround(posSign * fb.position) + homeShift;
 
   if (pendingCommLost) {
     pendingCommLost = false;
@@ -177,16 +306,25 @@ MotionCommand Cia402Axis::cycle(const MotionFeedback &fb, double dt, bool output
 
   // The controlword is only evaluated while the master's outputs are valid.
   if (outputsValid) processControlword(od->Controlword);
+  bool homingStartBit = outputsValid && (od->Controlword & CW_HOMING_START);
+  bool haltBit = outputsValid && (od->Controlword & CW_HALT);
 
   // Modes of operation: only supported modes are accepted, otherwise "no mode".
   int8_t requested = od->ModesOfOperation;
-  int8_t newMode =
-      (requested == CIA402_MODE_CSP || requested == CIA402_MODE_CSV) ? requested
-                                                                       : CIA402_MODE_NONE;
+  int8_t newMode = (requested == CIA402_MODE_CSP || requested == CIA402_MODE_CSV ||
+                    requested == CIA402_MODE_HOMING)
+                       ? requested
+                       : CIA402_MODE_NONE;
   if (newMode != activeMode) {
+    cspSyncWait = newMode == CIA402_MODE_CSP && fsaState == Cia402State::OperationEnabled;
     activeMode = newMode;
     resyncNext = true;
+    limitHold = false;
   }
+  // Homing stops when the mode changes or the axis leaves "Operation enabled"
+  if (homingActive() &&
+      (activeMode != CIA402_MODE_HOMING || fsaState != Cia402State::OperationEnabled))
+    homingPhase = HomingPhase::Idle;
   od->ModesOfOperationDisplay = activeMode;
 
   MotionCommand cmd = {};
@@ -197,12 +335,23 @@ MotionCommand Cia402Axis::cycle(const MotionFeedback &fb, double dt, bool output
 
   bool following = false;
   bool followingErrorActive = false;
+  uint16_t extraBits = 0;
+  if (in.posLimit || in.negLimit) extraBits |= SW_INTERNAL_LIMIT;
   int64_t followingError = 0;
   int64_t demand = actual;
 
   switch (fsaState) {
     case Cia402State::OperationEnabled: {
       cmd.enable = true;
+      if (activeMode == CIA402_MODE_CSP && cspSyncWait) {
+        int64_t t = unwrapTarget(od->TargetPosition);
+        followingError = t - actual;
+        if (llabs(t - actual) <= CSP_SYNC_STEPS) {
+          cspSyncWait = false;  // follows from the next cycle, resynchronised
+        }
+        cmd.velocity = 0.0;  // hold
+        break;               // resyncNext stays set
+      }
       if (activeMode == CIA402_MODE_CSP) {
         int32_t raw = od->TargetPosition;
         if (resyncNext) {
@@ -222,11 +371,31 @@ MotionCommand Cia402Axis::cycle(const MotionFeedback &fb, double dt, bool output
           target = receivedTarget + lastTargetDelta * missedFrames;
         }
         lastRawTarget = raw;
+        followingError = target - actual;
+
+        // A limit switch stops the axis (quick stop deceleration) when the target
+        // moves further towards it. It follows again once the target is back on the
+        // free side of where it stopped.
+        if (!limitHold && ((in.posLimit && target > actual) || (in.negLimit && target < actual))) {
+          limitHold = true;
+          holdDir = target > actual ? 1 : -1;
+        } else if (limitHold && ((holdDir > 0 && target <= actual) ||
+                                 (holdDir < 0 && target >= actual))) {
+          limitHold = false;
+          resyncNext = true;
+        }
+        if (limitHold) {
+          cmd.positionMode = false;
+          cmd.velocity = 0.0;
+          if (od->QuickStopDeceleration) cmd.maxAccel = (double)od->QuickStopDeceleration;
+          followingErrorTime = 0.0;
+          break;  // resyncNext stays as it is: it is set on release
+        }
+
         cmd.positionMode = true;
-        cmd.position = posSign * (double)target;
+        cmd.position = posSign * (double)(target - homeShift);
         cmd.resync = resyncNext;
         demand = target;
-        followingError = target - actual;
         following = true;
 
         // Following error supervision (0x6065, 0x6066). 0xFFFFFFFF switches it off.
@@ -245,9 +414,18 @@ MotionCommand Cia402Axis::cycle(const MotionFeedback &fb, double dt, bool output
           if (v > cmd.maxVelocity) v = cmd.maxVelocity;
           if (v < -cmd.maxVelocity) v = -cmd.maxVelocity;
         }
+        // A limit switch blocks motion towards it (quick stop deceleration)
+        if ((in.posLimit && posSign * v > 0.0) || (in.negLimit && posSign * v < 0.0)) {
+          v = 0.0;
+          if (od->QuickStopDeceleration) cmd.maxAccel = (double)od->QuickStopDeceleration;
+        }
         cmd.velocity = v;
         cmd.resync = resyncNext;
         following = true;
+      } else if (activeMode == CIA402_MODE_HOMING) {
+        homingCycle(fb, dt, in, posSign, homingStartBit, haltBit, cmd);
+        actual = (int64_t)llround(posSign * fb.position) + homeShift;  // homeShift may be new
+        demand = actual;
       } else {
         // No valid mode: hold the axis (decelerate to standstill).
         cmd.velocity = 0.0;
@@ -287,17 +465,25 @@ MotionCommand Cia402Axis::cycle(const MotionFeedback &fb, double dt, bool output
       break;
   }
 
+  if (activeMode == CIA402_MODE_HOMING) {
+    if (!homingActive()) extraBits |= SW_TARGET_REACHED;
+    if (homed) extraBits |= SW_HOMING_ATTAINED;
+    if (homingFailed) extraBits |= SW_HOMING_ERROR;
+  }
+  lastHomingStart = homingStartBit;
+
   od->PositionActual = (int32_t)(uint32_t)(uint64_t)actual;
   od->PositionDemand = (int32_t)(uint32_t)(uint64_t)demand;
   od->VelocityActual = (int32_t)lround(velSign * fb.velocity);
   od->FollowingErrorActual = clampToInt32(followingError);
   updateStatusword(following && fsaState == Cia402State::OperationEnabled,
-                   followingErrorActive);
+                   followingErrorActive, extraBits);
   return cmd;
 }
 
-void Cia402Axis::updateStatusword(bool following, bool followingErrorActive) {
-  uint16_t sw = SW_REMOTE;
+void Cia402Axis::updateStatusword(bool following, bool followingErrorActive,
+                                  uint16_t extraBits) {
+  uint16_t sw = SW_REMOTE | extraBits;
   switch (fsaState) {
     case Cia402State::NotReadyToSwitchOn:
       break;

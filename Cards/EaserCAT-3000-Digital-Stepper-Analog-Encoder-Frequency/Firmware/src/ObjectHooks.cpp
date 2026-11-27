@@ -80,7 +80,9 @@ uint32_t checkAxisObject(uint16_t offset, uint32_t value) {
     case 0x05E:  // Fault reaction option code
       return (sv16 >= 0 && sv16 <= 2) ? 0 : ABORT_VALUE_EXCEEDED;
     case 0x060:  // Modes of operation
-      return (sv8 == 0 || sv8 == 8 || sv8 == 9) ? 0 : ABORT_VALUE_EXCEEDED;
+      return (sv8 == 0 || sv8 == 6 || sv8 == 8 || sv8 == 9) ? 0 : ABORT_VALUE_EXCEEDED;
+    case 0x098:  // Homing method: home switch without index (19..22), current position (35, 37)
+      return ((sv8 >= 19 && sv8 <= 22) || sv8 == 35 || sv8 == 37) ? 0 : ABORT_VALUE_EXCEEDED;
     case 0x07E:  // Polarity, only bit 6 (velocity) and 7 (position) are supported
       return (value & ~0xC0u & 0xFF) == 0 ? 0 : ABORT_VALUE_EXCEEDED;
     default:
@@ -105,6 +107,9 @@ uint32_t ObjectHooks_preDownload(uint16_t index, uint8_t subindex, void *data, s
   if (index == 0x2000)  // Base period ns
     return (value >= BASE_PERIOD_MIN_NS && value <= BASE_PERIOD_MAX_NS) ? 0
                                                                         : ABORT_VALUE_EXCEEDED;
+
+  if (index >= 0x2020 && index < 0x2020 + N_AXES && subindex >= 1 && subindex <= 3)
+    return value <= 8 ? 0 : ABORT_VALUE_EXCEEDED;  // switch input: 0 = none, 1..8 = IN1..IN8
 
   if (index >= 0x6000 && index < 0x6000 + 0x800 * N_AXES)
     return checkAxisObject((index - 0x6000) % 0x800, value);

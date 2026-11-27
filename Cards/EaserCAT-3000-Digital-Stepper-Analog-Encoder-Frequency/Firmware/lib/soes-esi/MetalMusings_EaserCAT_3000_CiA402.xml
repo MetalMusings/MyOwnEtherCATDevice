@@ -1330,6 +1330,182 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT2020</Name>
+                <BitSize>72</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Home switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Positive limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>24</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>3</SubIdx>
+                  <Name>Negative limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>32</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>Homing time limit ms</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>40</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT2021</Name>
+                <BitSize>72</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Home switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Positive limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>24</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>3</SubIdx>
+                  <Name>Negative limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>32</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>Homing time limit ms</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>40</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT2022</Name>
+                <BitSize>72</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Home switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Positive limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>24</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>3</SubIdx>
+                  <Name>Negative limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>32</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>Homing time limit ms</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>40</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT2023</Name>
+                <BitSize>72</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Home switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Positive limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>24</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>3</SubIdx>
+                  <Name>Negative limit switch input</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>32</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>4</SubIdx>
+                  <Name>Homing time limit ms</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>40</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT2100</Name>
                 <BitSize>96</BitSize>
                 <SubItem>
@@ -1402,6 +1578,34 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT6099</Name>
+                <BitSize>80</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Speed during search for switch</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Speed during search for zero</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>48</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT60C2</Name>
                 <BitSize>32</BitSize>
                 <SubItem>
@@ -1451,6 +1655,34 @@
                 <SubItem>
                   <SubIdx>2</SubIdx>
                   <Name>Bit mask</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>48</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT6899</Name>
+                <BitSize>80</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Speed during search for switch</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Speed during search for zero</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>48</BitOffs>
@@ -1514,6 +1746,34 @@
                 </SubItem>
               </DataType>
               <DataType>
+                <Name>DT7099</Name>
+                <BitSize>80</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Speed during search for switch</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Speed during search for zero</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>48</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
                 <Name>DT70C2</Name>
                 <BitSize>32</BitSize>
                 <SubItem>
@@ -1563,6 +1823,34 @@
                 <SubItem>
                   <SubIdx>2</SubIdx>
                   <Name>Bit mask</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>48</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+              </DataType>
+              <DataType>
+                <Name>DT7899</Name>
+                <BitSize>80</BitSize>
+                <SubItem>
+                  <SubIdx>0</SubIdx>
+                  <Name>Max SubIndex</Name>
+                  <Type>USINT</Type>
+                  <BitSize>8</BitSize>
+                  <BitOffs>0</BitOffs>
+                  <Flags><Access>ro</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>1</SubIdx>
+                  <Name>Speed during search for switch</Name>
+                  <Type>UDINT</Type>
+                  <BitSize>32</BitSize>
+                  <BitOffs>16</BitOffs>
+                  <Flags><Access>rw</Access></Flags>
+                </SubItem>
+                <SubItem>
+                  <SubIdx>2</SubIdx>
+                  <Name>Speed during search for zero</Name>
                   <Type>UDINT</Type>
                   <BitSize>32</BitSize>
                   <BitOffs>48</BitOffs>
@@ -2472,6 +2760,122 @@
                 <Flags><Access>ro</Access></Flags>
               </Object>
               <Object>
+                <Index>#x2020</Index>
+                <Name>Axis 1 switches</Name>
+                <Type>DT2020</Type>
+                <BitSize>72</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>04</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Home switch input</Name>
+                    <Info><DefaultData>01</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Positive limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Negative limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Homing time limit ms</Name>
+                    <Info><DefaultData>60ea0000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x2021</Index>
+                <Name>Axis 2 switches</Name>
+                <Type>DT2021</Type>
+                <BitSize>72</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>04</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Home switch input</Name>
+                    <Info><DefaultData>02</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Positive limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Negative limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Homing time limit ms</Name>
+                    <Info><DefaultData>60ea0000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x2022</Index>
+                <Name>Axis 3 switches</Name>
+                <Type>DT2022</Type>
+                <BitSize>72</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>04</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Home switch input</Name>
+                    <Info><DefaultData>03</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Positive limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Negative limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Homing time limit ms</Name>
+                    <Info><DefaultData>60ea0000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x2023</Index>
+                <Name>Axis 4 switches</Name>
+                <Type>DT2023</Type>
+                <BitSize>72</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>04</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Home switch input</Name>
+                    <Info><DefaultData>04</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Positive limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Negative limit switch input</Name>
+                    <Info><DefaultData>00</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Homing time limit ms</Name>
+                    <Info><DefaultData>60ea0000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
                 <Index>#x2100</Index>
                 <Name>Encoder inputs</Name>
                 <Type>DT2100</Type>
@@ -2552,6 +2956,22 @@
                 <BitSize>8</BitSize>
                 <Info><DefaultData>00</DefaultData></Info>
                 <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
+              </Object>
+              <Object>
+                <Index>#x2106</Index>
+                <Name>Input polarity</Name>
+                <Type>USINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>ff</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x2107</Index>
+                <Name>Input filter time us</Name>
+                <Type>UINT</Type>
+                <BitSize>16</BitSize>
+                <Info><DefaultData>e803</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
               </Object>
               <Object>
                 <Index>#x6007</Index>
@@ -2666,6 +3086,14 @@
                 <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
               </Object>
               <Object>
+                <Index>#x607C</Index>
+                <Name>Home offset</Name>
+                <Type>DINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>00000000</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
                 <Index>#x607E</Index>
                 <Name>Polarity</Name>
                 <Type>USINT</Type>
@@ -2684,6 +3112,43 @@
               <Object>
                 <Index>#x6085</Index>
                 <Name>Quick stop deceleration</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>a0860100</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x6098</Index>
+                <Name>Homing method</Name>
+                <Type>SINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>25</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x6099</Index>
+                <Name>Homing speeds</Name>
+                <Type>DT6099</Type>
+                <BitSize>80</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>02</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for switch</Name>
+                    <Info><DefaultData>10270000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for zero</Name>
+                    <Info><DefaultData>d0070000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x609A</Index>
+                <Name>Homing acceleration</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
                 <Info><DefaultData>a0860100</DefaultData></Info>
@@ -2768,7 +3233,7 @@
                 <Name>Supported drive modes</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
-                <Info><DefaultData>80010000</DefaultData></Info>
+                <Info><DefaultData>a0010000</DefaultData></Info>
                 <Flags><Access>ro</Access></Flags>
               </Object>
               <Object>
@@ -2892,6 +3357,14 @@
                 <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
               </Object>
               <Object>
+                <Index>#x687C</Index>
+                <Name>Home offset</Name>
+                <Type>DINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>00000000</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
                 <Index>#x687E</Index>
                 <Name>Polarity</Name>
                 <Type>USINT</Type>
@@ -2910,6 +3383,43 @@
               <Object>
                 <Index>#x6885</Index>
                 <Name>Quick stop deceleration</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>a0860100</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x6898</Index>
+                <Name>Homing method</Name>
+                <Type>SINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>25</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x6899</Index>
+                <Name>Homing speeds</Name>
+                <Type>DT6899</Type>
+                <BitSize>80</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>02</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for switch</Name>
+                    <Info><DefaultData>10270000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for zero</Name>
+                    <Info><DefaultData>d0070000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x689A</Index>
+                <Name>Homing acceleration</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
                 <Info><DefaultData>a0860100</DefaultData></Info>
@@ -2994,7 +3504,7 @@
                 <Name>Supported drive modes</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
-                <Info><DefaultData>80010000</DefaultData></Info>
+                <Info><DefaultData>a0010000</DefaultData></Info>
                 <Flags><Access>ro</Access></Flags>
               </Object>
               <Object>
@@ -3118,6 +3628,14 @@
                 <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
               </Object>
               <Object>
+                <Index>#x707C</Index>
+                <Name>Home offset</Name>
+                <Type>DINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>00000000</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
                 <Index>#x707E</Index>
                 <Name>Polarity</Name>
                 <Type>USINT</Type>
@@ -3136,6 +3654,43 @@
               <Object>
                 <Index>#x7085</Index>
                 <Name>Quick stop deceleration</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>a0860100</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x7098</Index>
+                <Name>Homing method</Name>
+                <Type>SINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>25</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x7099</Index>
+                <Name>Homing speeds</Name>
+                <Type>DT7099</Type>
+                <BitSize>80</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>02</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for switch</Name>
+                    <Info><DefaultData>10270000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for zero</Name>
+                    <Info><DefaultData>d0070000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x709A</Index>
+                <Name>Homing acceleration</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
                 <Info><DefaultData>a0860100</DefaultData></Info>
@@ -3220,7 +3775,7 @@
                 <Name>Supported drive modes</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
-                <Info><DefaultData>80010000</DefaultData></Info>
+                <Info><DefaultData>a0010000</DefaultData></Info>
                 <Flags><Access>ro</Access></Flags>
               </Object>
               <Object>
@@ -3344,6 +3899,14 @@
                 <Flags><Access>rw</Access><PdoMapping>R</PdoMapping></Flags>
               </Object>
               <Object>
+                <Index>#x787C</Index>
+                <Name>Home offset</Name>
+                <Type>DINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>00000000</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
                 <Index>#x787E</Index>
                 <Name>Polarity</Name>
                 <Type>USINT</Type>
@@ -3362,6 +3925,43 @@
               <Object>
                 <Index>#x7885</Index>
                 <Name>Quick stop deceleration</Name>
+                <Type>UDINT</Type>
+                <BitSize>32</BitSize>
+                <Info><DefaultData>a0860100</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x7898</Index>
+                <Name>Homing method</Name>
+                <Type>SINT</Type>
+                <BitSize>8</BitSize>
+                <Info><DefaultData>25</DefaultData></Info>
+                <Flags><Access>rw</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x7899</Index>
+                <Name>Homing speeds</Name>
+                <Type>DT7899</Type>
+                <BitSize>80</BitSize>
+                <Info>
+                  <SubItem>
+                    <Name>Max SubIndex</Name>
+                    <Info><DefaultData>02</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for switch</Name>
+                    <Info><DefaultData>10270000</DefaultData></Info>
+                  </SubItem>
+                  <SubItem>
+                    <Name>Speed during search for zero</Name>
+                    <Info><DefaultData>d0070000</DefaultData></Info>
+                  </SubItem>
+                </Info>
+                <Flags><Access>ro</Access></Flags>
+              </Object>
+              <Object>
+                <Index>#x789A</Index>
+                <Name>Homing acceleration</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
                 <Info><DefaultData>a0860100</DefaultData></Info>
@@ -3446,7 +4046,7 @@
                 <Name>Supported drive modes</Name>
                 <Type>UDINT</Type>
                 <BitSize>32</BitSize>
-                <Info><DefaultData>80010000</DefaultData></Info>
+                <Info><DefaultData>a0010000</DefaultData></Info>
                 <Flags><Access>ro</Access></Flags>
               </Object>
               <Object>

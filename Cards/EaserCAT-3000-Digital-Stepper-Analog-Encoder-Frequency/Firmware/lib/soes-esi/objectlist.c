@@ -183,6 +183,30 @@ static const char acName2013_01[] = "Step length ns";
 static const char acName2013_02[] = "Step space ns";
 static const char acName2013_03[] = "Direction setup ns";
 static const char acName2013_04[] = "Direction hold ns";
+static const char acName2020[] = "Axis 1 switches";
+static const char acName2020_00[] = "Max SubIndex";
+static const char acName2020_01[] = "Home switch input";
+static const char acName2020_02[] = "Positive limit switch input";
+static const char acName2020_03[] = "Negative limit switch input";
+static const char acName2020_04[] = "Homing time limit ms";
+static const char acName2021[] = "Axis 2 switches";
+static const char acName2021_00[] = "Max SubIndex";
+static const char acName2021_01[] = "Home switch input";
+static const char acName2021_02[] = "Positive limit switch input";
+static const char acName2021_03[] = "Negative limit switch input";
+static const char acName2021_04[] = "Homing time limit ms";
+static const char acName2022[] = "Axis 3 switches";
+static const char acName2022_00[] = "Max SubIndex";
+static const char acName2022_01[] = "Home switch input";
+static const char acName2022_02[] = "Positive limit switch input";
+static const char acName2022_03[] = "Negative limit switch input";
+static const char acName2022_04[] = "Homing time limit ms";
+static const char acName2023[] = "Axis 4 switches";
+static const char acName2023_00[] = "Max SubIndex";
+static const char acName2023_01[] = "Home switch input";
+static const char acName2023_02[] = "Positive limit switch input";
+static const char acName2023_03[] = "Negative limit switch input";
+static const char acName2023_04[] = "Homing time limit ms";
 static const char acName2100[] = "Encoder inputs";
 static const char acName2100_00[] = "Max SubIndex";
 static const char acName2100_01[] = "Index status";
@@ -197,6 +221,8 @@ static const char acName2102[] = "Analog output V";
 static const char acName2103[] = "Frequency input Hz";
 static const char acName2104[] = "Digital inputs";
 static const char acName2105[] = "Digital outputs";
+static const char acName2106[] = "Input polarity";
+static const char acName2107[] = "Input filter time us";
 static const char acName6007[] = "Abort connection option code";
 static const char acName603F[] = "Error code";
 static const char acName6040[] = "Controlword";
@@ -211,9 +237,16 @@ static const char acName6065[] = "Following error window";
 static const char acName6066[] = "Following error time out";
 static const char acName606C[] = "Velocity actual value";
 static const char acName607A[] = "Target position";
+static const char acName607C[] = "Home offset";
 static const char acName607E[] = "Polarity";
 static const char acName607F[] = "Max profile velocity";
 static const char acName6085[] = "Quick stop deceleration";
+static const char acName6098[] = "Homing method";
+static const char acName6099[] = "Homing speeds";
+static const char acName6099_00[] = "Max SubIndex";
+static const char acName6099_01[] = "Speed during search for switch";
+static const char acName6099_02[] = "Speed during search for zero";
+static const char acName609A[] = "Homing acceleration";
 static const char acName60C2[] = "Interpolation time period";
 static const char acName60C2_00[] = "Max SubIndex";
 static const char acName60C2_01[] = "Interpolation time period value";
@@ -242,9 +275,16 @@ static const char acName6865[] = "Following error window";
 static const char acName6866[] = "Following error time out";
 static const char acName686C[] = "Velocity actual value";
 static const char acName687A[] = "Target position";
+static const char acName687C[] = "Home offset";
 static const char acName687E[] = "Polarity";
 static const char acName687F[] = "Max profile velocity";
 static const char acName6885[] = "Quick stop deceleration";
+static const char acName6898[] = "Homing method";
+static const char acName6899[] = "Homing speeds";
+static const char acName6899_00[] = "Max SubIndex";
+static const char acName6899_01[] = "Speed during search for switch";
+static const char acName6899_02[] = "Speed during search for zero";
+static const char acName689A[] = "Homing acceleration";
 static const char acName68C2[] = "Interpolation time period";
 static const char acName68C2_00[] = "Max SubIndex";
 static const char acName68C2_01[] = "Interpolation time period value";
@@ -273,9 +313,16 @@ static const char acName7065[] = "Following error window";
 static const char acName7066[] = "Following error time out";
 static const char acName706C[] = "Velocity actual value";
 static const char acName707A[] = "Target position";
+static const char acName707C[] = "Home offset";
 static const char acName707E[] = "Polarity";
 static const char acName707F[] = "Max profile velocity";
 static const char acName7085[] = "Quick stop deceleration";
+static const char acName7098[] = "Homing method";
+static const char acName7099[] = "Homing speeds";
+static const char acName7099_00[] = "Max SubIndex";
+static const char acName7099_01[] = "Speed during search for switch";
+static const char acName7099_02[] = "Speed during search for zero";
+static const char acName709A[] = "Homing acceleration";
 static const char acName70C2[] = "Interpolation time period";
 static const char acName70C2_00[] = "Max SubIndex";
 static const char acName70C2_01[] = "Interpolation time period value";
@@ -304,9 +351,16 @@ static const char acName7865[] = "Following error window";
 static const char acName7866[] = "Following error time out";
 static const char acName786C[] = "Velocity actual value";
 static const char acName787A[] = "Target position";
+static const char acName787C[] = "Home offset";
 static const char acName787E[] = "Polarity";
 static const char acName787F[] = "Max profile velocity";
 static const char acName7885[] = "Quick stop deceleration";
+static const char acName7898[] = "Homing method";
+static const char acName7899[] = "Homing speeds";
+static const char acName7899_00[] = "Max SubIndex";
+static const char acName7899_01[] = "Speed during search for switch";
+static const char acName7899_02[] = "Speed during search for zero";
+static const char acName789A[] = "Homing acceleration";
 static const char acName78C2[] = "Interpolation time period";
 static const char acName78C2_00[] = "Max SubIndex";
 static const char acName78C2_01[] = "Interpolation time period value";
@@ -560,6 +614,38 @@ const _objd SDO2013[] =
   {0x03, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_03, 0x00000000, &Obj.StepTiming[3].DirSetup},
   {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2013_04, 0x00000000, &Obj.StepTiming[3].DirHold},
 };
+const _objd SDO2020[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2020_00, 0x00000004, NULL},
+  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2020_01, 0x00000001, &Obj.Axis[0].HomeInput},
+  {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2020_02, 0x00000000, &Obj.Axis[0].PosLimitInput},
+  {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2020_03, 0x00000000, &Obj.Axis[0].NegLimitInput},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2020_04, 0x0000EA60, &Obj.Axis[0].HomingTimeLimit},
+};
+const _objd SDO2021[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2021_00, 0x00000004, NULL},
+  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2021_01, 0x00000002, &Obj.Axis[1].HomeInput},
+  {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2021_02, 0x00000000, &Obj.Axis[1].PosLimitInput},
+  {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2021_03, 0x00000000, &Obj.Axis[1].NegLimitInput},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2021_04, 0x0000EA60, &Obj.Axis[1].HomingTimeLimit},
+};
+const _objd SDO2022[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2022_00, 0x00000004, NULL},
+  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2022_01, 0x00000003, &Obj.Axis[2].HomeInput},
+  {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2022_02, 0x00000000, &Obj.Axis[2].PosLimitInput},
+  {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2022_03, 0x00000000, &Obj.Axis[2].NegLimitInput},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2022_04, 0x0000EA60, &Obj.Axis[2].HomingTimeLimit},
+};
+const _objd SDO2023[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2023_00, 0x00000004, NULL},
+  {0x01, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2023_01, 0x00000004, &Obj.Axis[3].HomeInput},
+  {0x02, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2023_02, 0x00000000, &Obj.Axis[3].PosLimitInput},
+  {0x03, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2023_03, 0x00000000, &Obj.Axis[3].NegLimitInput},
+  {0x04, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName2023_04, 0x0000EA60, &Obj.Axis[3].HomingTimeLimit},
+};
 const _objd SDO2100[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName2100_00, 0x00000004, NULL},
@@ -589,6 +675,14 @@ const _objd SDO2104[] =
 const _objd SDO2105[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW | ATYPE_RXPDO, acName2105, 0x00000000, &Obj.DigitalOut},
+};
+const _objd SDO2106[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName2106, 0x000000FF, &Obj.InputPolarity},
+};
+const _objd SDO2107[] =
+{
+  {0x00, DTYPE_UNSIGNED16, 16, ATYPE_RW, acName2107, 0x000003E8, &Obj.InputFilterTime},
 };
 const _objd SDO6007[] =
 {
@@ -646,6 +740,10 @@ const _objd SDO607A[] =
 {
   {0x00, DTYPE_INTEGER32, 32, ATYPE_RW | ATYPE_RXPDO, acName607A, 0x00000000, &Obj.Axis[0].TargetPosition},
 };
+const _objd SDO607C[] =
+{
+  {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName607C, 0x00000000, &Obj.Axis[0].HomeOffset},
+};
 const _objd SDO607E[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName607E, 0x00000000, &Obj.Axis[0].Polarity},
@@ -657,6 +755,20 @@ const _objd SDO607F[] =
 const _objd SDO6085[] =
 {
   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6085, 0x000186A0, &Obj.Axis[0].QuickStopDeceleration},
+};
+const _objd SDO6098[] =
+{
+  {0x00, DTYPE_INTEGER8, 8, ATYPE_RW, acName6098, 0x00000025, &Obj.Axis[0].HomingMethod},
+};
+const _objd SDO6099[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6099_00, 0x00000002, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6099_01, 0x00002710, &Obj.Axis[0].HomingSpeedSwitch},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6099_02, 0x000007D0, &Obj.Axis[0].HomingSpeedZero},
+};
+const _objd SDO609A[] =
+{
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName609A, 0x000186A0, &Obj.Axis[0].HomingAcceleration},
 };
 const _objd SDO60C2[] =
 {
@@ -688,7 +800,7 @@ const _objd SDO60FF[] =
 };
 const _objd SDO6502[] =
 {
-  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502, 0x00000180, NULL},
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6502, 0x000001A0, NULL},
 };
 const _objd SDO67FF[] =
 {
@@ -750,6 +862,10 @@ const _objd SDO687A[] =
 {
   {0x00, DTYPE_INTEGER32, 32, ATYPE_RW | ATYPE_RXPDO, acName687A, 0x00000000, &Obj.Axis[1].TargetPosition},
 };
+const _objd SDO687C[] =
+{
+  {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName687C, 0x00000000, &Obj.Axis[1].HomeOffset},
+};
 const _objd SDO687E[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName687E, 0x00000000, &Obj.Axis[1].Polarity},
@@ -761,6 +877,20 @@ const _objd SDO687F[] =
 const _objd SDO6885[] =
 {
   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6885, 0x000186A0, &Obj.Axis[1].QuickStopDeceleration},
+};
+const _objd SDO6898[] =
+{
+  {0x00, DTYPE_INTEGER8, 8, ATYPE_RW, acName6898, 0x00000025, &Obj.Axis[1].HomingMethod},
+};
+const _objd SDO6899[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName6899_00, 0x00000002, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6899_01, 0x00002710, &Obj.Axis[1].HomingSpeedSwitch},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName6899_02, 0x000007D0, &Obj.Axis[1].HomingSpeedZero},
+};
+const _objd SDO689A[] =
+{
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName689A, 0x000186A0, &Obj.Axis[1].HomingAcceleration},
 };
 const _objd SDO68C2[] =
 {
@@ -792,7 +922,7 @@ const _objd SDO68FF[] =
 };
 const _objd SDO6D02[] =
 {
-  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6D02, 0x00000180, NULL},
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName6D02, 0x000001A0, NULL},
 };
 const _objd SDO6FFF[] =
 {
@@ -854,6 +984,10 @@ const _objd SDO707A[] =
 {
   {0x00, DTYPE_INTEGER32, 32, ATYPE_RW | ATYPE_RXPDO, acName707A, 0x00000000, &Obj.Axis[2].TargetPosition},
 };
+const _objd SDO707C[] =
+{
+  {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName707C, 0x00000000, &Obj.Axis[2].HomeOffset},
+};
 const _objd SDO707E[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName707E, 0x00000000, &Obj.Axis[2].Polarity},
@@ -865,6 +999,20 @@ const _objd SDO707F[] =
 const _objd SDO7085[] =
 {
   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7085, 0x000186A0, &Obj.Axis[2].QuickStopDeceleration},
+};
+const _objd SDO7098[] =
+{
+  {0x00, DTYPE_INTEGER8, 8, ATYPE_RW, acName7098, 0x00000025, &Obj.Axis[2].HomingMethod},
+};
+const _objd SDO7099[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7099_00, 0x00000002, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7099_01, 0x00002710, &Obj.Axis[2].HomingSpeedSwitch},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7099_02, 0x000007D0, &Obj.Axis[2].HomingSpeedZero},
+};
+const _objd SDO709A[] =
+{
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName709A, 0x000186A0, &Obj.Axis[2].HomingAcceleration},
 };
 const _objd SDO70C2[] =
 {
@@ -896,7 +1044,7 @@ const _objd SDO70FF[] =
 };
 const _objd SDO7502[] =
 {
-  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7502, 0x00000180, NULL},
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7502, 0x000001A0, NULL},
 };
 const _objd SDO77FF[] =
 {
@@ -958,6 +1106,10 @@ const _objd SDO787A[] =
 {
   {0x00, DTYPE_INTEGER32, 32, ATYPE_RW | ATYPE_RXPDO, acName787A, 0x00000000, &Obj.Axis[3].TargetPosition},
 };
+const _objd SDO787C[] =
+{
+  {0x00, DTYPE_INTEGER32, 32, ATYPE_RW, acName787C, 0x00000000, &Obj.Axis[3].HomeOffset},
+};
 const _objd SDO787E[] =
 {
   {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RW, acName787E, 0x00000000, &Obj.Axis[3].Polarity},
@@ -969,6 +1121,20 @@ const _objd SDO787F[] =
 const _objd SDO7885[] =
 {
   {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7885, 0x000186A0, &Obj.Axis[3].QuickStopDeceleration},
+};
+const _objd SDO7898[] =
+{
+  {0x00, DTYPE_INTEGER8, 8, ATYPE_RW, acName7898, 0x00000025, &Obj.Axis[3].HomingMethod},
+};
+const _objd SDO7899[] =
+{
+  {0x00, DTYPE_UNSIGNED8, 8, ATYPE_RO, acName7899_00, 0x00000002, NULL},
+  {0x01, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7899_01, 0x00002710, &Obj.Axis[3].HomingSpeedSwitch},
+  {0x02, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName7899_02, 0x000007D0, &Obj.Axis[3].HomingSpeedZero},
+};
+const _objd SDO789A[] =
+{
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RW, acName789A, 0x000186A0, &Obj.Axis[3].HomingAcceleration},
 };
 const _objd SDO78C2[] =
 {
@@ -1000,7 +1166,7 @@ const _objd SDO78FF[] =
 };
 const _objd SDO7D02[] =
 {
-  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7D02, 0x00000180, NULL},
+  {0x00, DTYPE_UNSIGNED32, 32, ATYPE_RO, acName7D02, 0x000001A0, NULL},
 };
 const _objd SDO7FFF[] =
 {
@@ -1035,12 +1201,18 @@ const _objectlist SDOobjects[] =
   {0x2011, OTYPE_RECORD, 4, 0, acName2011, SDO2011},
   {0x2012, OTYPE_RECORD, 4, 0, acName2012, SDO2012},
   {0x2013, OTYPE_RECORD, 4, 0, acName2013, SDO2013},
+  {0x2020, OTYPE_RECORD, 4, 0, acName2020, SDO2020},
+  {0x2021, OTYPE_RECORD, 4, 0, acName2021, SDO2021},
+  {0x2022, OTYPE_RECORD, 4, 0, acName2022, SDO2022},
+  {0x2023, OTYPE_RECORD, 4, 0, acName2023, SDO2023},
   {0x2100, OTYPE_RECORD, 4, 0, acName2100, SDO2100},
   {0x2101, OTYPE_RECORD, 2, 0, acName2101, SDO2101},
   {0x2102, OTYPE_VAR, 0, 0, acName2102, SDO2102},
   {0x2103, OTYPE_VAR, 0, 0, acName2103, SDO2103},
   {0x2104, OTYPE_VAR, 0, 0, acName2104, SDO2104},
   {0x2105, OTYPE_VAR, 0, 0, acName2105, SDO2105},
+  {0x2106, OTYPE_VAR, 0, 0, acName2106, SDO2106},
+  {0x2107, OTYPE_VAR, 0, 0, acName2107, SDO2107},
   {0x6007, OTYPE_VAR, 0, 0, acName6007, SDO6007},
   {0x603F, OTYPE_VAR, 0, 0, acName603F, SDO603F},
   {0x6040, OTYPE_VAR, 0, 0, acName6040, SDO6040},
@@ -1055,9 +1227,13 @@ const _objectlist SDOobjects[] =
   {0x6066, OTYPE_VAR, 0, 0, acName6066, SDO6066},
   {0x606C, OTYPE_VAR, 0, 0, acName606C, SDO606C},
   {0x607A, OTYPE_VAR, 0, 0, acName607A, SDO607A},
+  {0x607C, OTYPE_VAR, 0, 0, acName607C, SDO607C},
   {0x607E, OTYPE_VAR, 0, 0, acName607E, SDO607E},
   {0x607F, OTYPE_VAR, 0, 0, acName607F, SDO607F},
   {0x6085, OTYPE_VAR, 0, 0, acName6085, SDO6085},
+  {0x6098, OTYPE_VAR, 0, 0, acName6098, SDO6098},
+  {0x6099, OTYPE_RECORD, 2, 0, acName6099, SDO6099},
+  {0x609A, OTYPE_VAR, 0, 0, acName609A, SDO609A},
   {0x60C2, OTYPE_RECORD, 2, 0, acName60C2, SDO60C2},
   {0x60C5, OTYPE_VAR, 0, 0, acName60C5, SDO60C5},
   {0x60F4, OTYPE_VAR, 0, 0, acName60F4, SDO60F4},
@@ -1080,9 +1256,13 @@ const _objectlist SDOobjects[] =
   {0x6866, OTYPE_VAR, 0, 0, acName6866, SDO6866},
   {0x686C, OTYPE_VAR, 0, 0, acName686C, SDO686C},
   {0x687A, OTYPE_VAR, 0, 0, acName687A, SDO687A},
+  {0x687C, OTYPE_VAR, 0, 0, acName687C, SDO687C},
   {0x687E, OTYPE_VAR, 0, 0, acName687E, SDO687E},
   {0x687F, OTYPE_VAR, 0, 0, acName687F, SDO687F},
   {0x6885, OTYPE_VAR, 0, 0, acName6885, SDO6885},
+  {0x6898, OTYPE_VAR, 0, 0, acName6898, SDO6898},
+  {0x6899, OTYPE_RECORD, 2, 0, acName6899, SDO6899},
+  {0x689A, OTYPE_VAR, 0, 0, acName689A, SDO689A},
   {0x68C2, OTYPE_RECORD, 2, 0, acName68C2, SDO68C2},
   {0x68C5, OTYPE_VAR, 0, 0, acName68C5, SDO68C5},
   {0x68F4, OTYPE_VAR, 0, 0, acName68F4, SDO68F4},
@@ -1105,9 +1285,13 @@ const _objectlist SDOobjects[] =
   {0x7066, OTYPE_VAR, 0, 0, acName7066, SDO7066},
   {0x706C, OTYPE_VAR, 0, 0, acName706C, SDO706C},
   {0x707A, OTYPE_VAR, 0, 0, acName707A, SDO707A},
+  {0x707C, OTYPE_VAR, 0, 0, acName707C, SDO707C},
   {0x707E, OTYPE_VAR, 0, 0, acName707E, SDO707E},
   {0x707F, OTYPE_VAR, 0, 0, acName707F, SDO707F},
   {0x7085, OTYPE_VAR, 0, 0, acName7085, SDO7085},
+  {0x7098, OTYPE_VAR, 0, 0, acName7098, SDO7098},
+  {0x7099, OTYPE_RECORD, 2, 0, acName7099, SDO7099},
+  {0x709A, OTYPE_VAR, 0, 0, acName709A, SDO709A},
   {0x70C2, OTYPE_RECORD, 2, 0, acName70C2, SDO70C2},
   {0x70C5, OTYPE_VAR, 0, 0, acName70C5, SDO70C5},
   {0x70F4, OTYPE_VAR, 0, 0, acName70F4, SDO70F4},
@@ -1130,9 +1314,13 @@ const _objectlist SDOobjects[] =
   {0x7866, OTYPE_VAR, 0, 0, acName7866, SDO7866},
   {0x786C, OTYPE_VAR, 0, 0, acName786C, SDO786C},
   {0x787A, OTYPE_VAR, 0, 0, acName787A, SDO787A},
+  {0x787C, OTYPE_VAR, 0, 0, acName787C, SDO787C},
   {0x787E, OTYPE_VAR, 0, 0, acName787E, SDO787E},
   {0x787F, OTYPE_VAR, 0, 0, acName787F, SDO787F},
   {0x7885, OTYPE_VAR, 0, 0, acName7885, SDO7885},
+  {0x7898, OTYPE_VAR, 0, 0, acName7898, SDO7898},
+  {0x7899, OTYPE_RECORD, 2, 0, acName7899, SDO7899},
+  {0x789A, OTYPE_VAR, 0, 0, acName789A, SDO789A},
   {0x78C2, OTYPE_RECORD, 2, 0, acName78C2, SDO78C2},
   {0x78C5, OTYPE_VAR, 0, 0, acName78C5, SDO78C5},
   {0x78F4, OTYPE_VAR, 0, 0, acName78F4, SDO78F4},

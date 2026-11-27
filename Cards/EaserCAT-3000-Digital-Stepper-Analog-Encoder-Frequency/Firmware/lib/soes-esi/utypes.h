@@ -58,9 +58,14 @@ typedef struct
    uint16_t FollowingErrorTimeout;    /* 0x6066 */
    int32_t VelocityActual;            /* 0x606C */
    int32_t TargetPosition;            /* 0x607A */
+   int32_t HomeOffset;                /* 0x607C */
    uint8_t Polarity;                  /* 0x607E */
    uint32_t MaxProfileVelocity;       /* 0x607F */
    uint32_t QuickStopDeceleration;    /* 0x6085 */
+   int8_t HomingMethod;               /* 0x6098 */
+   uint32_t HomingSpeedSwitch;        /* 0x6099:01 */
+   uint32_t HomingSpeedZero;          /* 0x6099:02 */
+   uint32_t HomingAcceleration;       /* 0x609A */
    uint8_t InterpolationTimeValue;    /* 0x60C2:01 */
    int8_t InterpolationTimeIndex;     /* 0x60C2:02 */
    uint32_t MaxAcceleration;          /* 0x60C5 */
@@ -69,6 +74,11 @@ typedef struct
    uint32_t DigitalOutputs;           /* 0x60FE:01 */
    uint32_t DigitalOutputsMask;       /* 0x60FE:02 */
    int32_t TargetVelocity;            /* 0x60FF */
+   /* Manufacturer specific, 0x2020 + axis */
+   uint8_t HomeInput;                 /* :01, 0 = none, 1..8 = IN1..IN8 */
+   uint8_t PosLimitInput;             /* :02 */
+   uint8_t NegLimitInput;             /* :03 */
+   uint32_t HomingTimeLimit;          /* :04, ms, 0 = none */
 } Cia402Axis_t;
 
 typedef struct
@@ -104,6 +114,8 @@ typedef struct
    float FrequencyIn;
    uint8_t DigitalIn;
    uint8_t DigitalOut;
+   uint8_t InputPolarity;
+   uint16_t InputFilterTime;
 
    /* CiA402 */
    Cia402Axis_t Axis[N_AXES];

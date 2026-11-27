@@ -40,7 +40,7 @@ SW_VERSION = "1.0.0"
 N_AXES = 4
 AXIS_OFFSET = 0x800                      # ETG.6010 chapter 16
 DEVICE_TYPE = 0x00040192                 # ETG.6010 table 84: stepper drive, profile 402
-SUPPORTED_MODES = (1 << 7) | (1 << 8)    # csp + csv
+SUPPORTED_MODES = (1 << 5) | (1 << 7) | (1 << 8)    # homing + csp + csv
 
 MAX_PDO_ENTRIES = 8                      # Capacity of each PDO mapping object
 EEPROM_BYTES = 2048
@@ -234,6 +234,23 @@ def build_od():
     od.append(var(0x2103, "Frequency input Hz", "REAL32", pdo="T", field="Obj.FrequencyIn"))
     od.append(var(0x2104, "Digital inputs", "UNSIGNED8", pdo="T", field="Obj.DigitalIn"))
     od.append(var(0x2105, "Digital outputs", "UNSIGNED8", "RW", pdo="R", field="Obj.DigitalOut"))
+    od.append(var(0x2106, "Input polarity", "UNSIGNED8", "RW", default=0xFF,
+                  field="Obj.InputPolarity"))
+    od.append(var(0x2107, "Input filter time us", "UNSIGNED16", "RW", default=1000,
+                  field="Obj.InputFilterTime"))
+    for n in range(N_AXES):
+        a = f"Obj.Axis[{n}]"
+        od.append(Obj(0x2020 + n, f"Axis {n + 1} switches", "RECORD", [
+            Entry(0, "Max SubIndex", "UNSIGNED8", default=4),
+            Entry(1, "Home switch input", "UNSIGNED8", "RW", default=n + 1,
+                  field=a + ".HomeInput"),
+            Entry(2, "Positive limit switch input", "UNSIGNED8", "RW", default=0,
+                  field=a + ".PosLimitInput"),
+            Entry(3, "Negative limit switch input", "UNSIGNED8", "RW", default=0,
+                  field=a + ".NegLimitInput"),
+            Entry(4, "Homing time limit ms", "UNSIGNED32", "RW", default=60000,
+                  field=a + ".HomingTimeLimit"),
+        ]))
 
     # CiA402 axis objects
     for n in range(N_AXES):
@@ -265,11 +282,23 @@ def build_od():
                       field=a + ".VelocityActual"))
         od.append(var(b + 0x07A, "Target position", "INTEGER32", "RW", pdo="R",
                       field=a + ".TargetPosition"))
+        od.append(var(b + 0x07C, "Home offset", "INTEGER32", "RW", field=a + ".HomeOffset"))
         od.append(var(b + 0x07E, "Polarity", "UNSIGNED8", "RW", field=a + ".Polarity"))
         od.append(var(b + 0x07F, "Max profile velocity", "UNSIGNED32", "RW", default=0,
                       field=a + ".MaxProfileVelocity"))
         od.append(var(b + 0x085, "Quick stop deceleration", "UNSIGNED32", "RW", default=100000,
                       field=a + ".QuickStopDeceleration"))
+        od.append(var(b + 0x098, "Homing method", "INTEGER8", "RW", default=37,
+                      field=a + ".HomingMethod"))
+        od.append(Obj(b + 0x099, "Homing speeds", "RECORD", [
+            Entry(0, "Max SubIndex", "UNSIGNED8", default=2),
+            Entry(1, "Speed during search for switch", "UNSIGNED32", "RW", default=10000,
+                  field=a + ".HomingSpeedSwitch"),
+            Entry(2, "Speed during search for zero", "UNSIGNED32", "RW", default=2000,
+                  field=a + ".HomingSpeedZero"),
+        ]))
+        od.append(var(b + 0x09A, "Homing acceleration", "UNSIGNED32", "RW", default=100000,
+                      field=a + ".HomingAcceleration"))
         od.append(Obj(b + 0x0C2, "Interpolation time period", "RECORD", [
             Entry(0, "Max SubIndex", "UNSIGNED8", default=2),
             Entry(1, "Interpolation time period value", "UNSIGNED8", default=1,
@@ -449,9 +478,14 @@ typedef struct
    uint16_t FollowingErrorTimeout;    /* 0x6066 */
    int32_t VelocityActual;            /* 0x606C */
    int32_t TargetPosition;            /* 0x607A */
+   int32_t HomeOffset;                /* 0x607C */
    uint8_t Polarity;                  /* 0x607E */
    uint32_t MaxProfileVelocity;       /* 0x607F */
    uint32_t QuickStopDeceleration;    /* 0x6085 */
+   int8_t HomingMethod;               /* 0x6098 */
+   uint32_t HomingSpeedSwitch;        /* 0x6099:01 */
+   uint32_t HomingSpeedZero;          /* 0x6099:02 */
+   uint32_t HomingAcceleration;       /* 0x609A */
    uint8_t InterpolationTimeValue;    /* 0x60C2:01 */
    int8_t InterpolationTimeIndex;     /* 0x60C2:02 */
    uint32_t MaxAcceleration;          /* 0x60C5 */
@@ -460,6 +494,11 @@ typedef struct
    uint32_t DigitalOutputs;           /* 0x60FE:01 */
    uint32_t DigitalOutputsMask;       /* 0x60FE:02 */
    int32_t TargetVelocity;            /* 0x60FF */
+   /* Manufacturer specific, 0x2020 + axis */
+   uint8_t HomeInput;                 /* :01, 0 = none, 1..8 = IN1..IN8 */
+   uint8_t PosLimitInput;             /* :02 */
+   uint8_t NegLimitInput;             /* :03 */
+   uint32_t HomingTimeLimit;          /* :04, ms, 0 = none */
 }} Cia402Axis_t;
 
 typedef struct
@@ -495,6 +534,8 @@ typedef struct
    float FrequencyIn;
    uint8_t DigitalIn;
    uint8_t DigitalOut;
+   uint8_t InputPolarity;
+   uint16_t InputFilterTime;
 
    /* CiA402 */
    Cia402Axis_t Axis[N_AXES];

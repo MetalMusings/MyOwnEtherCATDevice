@@ -36,7 +36,12 @@ LinuxCNC writes `linuxcnc.var` and `position.txt` here while it runs
    `MAX_VELOCITY * SCALE` must stay below that.
 3. Directions: a negative `SCALE`, or the axis' polarity object (example in
    `ethercat-conf.xml`).
-4. E-stop: `e3000.hal` loops the GUI's enable back; wire a real E-stop to
+4. Homing: the board does it (CiA402 homing mode). LinuxCNC starts it as
+   "home on index" through `cia402.N.home`. With the board's default method 37
+   a joint is homed where it stands. For home switches (IN1..IN3 for X, Y, Z),
+   set the method and speeds with the commented SDOs in `ethercat-conf.xml`.
+   The switch edge becomes `HOME_OFFSET`.
+5. E-stop: `e3000.hal` loops the GUI's enable back; wire a real E-stop to
    `iocontrol.0.emc-enable-in`, for example through a board input.
 
 Then `linuxcnc axis.ini`.

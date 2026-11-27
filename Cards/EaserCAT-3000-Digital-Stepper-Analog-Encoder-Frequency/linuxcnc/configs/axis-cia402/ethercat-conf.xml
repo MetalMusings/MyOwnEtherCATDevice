@@ -42,6 +42,24 @@
            0x787E; 0xC0 turns position and velocity round. Example, axis 3:
       <sdoConfig idx="707E" subIdx="0"><sdoDataRaw data="C0"/></sdoConfig>
       -->
+      <!-- Homing by the board (LinuxCNC starts it through index-enable, axis.ini).
+           Defaults: method 37 (home where the axis stands), home switch of axis n
+           on IN n (0x2020+n-1:01), no limit switches, inputs normally open.
+           Home switches with method 21 (switch on the negative side, home where it
+           releases moving positive) on axis 1..3, 10000 steps/s to find the switch,
+           1000 steps/s to the edge:
+      <sdoConfig idx="6098" subIdx="0"><sdoDataRaw data="15"/></sdoConfig>
+      <sdoConfig idx="6898" subIdx="0"><sdoDataRaw data="15"/></sdoConfig>
+      <sdoConfig idx="7098" subIdx="0"><sdoDataRaw data="15"/></sdoConfig>
+      <sdoConfig idx="6099" subIdx="1"><sdoDataRaw data="10 27 00 00"/></sdoConfig>
+      <sdoConfig idx="6099" subIdx="2"><sdoDataRaw data="E8 03 00 00"/></sdoConfig>
+           (and 0x6899, 0x7099 the same). Normally closed switches on IN1..IN3
+           (0x2106, bit = 1 normally open):
+      <sdoConfig idx="2106" subIdx="0"><sdoDataRaw data="F8"/></sdoConfig>
+           Limit switches, e.g. axis 1 positive on IN5 and negative on IN6:
+      <sdoConfig idx="2020" subIdx="2"><sdoDataRaw data="05"/></sdoConfig>
+      <sdoConfig idx="2020" subIdx="3"><sdoDataRaw data="06"/></sdoConfig>
+      -->
       <!-- Following error window in steps (0x6065, 0xFFFFFFFF = off) and its
            time in ms (0x6066). The step generator follows the command, so the
            default is off. -->

@@ -14,12 +14,20 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JO
 loadusr -W lcec_conf ethercat-conf.xml
 loadrt lcec
 loadrt cia402 names=cia402.x,cia402.y,cia402.z
+# Position feedback to motion: the drive's while running, the command while the
+# drive homes (cia402.N.home is joint.N.index-enable), so that motion sees no
+# following error; when homing ends the feedback jumps to the homed position, as
+# an encoder's count does at its index.
+loadrt mux2 names=x-fb-mux,y-fb-mux,z-fb-mux
 
 # lcec reads first and writes last; the state machines run between
 addf lcec.read-all          servo-thread
 addf cia402.x.read-all      servo-thread
 addf cia402.y.read-all      servo-thread
 addf cia402.z.read-all      servo-thread
+addf x-fb-mux               servo-thread
+addf y-fb-mux               servo-thread
+addf z-fb-mux               servo-thread
 addf motion-command-handler servo-thread
 addf motion-controller      servo-thread
 addf cia402.x.write-all     servo-thread
@@ -37,8 +45,11 @@ net estop-loop iocontrol.0.user-enable-out => iocontrol.0.emc-enable-in
 setp cia402.x.csp-mode  1
 setp cia402.x.pos-scale [JOINT_0]SCALE
 
-net x-pos-cmd    joint.0.motor-pos-cmd     => cia402.x.pos-cmd
-net x-pos-fb     cia402.x.pos-fb           => joint.0.motor-pos-fb
+net x-pos-cmd    joint.0.motor-pos-cmd     => cia402.x.pos-cmd x-fb-mux.in1
+net x-pos-fb-drv cia402.x.pos-fb           => x-fb-mux.in0
+net x-pos-fb     x-fb-mux.out              => joint.0.motor-pos-fb
+net x-home       joint.0.index-enable      <=> cia402.x.home
+net x-home       => x-fb-mux.sel
 net x-enable     joint.0.amp-enable-out    => cia402.x.enable
 net x-fault      cia402.x.drv-fault        => joint.0.amp-fault-in
 
@@ -57,8 +68,11 @@ net x-target-vel    cia402.x.drv-target-velocity      => lcec.0.E3000.ax1-target
 setp cia402.y.csp-mode  1
 setp cia402.y.pos-scale [JOINT_1]SCALE
 
-net y-pos-cmd    joint.1.motor-pos-cmd     => cia402.y.pos-cmd
-net y-pos-fb     cia402.y.pos-fb           => joint.1.motor-pos-fb
+net y-pos-cmd    joint.1.motor-pos-cmd     => cia402.y.pos-cmd y-fb-mux.in1
+net y-pos-fb-drv cia402.y.pos-fb           => y-fb-mux.in0
+net y-pos-fb     y-fb-mux.out              => joint.1.motor-pos-fb
+net y-home       joint.1.index-enable      <=> cia402.y.home
+net y-home       => y-fb-mux.sel
 net y-enable     joint.1.amp-enable-out    => cia402.y.enable
 net y-fault      cia402.y.drv-fault        => joint.1.amp-fault-in
 
@@ -77,8 +91,11 @@ net y-target-vel    cia402.y.drv-target-velocity      => lcec.0.E3000.ax2-target
 setp cia402.z.csp-mode  1
 setp cia402.z.pos-scale [JOINT_2]SCALE
 
-net z-pos-cmd    joint.2.motor-pos-cmd     => cia402.z.pos-cmd
-net z-pos-fb     cia402.z.pos-fb           => joint.2.motor-pos-fb
+net z-pos-cmd    joint.2.motor-pos-cmd     => cia402.z.pos-cmd z-fb-mux.in1
+net z-pos-fb-drv cia402.z.pos-fb           => z-fb-mux.in0
+net z-pos-fb     z-fb-mux.out              => joint.2.motor-pos-fb
+net z-home       joint.2.index-enable      <=> cia402.z.home
+net z-home       => z-fb-mux.sel
 net z-enable     joint.2.amp-enable-out    => cia402.z.enable
 net z-fault      cia402.z.drv-fault        => joint.2.amp-fault-in
 
@@ -99,7 +116,6 @@ net z-target-vel    cia402.z.drv-target-velocity      => lcec.0.E3000.ax3-target
 # I/O, examples
 #########################################################################
 # net coolant-flood  iocontrol.0.coolant-flood => lcec.0.E3000.out-1
-# net home-x         lcec.0.E3000.in-1         => joint.0.home-sw-in
 #
 # Spindle speed as 0..3.3 V on the DAC pin. The board has no amplifier: a VFD's
 # 0..10 V input needs an external one (a gain of 3.03 gives 10 V at 3.3 V).

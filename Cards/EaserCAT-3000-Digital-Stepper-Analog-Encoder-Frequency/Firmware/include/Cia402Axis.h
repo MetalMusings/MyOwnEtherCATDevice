@@ -1,5 +1,6 @@
-// CiA402 drive state machine (FSA) and cyclic synchronous modes (csp, csv) for one
-// axis, implemented according to ETG.6010 (CiA402 Implementation Directive).
+// CiA402 drive state machine (FSA), cyclic synchronous modes (csp, csv) and homing
+// mode (hm, methods 19..22, 35, 37) for one axis, implemented according to ETG.6010
+// (CiA402 Implementation Directive) and IEC 61800-7-201.
 //
 // The class is hardware independent: it reads/writes the CiA402 objects of one axis
 // (struct Cia402Axis_t from utypes.h) and produces a MotionCommand for the step
@@ -29,6 +30,7 @@ enum class Cia402State : uint8_t {
 
 // Modes of operation (object 0x6060)
 static const int8_t CIA402_MODE_NONE = 0;
+static const int8_t CIA402_MODE_HOMING = 6;
 static const int8_t CIA402_MODE_CSP = 8;
 static const int8_t CIA402_MODE_CSV = 9;
 
@@ -47,8 +49,25 @@ static const uint16_t SW_QUICK_STOP = 1u << 5;
 static const uint16_t SW_SWITCH_ON_DISABLED = 1u << 6;
 static const uint16_t SW_WARNING = 1u << 7;
 static const uint16_t SW_REMOTE = 1u << 9;
+static const uint16_t SW_TARGET_REACHED = 1u << 10;      // homing: stopped (done, not started or interrupted)
+static const uint16_t SW_INTERNAL_LIMIT = 1u << 11;      // a limit switch is active
 static const uint16_t SW_FOLLOWS_COMMAND = 1u << 12;     // csp/csv mode specific
+static const uint16_t SW_HOMING_ATTAINED = 1u << 12;     // homing mode specific
 static const uint16_t SW_FOLLOWING_ERROR = 1u << 13;     // csp mode specific
+static const uint16_t SW_HOMING_ERROR = 1u << 13;        // homing mode specific
+
+// Controlword bits (object 0x6040), besides the state machine commands
+static const uint16_t CW_HOMING_START = 1u << 4;         // homing mode: rising edge starts
+static const uint16_t CW_HALT = 1u << 8;
+
+// The axis' switches this cycle, after the input polarity (0x2106) and filter (0x2107).
+struct AxisInputs {
+  bool home = false;               // home switch active
+  bool posLimit = false;           // positive limit switch active
+  bool negLimit = false;           // negative limit switch active
+  bool homeChanged = false;        // the home switch changed state since the last cycle
+  double homeChangePosition = 0.0; // step generator position (steps) latched at that change
+};
 
 // Position feedback from the step generator, in internal (motor) direction.
 struct MotionFeedback {
@@ -76,8 +95,9 @@ class Cia402Axis {
   //   dtSeconds    : cycle time
   //   outputsValid : the master's outputs (RxPDO) are valid, i.e. ESM is in OP
   //   newOutputs   : the RxPDO has been updated during this cycle
+  //   in           : the axis' switches
   MotionCommand cycle(const MotionFeedback &fb, double dtSeconds, bool outputsValid,
-                      bool newOutputs);
+                      bool newOutputs, const AxisInputs &in = AxisInputs());
 
   // ESM left OP (watchdog, master request, error). Reacts according to 0x6007.
   void communicationLost();
@@ -86,6 +106,7 @@ class Cia402Axis {
   bool faulted() const {
     return fsaState == Cia402State::Fault || fsaState == Cia402State::FaultReactionActive;
   }
+  bool homingAttained() const { return homed; }
 
  private:
   enum class StopKind : uint8_t { None, QuickStop, FaultReaction };
@@ -94,7 +115,22 @@ class Cia402Axis {
   void enterFault(uint16_t errorCode);
   void startStop(StopKind kind, int16_t optionCode);
   void enterOperationEnabled();
-  void updateStatusword(bool following, bool followingErrorActive);
+  void updateStatusword(bool following, bool followingErrorActive, uint16_t extraBits);
+  // Homing mode
+  enum class HomingPhase : uint8_t { Idle, Moving, Braking, Done, Failed };
+  enum class BrakeReason : uint8_t { NextMove, Home, Interrupt, Error };
+  struct HomingMove {
+    int8_t dir;         // +1 / -1, in position (external) direction
+    bool fast;          // 0x6099:01, else 0x6099:02
+    bool untilActive;   // move until the home switch is active, else until inactive
+  };
+  void startHoming(const AxisInputs &in, double posSign, const MotionFeedback &fb);
+  void brakeHoming(BrakeReason why);
+  void homingCycle(const MotionFeedback &fb, double dt, const AxisInputs &in,
+                   double posSign, bool startBit, bool halt, MotionCommand &cmd);
+  bool homingActive() const {
+    return homingPhase == HomingPhase::Moving || homingPhase == HomingPhase::Braking;
+  }
   double rampDeceleration(int16_t optionCode) const;
   int64_t unwrapTarget(int32_t raw) const;
 
@@ -114,6 +150,19 @@ class Cia402Axis {
   uint8_t missedFrames = 0;
   bool resyncNext = true;
   double followingErrorTime = 0.0; // seconds the following error has been outside window
+  int64_t homeShift = 0;           // added to the step position to give the position actual value
+  bool homed = false;              // homing attained (kept until the next homing starts)
+  bool homingFailed = false;       // homing error
+  bool lastHomingStart = false;    // controlword bit 4 last cycle
+  HomingPhase homingPhase = HomingPhase::Idle;
+  BrakeReason brakeReason = BrakeReason::Interrupt;
+  HomingMove moves[3] = {};
+  uint8_t nMoves = 0, moveIdx = 0;
+  double homeEdge = 0.0;           // step position of the home switch edge
+  double homingElapsed = 0.0;      // seconds since homing started
+  bool cspSyncWait = false;        // csp after a mode change: wait until the target is near
+  bool limitHold = false;          // csp: stopped by a limit switch, waiting for the target to come back
+  int8_t holdDir = 0;
 };
 
 #endif
