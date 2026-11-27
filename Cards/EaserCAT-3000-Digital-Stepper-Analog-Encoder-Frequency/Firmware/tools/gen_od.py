@@ -205,30 +205,31 @@ def build_od():
     od.append(sm_param_obj(0x1C33, "Input SyncManager Parameter", "Obj.SmInParam"))
 
     # Manufacturer specific objects
-    # Cycle diagnostics: is the cycle time / step rate asked for possible?
-    # Read by SDO or mapped into a TxPDO. Maxima and counters are cleared by 0x1C32:08.
+    # Diagnostics: is the cycle time / step rate asked for possible? The board's in 0x2000,
+    # each axis' with its step timing (0x2010 + n, :05..). All can be read by SDO or mapped
+    # into a TxPDO; maxima and counters are cleared by 0x1C32:08.
     d = "Obj.CycleDiag."
-    od.append(Obj(0x2001, "Cycle diagnostics", "RECORD", [
-        Entry(0, "Max SubIndex", "UNSIGNED8", default=10),
-        Entry(1, "Max step frequency Hz", "UNSIGNED32", pdo="T", field=d + "MaxStepFrequency"),
-        Entry(2, "Step interrupt time max ns", "UNSIGNED32", pdo="T", field=d + "IsrTimeMax"),
-        Entry(3, "Step generation load 0.1%", "UNSIGNED16", pdo="T", field=d + "StepLoad"),
-        Entry(4, "Step generation load max 0.1%", "UNSIGNED16", pdo="T", field=d + "StepLoadMax"),
-        Entry(5, "Cycle time used 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsed"),
-        Entry(6, "Cycle time used max 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsedMax"),
-        Entry(7, "Cycle distance max ns", "UNSIGNED32", pdo="T", field=d + "CycleDistanceMax"),
-        Entry(8, "Late steps", "UNSIGNED32", pdo="T", field=d + "LateSteps"),
-        Entry(9, "Frequency limited axes", "UNSIGNED8", pdo="T", field=d + "FrequencyLimited"),
-        Entry(10, "Step queue lead min us", "UNSIGNED32", pdo="T", field=d + "QueueLeadMin"),
+    od.append(Obj(0x2000, "Cycle diagnostics", "RECORD", [
+        Entry(0, "Max SubIndex", "UNSIGNED8", default=6),
+        Entry(1, "Step generation load 0.1%", "UNSIGNED16", pdo="T", field=d + "StepLoad"),
+        Entry(2, "Step generation load max 0.1%", "UNSIGNED16", pdo="T", field=d + "StepLoadMax"),
+        Entry(3, "Cycle time used 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsed"),
+        Entry(4, "Cycle time used max 0.1%", "UNSIGNED16", pdo="T", field=d + "CycleUsedMax"),
+        Entry(5, "Cycle distance max ns", "UNSIGNED32", pdo="T", field=d + "CycleDistanceMax"),
+        Entry(6, "Step interrupt time max ns", "UNSIGNED32", pdo="T", field=d + "IsrTimeMax"),
     ]))
     for n in range(N_AXES):
         f = f"Obj.StepTiming[{n}]"
         od.append(Obj(0x2010 + n, f"Axis {n + 1} step timing", "RECORD", [
-            Entry(0, "Max SubIndex", "UNSIGNED8", default=4),
+            Entry(0, "Max SubIndex", "UNSIGNED8", default=8),
             Entry(1, "Step length ns", "UNSIGNED32", "RW", default=5000, field=f + ".StepLength"),
             Entry(2, "Step space ns", "UNSIGNED32", "RW", default=5000, field=f + ".StepSpace"),
             Entry(3, "Direction setup ns", "UNSIGNED32", "RW", default=5000, field=f + ".DirSetup"),
             Entry(4, "Direction hold ns", "UNSIGNED32", "RW", default=5000, field=f + ".DirHold"),
+            Entry(5, "Max step frequency Hz", "UNSIGNED32", pdo="T", field=f + ".MaxStepFrequency"),
+            Entry(6, "Frequency limited", "UNSIGNED8", pdo="T", field=f + ".FrequencyLimited"),
+            Entry(7, "Late steps", "UNSIGNED32", pdo="T", field=f + ".LateSteps"),
+            Entry(8, "Step queue lead min us", "UNSIGNED32", pdo="T", field=f + ".QueueLeadMin"),
         ]))
     od.append(Obj(0x2100, "Encoder inputs", "RECORD", [
         Entry(0, "Max SubIndex", "UNSIGNED8", default=4),
@@ -482,6 +483,10 @@ typedef struct
    uint32_t StepSpace;
    uint32_t DirSetup;
    uint32_t DirHold;
+   uint32_t MaxStepFrequency;  /* :05 Hz the axis is held at: step timing, queue, 0x607F */
+   uint8_t FrequencyLimited;   /* :06 1: was held at that rate (sticky) */
+   uint32_t LateSteps;         /* :07 the step queue ran empty while moving */
+   uint32_t QueueLeadMin;      /* :08 us, shortest time the queue was ahead */
 }} StepTiming_t;
 
 /* CiA402 objects of one axis (index = 0x6000 + 0x800 * axis + offset) */
@@ -541,16 +546,12 @@ typedef struct
    /* Manufacturer specific */
    struct
    {{
-      uint32_t MaxStepFrequency;     /* :01 Hz, the lowest of the axes */
-      uint32_t IsrTimeMax;           /* :02 ns, longest step timer interrupt */
-      uint16_t StepLoad;             /* :03 0.1 % of the CPU: interrupts and planning */
-      uint16_t StepLoadMax;          /* :04 */
-      uint16_t CycleUsed;            /* :05 0.1 % of the cycle time, last cycle */
-      uint16_t CycleUsedMax;         /* :06 */
-      uint32_t CycleDistanceMax;     /* :07 ns between cycle starts */
-      uint32_t LateSteps;            /* :08 the step queue ran empty while moving */
-      uint8_t FrequencyLimited;      /* :09 bit n: axis n+1 was held at its step rate limit */
-      uint32_t QueueLeadMin;         /* :0A us, shortest time the queue was ahead */
+      uint16_t StepLoad;             /* :01 0.1 % of the CPU: step interrupts and planning */
+      uint16_t StepLoadMax;          /* :02 */
+      uint16_t CycleUsed;            /* :03 0.1 % of the cycle time, last cycle */
+      uint16_t CycleUsedMax;         /* :04 */
+      uint32_t CycleDistanceMax;     /* :05 ns between cycle starts */
+      uint32_t IsrTimeMax;           /* :06 ns, longest step timer interrupt */
    }} CycleDiag;
    StepTiming_t StepTiming[N_AXES];
    struct

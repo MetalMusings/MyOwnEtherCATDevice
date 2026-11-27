@@ -20,14 +20,13 @@
 
 #define STEP_AXES 4
 #define STEP_TIMING_DEFAULT_NS 5000u  // step length, step space, direction setup and hold: 0 = this
-#define STEP_RATE_MAX_HZ 250000u      // per axis, so that four axes leave CPU for the cycle
 
 struct StepDiagnostics {
     uint32_t isrCycles;     // interrupt CPU cycles since the last take
     uint32_t isrMaxCycles;  // longest interrupt
     uint32_t planCycles;    // planning CPU cycles in the last update()
-    uint32_t late;          // the queue ran empty while an axis was moving
-    int32_t leadMinTicks;   // shortest queue lead at a planning, since the last reset
+    uint32_t late[4];       // per axis: the queue ran empty while it was moving
+    int32_t leadMinTicks[4];  // per axis: shortest queue lead at a planning, since the reset
 };
 
 class StepTimers {
@@ -50,12 +49,13 @@ class StepTimers {
     // Position feedback, fixed point steps (StepGenLoop.h)
     int64_t position(int ch) const { return (int64_t)q[ch].emitted << 28; }
     float velocity(int ch) const { return sg[ch].freq; }
-    // Highest step rate of an axis with its present timing and the cycle time
+    // Highest step rate of an axis: its step timing and the queue (at the cycle time)
     uint32_t maxFrequency(int ch) const { return maxFreq[ch]; }
 
     // Diagnostics: interrupt cycles are summed until taken
     StepDiagnostics takeDiagnostics();
-    void resetDiagnostics();
+    void resetDiagnostics();      // maxima and minima
+    void resetLate(int ch) { late[ch] = 0; }
 
     // Called by the interrupt handlers
     void isr(int ch);
@@ -72,8 +72,9 @@ class StepTimers {
     uint64_t dwtHigh = 0;
     uint32_t dwtLast = 0;
     volatile uint32_t isrCycles = 0, isrMaxCycles = 0;
-    uint32_t planCycles = 0, late = 0;
-    int32_t leadMin = 0x7FFFFFFF;
+    uint32_t planCycles = 0;
+    uint32_t late[STEP_AXES] = {};
+    int32_t leadMin[STEP_AXES] = {0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF};
 
     uint64_t dwt64();
 };

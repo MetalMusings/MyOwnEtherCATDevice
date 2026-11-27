@@ -347,12 +347,14 @@ static void testUnsupportedMode() {
 // Object dictionary
 // ---------------------------------------------------------------------------
 static uint32_t sdoWrite(uint16_t index, uint8_t sub, uint32_t value, size_t size) {
-  uint32_t abort = ObjectHooks_preDownload(index, sub, &value, size, 0);
-  if (abort) return abort;
   int32_t nidx = SDO_findobject(index);
   if (nidx < 0) return ABORT_NOOBJECT;
   int16_t nsub = SDO_findsubindex(nidx, sub);
   if (nsub < 0) return ABORT_NOSUBINDEX;
+  // As SOES: written only if writable (in PREOP here), then the hook
+  if (!(SDOobjects[nidx].objdesc[nsub].flags & ATYPE_Wpre)) return ABORT_READONLY;
+  uint32_t abort = ObjectHooks_preDownload(index, sub, &value, size, 0);
+  if (abort) return abort;
   memcpy(SDOobjects[nidx].objdesc[nsub].data, &value, size);
   return 0;
 }
@@ -423,7 +425,7 @@ static void testObjectDictionary() {
   CHECK_EQ(sdoWrite(0x2021, 2, 9, 1), ABORT_VALUE_EXCEEDED);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x80, 1), 0);
   CHECK_EQ(sdoWrite(0x607E, 0, 0x01, 1), ABORT_VALUE_EXCEEDED);
-  CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), ABORT_NOOBJECT);  // the base period is gone
+  CHECK_EQ(sdoWrite(0x2000, 0, 20000, 4), ABORT_READONLY);  // not the base period any more
 }
 
 // ---------------------------------------------------------------------------
@@ -1016,7 +1018,7 @@ static void testCycleDiagnostics() {
   CHECK_EQ(cycleModelMinCycle(4000000), CYCLE_IMPOSSIBLE);
   CHECK_EQ(cycleModelMinCycle(0) % 10000, 0u);
 
-  // Objects: 0x1C32/0x1C33 :05, :08, :0A, :0D, and 0x2001
+  // Objects: 0x1C32/0x1C33 :05, :08, :0A, :0D; 0x2000 (the board) and 0x2010+n :05..:08
   COE_initDefaultValues();
   int32_t nidx = SDO_findobject(0x1C32);
   CHECK(nidx >= 0);
@@ -1025,19 +1027,31 @@ static void testCycleDiagnostics() {
   CHECK(SDO_findsubindex(nidx, 10) >= 0);
   CHECK(SDO_findsubindex(nidx, 13) >= 0);
   CHECK(SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 5)].data == &Obj.SmOutParam.MinCycleTime);
-  nidx = SDO_findobject(0x2001);
+  CHECK(SDO_findobject(0x2001) < 0);
+  nidx = SDO_findobject(0x2000);
   CHECK(nidx >= 0);
-  CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 10);
-  int16_t sub = SDO_findsubindex(nidx, 9);
-  CHECK(sub >= 0 && SDOobjects[nidx].objdesc[sub].data == &Obj.CycleDiag.FrequencyLimited);
-  CHECK((SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 4)].flags & ATYPE_TXPDO) != 0);
-  // and it can be mapped
+  CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 6);
+  int16_t sub = SDO_findsubindex(nidx, 3);
+  CHECK(sub >= 0 && SDOobjects[nidx].objdesc[sub].data == &Obj.CycleDiag.CycleUsed);
+  CHECK((SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 1)].flags & ATYPE_TXPDO) != 0);
+  CHECK_EQ(sdoWrite(0x2000, 1, 5, 2), ABORT_READONLY);
+  nidx = SDO_findobject(0x2012);  // axis 3
+  CHECK(nidx >= 0);
+  CHECK_EQ(SDOobjects[nidx].objdesc[0].value, 8);
+  sub = SDO_findsubindex(nidx, 6);
+  CHECK(sub >= 0 && SDOobjects[nidx].objdesc[sub].data == &Obj.StepTiming[2].FrequencyLimited);
+  sub = SDO_findsubindex(nidx, 7);
+  CHECK(sub >= 0 && SDOobjects[nidx].objdesc[sub].data == &Obj.StepTiming[2].LateSteps);
+  CHECK((SDOobjects[nidx].objdesc[SDO_findsubindex(nidx, 5)].flags & ATYPE_TXPDO) != 0);
+  // and they can be mapped
   CHECK_EQ(sdoWrite(0x1A04, 0, 0, 1), 0);
-  CHECK_EQ(sdoWrite(0x1A04, 7, 0x20010510, 4), 0);  // cycle time used, 16 bit
-  CHECK_EQ(sdoWrite(0x1A04, 0, 7, 1), 0);
+  CHECK_EQ(sdoWrite(0x1A04, 7, 0x20000310, 4), 0);  // cycle time used, 16 bit
+  CHECK_EQ(sdoWrite(0x1A04, 8, 0x20120708, 4), ABORT_MAPPING_OBJECT_ERROR);  // 32 bit object
+  CHECK_EQ(sdoWrite(0x1A04, 8, 0x20120720, 4), 0);  // axis 3 late steps
+  CHECK_EQ(sdoWrite(0x1A04, 0, 8, 1), 0);
   _SMmap map[64];
   int n = 0;
-  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 75 + 2);
+  CHECK_EQ(sizeOfPDO(TX_PDO_OBJIDX, &n, map, MAX_MAPPINGS_SM3), 75 + 2 + 4);
   COE_initDefaultValues();
 
   // Get cycle time: 0..2
@@ -1140,7 +1154,7 @@ static void testStepPlanner() {
   auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
   long totalSteps = 0, totalRev = 0;
   for (int run = 0; run < 10; run++) {
-    // 5 us / 5 us (100 kHz), or 2 / 2 us (250 kHz); direction setup and hold
+    // 5 us / 5 us (the default), or 2 / 2 us; direction setup and hold
     StepTimingTicks tm = (run % 2) ? StepTimingTicks{160, 160, 240, 160}
                                    : StepTimingTicks{400, 400, 400, 400};
     const float maxF = (float)STEP_TICK_HZ / (float)(tm.len + tm.space);
@@ -1296,7 +1310,7 @@ static void testStepAxisLoop() {
     const int64_t cycleTicks = (run % 2) ? 40000 : 80000;  // 0.5 / 1 ms
     const float dt = (float)cycleTicks / (float)STEP_TICK_HZ;
     const StepLoopTiming k = {dt, 1.0f / dt, 0.0f, 0.0f};
-    StepTimingTicks tm = {400, 400, 400, 400};  // 5 us each: 100 kHz
+    StepTimingTicks tm = {400, 400, 400, 400};  // 5 us each, the default
     StepQueue q;
     stepQueueInit(q, buf, 8000);
     StepPlanState ps;

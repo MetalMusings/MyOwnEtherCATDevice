@@ -198,10 +198,11 @@ void StepTimers::update(uint32_t cycleNs)
     const int64_t cycleTicks = (int64_t)cycleNs * (STEP_TICK_HZ / 1000000u) / 1000;
     const float dt = (float)cycleNs * 1e-9f;
     const StepLoopTiming k = {dt, 1.0f / dt, 0.0f, 0.0f};
-    // The queue holds about a cycle and the lead: limit the rate so that it fits
-    float cap = (float)(STEP_QUEUE_LEN - 248u) * (float)STEP_TICK_HZ /
-                (float)(cycleTicks + STEP_LEAD_TICKS + STEP_CARRY_TICKS);
-    if (cap > (float)STEP_RATE_MAX_HZ) cap = (float)STEP_RATE_MAX_HZ;
+    // The queue holds about a cycle and the lead: limit the rate so that it fits (only
+    // long cycles come near it: about 1.3 MHz at 1 ms, 175 kHz at 10 ms). Otherwise the
+    // step timing sets the limit, and the CPU time is checked by the cycle time model.
+    const float cap = (float)(STEP_QUEUE_LEN - 248u) * (float)STEP_TICK_HZ /
+                      (float)(cycleTicks + STEP_LEAD_TICKS + STEP_CARRY_TICKS);
 
     for (int i = 0; i < STEP_AXES; i++) {
         StepQueue &qq = q[i];
@@ -213,7 +214,7 @@ void StepTimers::update(uint32_t cycleNs)
         qq.underrunTicks = 0;
         __enable_irq();
         if (u) {
-            if (ps.vel != 0.0f || ps.steps) late++;
+            if (ps.vel != 0.0f || ps.steps) late[i]++;
             stepPlanTakeUnderrun(ps, u);
         }
         if (!g.enable && wasEnabled[i]) {  // disabled: stop now, drop what is queued
@@ -229,7 +230,7 @@ void StepTimers::update(uint32_t cycleNs)
         // Now for this axis: the planning of the axes before it took time
         const int64_t nowT = (int64_t)((dwt64() - startDwt[i]) / ratio);
         const int64_t lead = (ps.open ? ps.openStart : ps.qEnd) - nowT;
-        if (lead < leadMin) leadMin = lead < -0x7FFFFFFF ? -0x7FFFFFFF : (int32_t)lead;
+        if (lead < leadMin[i]) leadMin[i] = lead < -0x7FFFFFFF ? -0x7FFFFFFF : (int32_t)lead;
 
         stepAxisCycle(&g, axis[i], ps, qq, tm[i], k, nowT, cycleTicks, cap);
     }
@@ -245,13 +246,15 @@ StepDiagnostics StepTimers::takeDiagnostics()
     d.isrMaxCycles = isrMaxCycles;
     __enable_irq();
     d.planCycles = planCycles;
-    d.late = late;
-    d.leadMinTicks = leadMin;
+    for (int i = 0; i < STEP_AXES; i++) {
+        d.late[i] = late[i];
+        d.leadMinTicks[i] = leadMin[i];
+    }
     return d;
 }
 
 void StepTimers::resetDiagnostics()
 {
     isrMaxCycles = 0;
-    leadMin = 0x7FFFFFFF;
+    for (int i = 0; i < STEP_AXES; i++) leadMin[i] = 0x7FFFFFFF;
 }

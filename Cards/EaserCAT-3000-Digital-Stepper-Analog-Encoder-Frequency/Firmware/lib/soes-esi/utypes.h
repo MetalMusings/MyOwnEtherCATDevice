@@ -42,6 +42,10 @@ typedef struct
    uint32_t StepSpace;
    uint32_t DirSetup;
    uint32_t DirHold;
+   uint32_t MaxStepFrequency;  /* :05 Hz the axis is held at: step timing, queue, 0x607F */
+   uint8_t FrequencyLimited;   /* :06 1: was held at that rate (sticky) */
+   uint32_t LateSteps;         /* :07 the step queue ran empty while moving */
+   uint32_t QueueLeadMin;      /* :08 us, shortest time the queue was ahead */
 } StepTiming_t;
 
 /* CiA402 objects of one axis (index = 0x6000 + 0x800 * axis + offset) */
@@ -101,16 +105,12 @@ typedef struct
    /* Manufacturer specific */
    struct
    {
-      uint32_t MaxStepFrequency;     /* :01 Hz, the lowest of the axes */
-      uint32_t IsrTimeMax;           /* :02 ns, longest step timer interrupt */
-      uint16_t StepLoad;             /* :03 0.1 % of the CPU: interrupts and planning */
-      uint16_t StepLoadMax;          /* :04 */
-      uint16_t CycleUsed;            /* :05 0.1 % of the cycle time, last cycle */
-      uint16_t CycleUsedMax;         /* :06 */
-      uint32_t CycleDistanceMax;     /* :07 ns between cycle starts */
-      uint32_t LateSteps;            /* :08 the step queue ran empty while moving */
-      uint8_t FrequencyLimited;      /* :09 bit n: axis n+1 was held at its step rate limit */
-      uint32_t QueueLeadMin;         /* :0A us, shortest time the queue was ahead */
+      uint16_t StepLoad;             /* :01 0.1 % of the CPU: step interrupts and planning */
+      uint16_t StepLoadMax;          /* :02 */
+      uint16_t CycleUsed;            /* :03 0.1 % of the cycle time, last cycle */
+      uint16_t CycleUsedMax;         /* :04 */
+      uint32_t CycleDistanceMax;     /* :05 ns between cycle starts */
+      uint32_t IsrTimeMax;           /* :06 ns, longest step timer interrupt */
    } CycleDiag;
    StepTiming_t StepTiming[N_AXES];
    struct

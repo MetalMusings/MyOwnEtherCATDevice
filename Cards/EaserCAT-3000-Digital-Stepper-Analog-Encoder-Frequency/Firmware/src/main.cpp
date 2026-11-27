@@ -358,7 +358,7 @@ static void profileBench() {
   uint32_t t;
   {
     // Step planning, on a queue of its own (CCM RAM after the four axis queues):
-    // 1 ms windows at 100 kHz, constant speed (pulses100) and ramping (core400Active)
+    // 1 ms windows, 100 steps at constant speed (pulses100) and a ramp (core400Active)
     static StepQueue bq;
     static StepPlanState bs;
     StepTimingTicks btm = {400, 400, 400, 400};
@@ -455,12 +455,11 @@ static void profileBench() {
 #define PT() 0u
 #endif
 
-////// Cycle diagnostics (0x2001, 0x1C32/0x1C33:05, :08, :0A)
+////// Cycle diagnostics (0x2000, 0x2010+n :05..:08, 0x1C32/0x1C33:05, :08, :0A)
 static uint32_t lastSyncCycleStart = 0;  // DWT at the start of the last SYNC0 cycle
 static bool lastCycleFromSync = false;
 
 // 0x1C32:08 / 0x1C33:08 "Get cycle time": 1 = new measurement, 2 = also the counters
-static uint32_t lateBase = 0;  // StepDiagnostics::late at the last counter reset
 static void cycleDiagCommand() {
   uint16_t cmd = Obj.SmOutParam.GetCycleTime > Obj.SmInParam.GetCycleTime
                      ? Obj.SmOutParam.GetCycleTime
@@ -473,13 +472,15 @@ static void cycleDiagCommand() {
   Obj.CycleDiag.StepLoadMax = 0;
   Obj.CycleDiag.CycleUsedMax = 0;
   Obj.CycleDiag.CycleDistanceMax = 0;
-  Obj.CycleDiag.QueueLeadMin = 0;
+  for (int i = 0; i < N_AXES; i++) Obj.StepTiming[i].QueueLeadMin = 0;
   if (cmd == 2) {
     Obj.SmOutParam.SmEventMissed = Obj.SmInParam.SmEventMissed = 0;
     sync0Overruns = 0;
-    lateBase += Obj.CycleDiag.LateSteps;
-    Obj.CycleDiag.LateSteps = 0;
-    Obj.CycleDiag.FrequencyLimited = 0;
+    for (int i = 0; i < N_AXES; i++) {
+      Steps.resetLate(i);
+      Obj.StepTiming[i].LateSteps = 0;
+      Obj.StepTiming[i].FrequencyLimited = 0;
+    }
   }
 }
 
@@ -498,24 +499,21 @@ static uint32_t minCycleTime() {
   return cycleModelMinCycle(total);
 }
 
-// What the step generators can do with their present settings
+// What the step generators can do with their present settings: 0x2010 + axis :05..:08
 static void updateStepDiagnostics(const StepDiagnostics &d) {
-  uint32_t maxFreq = 0xFFFFFFFFu;
-  uint8_t limited = 0;
   for (int i = 0; i < N_AXES; i++) {
+    StepTiming_t &t = Obj.StepTiming[i];
     stepgen_t &sg = Steps.sg[i];
     if (sg.freq_limited) {
-      limited |= 1u << i;
+      t.FrequencyLimited = 1;
       sg.freq_limited = 0;
     }
-    if (Steps.maxFrequency(i) < maxFreq) maxFreq = Steps.maxFrequency(i);
+    t.MaxStepFrequency = axisRate(i);  // timing, queue and 0x607F: what holds the axis
+    t.LateSteps = d.late[i];
+    int32_t lead = d.leadMinTicks[i];
+    t.QueueLeadMin = (lead == 0x7FFFFFFF || lead < 0) ? 0 : (uint32_t)lead / (STEP_TICK_HZ / 1000000u);
   }
-  Obj.CycleDiag.MaxStepFrequency = maxFreq;
-  Obj.CycleDiag.FrequencyLimited |= limited;
   Obj.CycleDiag.IsrTimeMax = cyclesToNs(d.isrMaxCycles);
-  Obj.CycleDiag.LateSteps = d.late - lateBase;
-  int32_t leadUs = d.leadMinTicks / (int32_t)(STEP_TICK_HZ / 1000000u);
-  Obj.CycleDiag.QueueLeadMin = d.leadMinTicks == 0x7FFFFFFF ? 0 : (leadUs < 0 ? 0 : (uint32_t)leadUs);
   Obj.SmOutParam.MinCycleTime = Obj.SmInParam.MinCycleTime = minCycleTime();
   Obj.SmOutParam.Sync0CycleTime = Obj.SmInParam.Sync0CycleTime = ESCvar.dcsync ? sync0CycleNs : 0;
 }
@@ -540,8 +538,11 @@ static void cycleDiagStart(uint32_t now, bool fromSync) {
     runProf.isrSum += d.isrCycles;
     if (d.isrMaxCycles > runProf.isrMax) runProf.isrMax = d.isrMaxCycles;
     runProf.planSum += d.planCycles;
-    runProf.late = d.late;
-    runProf.leadMin = (uint32_t)d.leadMinTicks;
+    runProf.late = d.late[0] + d.late[1] + d.late[2] + d.late[3];
+    int32_t lm = d.leadMinTicks[0];
+    for (int i = 1; i < N_AXES; i++)
+      if (d.leadMinTicks[i] < lm) lm = d.leadMinTicks[i];
+    runProf.leadMin = (uint32_t)lm;
 #endif
   }
   if (fromSync) lastSyncCycleStart = now;
@@ -698,7 +699,7 @@ void serveCycle(uint32_t cycleNs, bool fromSync) {
 
 void setup(void) {
   DebugSerial.begin(115200);
-  // DWT cycle counter: the timing measurements of 0x2001
+  // DWT cycle counter: the timing measurements of 0x2000 and the step timers
   CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
   DWT->CYCCNT = 0;
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
