@@ -851,8 +851,11 @@ void StepGen3::setTiming(int ch, uint32_t stepLen, uint32_t stepSpace, uint32_t 
     // requested value is different from the rounded one, to avoid recalculation.
     if (ulceil(stepLen ? stepLen : 1, periodns) != (unsigned long)s->step_len)
         s->step_len = stepLen ? stepLen : 1;
-    if (ulceil(stepSpace, periodns) != s->step_space)
-        s->step_space = stepSpace;
+    // Step space 0 would let a step come every base period: the step pin would then stay
+    // high and the steps would run together. At least one base period low, as LinuxCNC
+    // requires a non-zero stepspace for step/dir.
+    if (ulceil(stepSpace ? stepSpace : 1, periodns) != s->step_space)
+        s->step_space = stepSpace ? stepSpace : 1;
     if (ulceil(dirSetup, periodns) != s->dir_setup)
         s->dir_setup = dirSetup;
     if (ulceil(dirHold ? dirHold : 1, periodns) != s->dir_hold_dly)

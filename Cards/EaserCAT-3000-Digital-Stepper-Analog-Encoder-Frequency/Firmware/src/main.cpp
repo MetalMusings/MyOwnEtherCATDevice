@@ -37,6 +37,54 @@ const uint32_t OUTPUTS[4] = {PC5, PB0, PB1, PE7};
 // Bit 0 = terminal 1 in 0x2104 / 0x2105; bits 16.. in CiA402 0x60FD / 0x60FE:01
 const uint32_t DIGITAL_IO_SHIFT = 16;
 
+///// System clock: 160 MHz from the 8 MHz crystal Y1 (HSE)
+// The Arduino core's generic F407 variant runs the PLL from the internal 16 MHz RC
+// oscillator (HSI) for a nominal 168 MHz. On this board's chip HSI ran 4.8 % slow:
+// 160 MHz measured against the host, so step rates, micros(), the THCAD frequency and
+// all timeouts were 4.8 % off. The crystal is used instead, for 160 MHz:
+// 8 MHz / M 8 * N 320 / P 2. Not 168 MHz: SPI1 (APB2 / 2) would then run at 42 MHz,
+// and the AX58100 stops answering correctly (stuck in INIT, garbled mailbox); at
+// 160 MHz it is 40 MHz, as the board has always run. USB (Q) is not used.
+// If the crystal does not start, the HSI setup of the core is used as before.
+volatile uint8_t clockSource = 0;  // 1 = HSE (crystal), 2 = HSI (fallback)
+extern "C" void SystemClock_Config(void) {
+  RCC_OscInitTypeDef osc = {};
+  RCC_ClkInitTypeDef clk = {};
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+  osc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  osc.HSEState = RCC_HSE_ON;
+  osc.PLL.PLLState = RCC_PLL_ON;
+  osc.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  osc.PLL.PLLM = 8;
+  osc.PLL.PLLN = 320;
+  osc.PLL.PLLP = RCC_PLLP_DIV2;
+  osc.PLL.PLLQ = 7;
+  clockSource = 1;
+  if (HAL_RCC_OscConfig(&osc) != HAL_OK) {
+    osc = {};
+    osc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+    osc.HSIState = RCC_HSI_ON;
+    osc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+    osc.PLL.PLLState = RCC_PLL_ON;
+    osc.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+    osc.PLL.PLLM = 8;
+    osc.PLL.PLLN = 168;
+    osc.PLL.PLLP = RCC_PLLP_DIV2;
+    osc.PLL.PLLQ = 7;
+    clockSource = 2;
+    if (HAL_RCC_OscConfig(&osc) != HAL_OK) Error_Handler();
+  }
+  clk.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 |
+                  RCC_CLOCKTYPE_PCLK2;
+  clk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  clk.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  clk.APB1CLKDivider = RCC_HCLK_DIV4;  // 40 MHz, timers 80 MHz
+  clk.APB2CLKDivider = RCC_HCLK_DIV2;  // 80 MHz, timers 160 MHz, SPI1 40 MHz
+  if (HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_5) != HAL_OK) Error_Handler();
+}
+
 ///// Frequency input (THCAD, J5 -> MAX3485 -> PA2)
 #include "FreqCounter.h"
 FreqCounter Freq;
