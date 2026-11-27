@@ -1093,14 +1093,33 @@ static void testCycleDiagnostics() {
   g.step_len = 10000;
   g.step_space = 10000;
   g.accum = 1LL << (PICKOFF - 1);
-  for (int c = 1; c <= 3; c++) {
-    g.pos_cmd = stepgenFxFromSteps(40 * c);  // 40 kHz
+  // the axis moves at the loop's output, as the step timers make it
+  auto cycleAt = [&](int64_t steps) {
+    g.pos_cmd = stepgenFxFromSteps(steps);
     stepgenUpdateFreq(&g, k);
+    g.accum += (int64_t)((double)g.freq * 0.001 * (double)(1LL << PICKOFF));
+  };
+  for (int c = 1; c <= 200; c++) cycleAt(40 * c);  // 40 kHz
+  CHECK_EQ(g.freq_limited, 0);
+  for (int c = 1; c <= 3; c++) cycleAt(8000 + 70 * c);  // 70 kHz: held at 50 kHz
+  CHECK_EQ(g.freq_limited, 1);
+  CHECK(fabsf(g.freq - 50000.0f) < 1.0f);
+  // a single doubled step of the command (a repeated frame) with an acceleration
+  // limit: the loop takes it, no flag
+  memset((void *)&g, 0, sizeof(g));
+  g.enable = 1;
+  g.pos_mode = 1;
+  g.step_len = 10000;
+  g.step_space = 10000;
+  g.maxaccel = 2e6f;
+  g.accum = 1LL << (PICKOFF - 1);
+  int64_t p = 0;
+  for (int c = 1; c <= 300; c++) {
+    int64_t v = c < 40 ? c : 40;  // ramps to 40 kHz (1e6 steps/s^2)
+    p += (c == 200) ? 0 : (c == 201 ? 2 * v : v);  // one repeated frame
+    cycleAt(p);
   }
   CHECK_EQ(g.freq_limited, 0);
-  g.pos_cmd = stepgenFxFromSteps(120 + 70);  // 70 kHz
-  stepgenUpdateFreq(&g, k);
-  CHECK_EQ(g.freq_limited, 1);
 }
 
 // ---------------------------------------------------------------------------

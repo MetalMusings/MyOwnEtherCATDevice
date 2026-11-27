@@ -27,7 +27,6 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
     float max_freq = 1.0e9f / (float)min_step_period;
     if (sg->freq_cap > 0.0f && max_freq > sg->freq_cap)
         max_freq = sg->freq_cap;         /* the step generator's own limit */
-    const float timing_freq = max_freq;  /* what the step timing allows at all */
     /* check for user specified frequency limit parameter */
     if (sg->maxvel <= 0.0f)
         sg->maxvel = 0.0f;
@@ -94,26 +93,27 @@ void stepgenUpdateFreq(stepgen_t *sg, const StepLoopTiming &k)
                 match_ac = -match_ac;
             new_vel = curr_vel + match_ac * k.dt;
         }
-        /* apply frequency limit */
-        if (new_vel > max_freq)
+        /* apply frequency limit; the axis is held at its limit: flag it */
+        if (new_vel > max_freq) {
             new_vel = max_freq;
-        else if (new_vel < -max_freq)
-            new_vel = -max_freq;
-        /* the command itself is faster than the step timing allows */
-        if (fabsf(vel_cmd) > timing_freq)
             sg->freq_limited = 1;
+        } else if (new_vel < -max_freq) {
+            new_vel = -max_freq;
+            sg->freq_limited = 1;
+        }
     }
     else
     {
         /* velocity mode is simpler */
         float vel_cmd = sg->vel_cmd;
-        if (fabsf(vel_cmd) > timing_freq)
-            sg->freq_limited = 1;
-        /* apply frequency limit */
-        if (vel_cmd > max_freq)
+        /* apply frequency limit; the axis is held at its limit: flag it */
+        if (vel_cmd > max_freq) {
             vel_cmd = max_freq;
-        else if (vel_cmd < -max_freq)
+            sg->freq_limited = 1;
+        } else if (vel_cmd < -max_freq) {
             vel_cmd = -max_freq;
+            sg->freq_limited = 1;
+        }
         /* calc max change in frequency in one period, apply accel limit */
         const float dv = max_ac * k.dt;
         if (vel_cmd > (sg->freq + dv))
