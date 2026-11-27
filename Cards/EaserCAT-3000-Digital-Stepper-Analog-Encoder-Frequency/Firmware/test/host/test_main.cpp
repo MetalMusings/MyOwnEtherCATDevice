@@ -8,6 +8,7 @@
 #include "Cia402Axis.h"
 #include "ObjectHooks.h"
 #include "StepGenChannel.h"
+#include "StepGenLoop.h"
 
 extern "C" {
 #include "ecat_slv.h"
@@ -60,7 +61,7 @@ struct Plant {
     }
     double v;
     if (c.positionMode) {
-      v = (c.position - pos) / DT;
+      v = ((double)c.position / (double)STEPGEN_FX_ONE - pos) / DT;
     } else {
       v = c.velocity;
     }
@@ -72,7 +73,9 @@ struct Plant {
     vel = v;
     pos += vel * DT;
   }
-  MotionFeedback fb() const { return {pos, vel}; }
+  MotionFeedback fb() const {
+    return {(int64_t)llround(pos * (double)STEPGEN_FX_ONE), (float)vel};
+  }
 };
 
 static void resetAxisOd(Cia402Axis_t &od) {
@@ -198,11 +201,11 @@ static void testMissedFrameExtrapolation() {
   }
   // Frame missed: target not updated, but motion continues with the last delta
   MotionCommand c = step(ax, od, p, 0x000F, true, false);
-  CHECK(fabs(c.position - 55.0) < 1e-9);
+  CHECK_EQ(c.position, stepgenFxFromSteps(55));
   // Next real frame jumps to the real target, which is consistent again
   od.TargetPosition = 60;
   c = step(ax, od, p, 0x000F);
-  CHECK(fabs(c.position - 60.0) < 1e-9);
+  CHECK_EQ(c.position, stepgenFxFromSteps(60));
 }
 
 static void testCsvAndPolarity() {
@@ -264,7 +267,7 @@ static void testFollowingErrorFaultAndReset() {
   enableAxis(ax, od, p);
   // Plant that does not move: simulate a stalled axis by feeding a fixed feedback
   od.TargetPosition = 1000;
-  MotionFeedback stalled = {0.0, 0.0};
+  MotionFeedback stalled = {0, 0.0f};
   int i;
   for (i = 0; i < 20 && !ax.faulted(); i++) {
     od.Controlword = 0x000F;
@@ -438,7 +441,7 @@ static MotionCommand stepIn(Cia402Axis &ax, Cia402Axis_t &od, Plant &p, uint16_t
   AxisInputs in;
   in.home = sw.active(p.pos);
   in.homeChanged = in.home != sw.last;
-  in.homeChangePosition = sw.edge;  // the latch gives the edge to one step
+  in.homeChangePosition = stepgenFxFromSteps((int64_t)sw.edge);  // the latch: to one step
   sw.last = in.home;
   in.posLimit = posLim;
   in.negLimit = negLim;
@@ -830,7 +833,174 @@ static void testPdoPacking() {
   CHECK_EQ(Obj.Axis[0].Controlword, 0xABCD);
 }
 
+// ---------------------------------------------------------------------------
+// Position loop: stepgenUpdateFreq() (fixed point + float) against LinuxCNC's
+// update_freq() in double, both driving the pulse core
+// ---------------------------------------------------------------------------
+struct RefLoop {
+  double pos_cmd = 0, old_pos_cmd = 0, vel_cmd = 0, freq = 0, maxvel = 0, maxaccel = 0;
+  int pos_mode = 1;
+};
+
+static void refUpdateFreq(stepgen_t *sg, RefLoop &r, double dt, double freqscale,
+                          double accelscale) {
+  double recip_dt = 1.0 / dt;
+  double pos_cmd, vel_cmd, curr_pos, curr_vel, avg_v, max_freq, max_ac;
+  double match_ac, match_time, est_out, est_cmd, est_err, dp, dv, new_vel;
+  if (sg->enable == 0) {
+    if (r.pos_mode) r.old_pos_cmd = r.pos_cmd;
+    r.freq = 0;
+    sg->addval = 0;
+    sg->target_addval = 0;
+    return;
+  }
+  long min_step_period = sg->step_len + sg->step_space;
+  max_freq = 1.0 / (min_step_period * 0.000000001);
+  if (r.maxvel <= 0.0) r.maxvel = 0.0;
+  else if (r.maxvel > max_freq) r.maxvel = max_freq;
+  else max_freq = r.maxvel;
+  max_ac = max_freq * recip_dt;
+  if (r.maxaccel <= 0.0) r.maxaccel = 0.0;
+  else if (r.maxaccel > max_ac) r.maxaccel = max_ac;
+  else max_ac = r.maxaccel;
+  if (r.pos_mode) {
+    pos_cmd = r.pos_cmd;
+    vel_cmd = (pos_cmd - r.old_pos_cmd) * recip_dt;
+    r.old_pos_cmd = pos_cmd;
+    curr_pos = (sg->accum - (1 << (PICKOFF - 1))) * (1.0 / (1L << PICKOFF));
+    curr_vel = r.freq;
+    match_ac = (vel_cmd > curr_vel) ? max_ac : -max_ac;
+    match_time = (vel_cmd - curr_vel) / match_ac;
+    avg_v = (vel_cmd + curr_vel) * 0.5;
+    est_out = curr_pos + avg_v * match_time;
+    est_cmd = pos_cmd + vel_cmd * (match_time - 1.5 * dt);
+    est_err = est_out - est_cmd;
+    if (match_time < dt) {
+      if (fabs(est_err) < 0.0001) {
+        new_vel = vel_cmd;
+      } else {
+        new_vel = vel_cmd - 0.5 * est_err * recip_dt;
+        if (new_vel > (curr_vel + max_ac * dt)) new_vel = curr_vel + max_ac * dt;
+        else if (new_vel < (curr_vel - max_ac * dt)) new_vel = curr_vel - max_ac * dt;
+      }
+    } else {
+      dv = -2.0 * match_ac * dt;
+      dp = dv * match_time;
+      if (fabs(est_err + dp * 2.0) < fabs(est_err)) match_ac = -match_ac;
+      new_vel = curr_vel + match_ac * dt;
+    }
+    if (new_vel > max_freq) new_vel = max_freq;
+    else if (new_vel < -max_freq) new_vel = -max_freq;
+  } else {
+    vel_cmd = r.vel_cmd;
+    if (vel_cmd > max_freq) vel_cmd = max_freq;
+    else if (vel_cmd < -max_freq) vel_cmd = -max_freq;
+    dv = max_ac * dt;
+    if (vel_cmd > (r.freq + dv)) new_vel = r.freq + dv;
+    else if (vel_cmd < (r.freq - dv)) new_vel = r.freq - dv;
+    else new_vel = vel_cmd;
+  }
+  r.freq = new_vel;
+  sg->target_addval = r.freq * freqscale;
+  sg->deltalim = max_ac * accelscale;
+}
+
+static void testPositionLoop() {
+  const long period = 10000;  // base period, ns
+  const double dt = 0.001;    // servo cycle
+  const int pulsesPerCycle = 100;
+  const double freqscale = (1L << PICKOFF) * (period * 1e-9);
+  const double accelscale = freqscale * (period * 1e-9);
+  StepLoopTiming k = {(float)dt, (float)(1.0 / dt), (float)freqscale, (float)accelscale};
+  unsigned rnd = 777;
+  auto next = [&rnd]() { rnd = rnd * 1103515245u + 12345u; return (rnd >> 8) & 0xFFFFFF; };
+
+  long long maxDiff = 0, maxLagNew = 0, maxLagRef = 0, cycles = 0;
+  for (int run = 0; run < 12; run++) {
+    const long long start = (run % 2) ? 50000000LL : -3000LL;  // far from zero too
+    stepgen_t a, b;
+    memset((void *)&a, 0, sizeof(a));
+    a.accum = (start << PICKOFF) + (1LL << (PICKOFF - 1));
+    a.enable = 1;
+    a.pos_mode = 1;
+    a.step_len = 10000;
+    a.step_space = 10000;
+    a.dir_hold_dly = 10000;
+    a.dir_setup = 10000;
+    memcpy((void *)&b, (const void *)&a, sizeof(a));
+    RefLoop r;
+    r.pos_cmd = r.old_pos_cmd = (double)start;
+    b.pos_cmd = b.old_pos_cmd = stepgenFxFromSteps(start);
+    double maxAcc = (run % 3 == 0) ? 0 : 20000.0 + (double)(next() % 2000000);
+    double maxVel = (run % 4 == 0) ? 0 : 5000.0 + (double)(next() % 40000);
+    r.maxaccel = maxAcc;
+    r.maxvel = maxVel;
+    double cmd = (double)start, vel = 0;
+    for (int c = 0; c < 3000; c++) {
+      // Command: smooth moves, sometimes a jump (with resync), csv segments
+      int phase = (c / 500) % 3;
+      if (c % 100 == 0) vel = (double)((long)(next() % 60000) - 30000);  // steps/s
+      if (phase == 2) {
+        r.pos_mode = b.pos_mode = 0;
+        r.vel_cmd = vel;
+        b.vel_cmd = (float)vel;
+      } else {
+        if (!r.pos_mode) {  // back to position mode: resync, as setChannel() does
+          cmd = floor((double)stepgenFxRound(stepgenPosition(&b)));
+          r.old_pos_cmd = cmd;
+          b.old_pos_cmd = stepgenFxFromSteps((long long)cmd);
+        }
+        r.pos_mode = b.pos_mode = 1;
+        cmd += floor(vel * dt);
+        r.pos_cmd = cmd;
+        b.pos_cmd = stepgenFxFromSteps((long long)cmd);
+      }
+      b.maxvel = (float)r.maxvel;
+      b.maxaccel = (float)r.maxaccel;
+      r.maxvel = maxVel;
+      r.maxaccel = maxAcc;
+      refUpdateFreq(&a, r, dt, freqscale, accelscale);
+      stepgenUpdateFreq(&b, k);
+      for (int i = 0; i < pulsesPerCycle; i++) {
+        stepgenPulseStepDir(&a, period);
+        stepgenPulseStepDir(&b, period);
+      }
+      long long d = llabs((long long)a.rawcount - (long long)b.rawcount);
+      if (d > maxDiff) maxDiff = d;
+      if (r.pos_mode && maxAcc == 0) {  // no accel limit: both should follow closely
+        long long lagA = llabs((long long)a.rawcount - (long long)cmd);
+        long long lagB = llabs((long long)b.rawcount - (long long)cmd);
+        if (c % 500 > 20) {  // not right after a mode change
+          if (lagA > maxLagRef) maxLagRef = lagA;
+          if (lagB > maxLagNew) maxLagNew = lagB;
+        }
+      }
+      cycles++;
+    }
+    // At the end: command still, both settle on it
+    for (int c = 0; c < 2000; c++) {
+      r.pos_mode = b.pos_mode = 1;
+      r.pos_cmd = cmd;
+      b.pos_cmd = stepgenFxFromSteps((long long)cmd);
+      refUpdateFreq(&a, r, dt, freqscale, accelscale);
+      stepgenUpdateFreq(&b, k);
+      for (int i = 0; i < pulsesPerCycle; i++) {
+        stepgenPulseStepDir(&a, period);
+        stepgenPulseStepDir(&b, period);
+      }
+    }
+    CHECK_EQ(stepgenFxRound(stepgenPosition(&b)), (long long)cmd);
+    CHECK_EQ(stepgenFxRound(stepgenPosition(&a)), (long long)cmd);
+  }
+  printf("  position loop: %lld cycles, max difference to the double loop %lld steps,"
+         " max lag %lld (double) / %lld (new) steps\n",
+         cycles, maxDiff, maxLagRef, maxLagNew);
+  CHECK(maxDiff <= 1);
+  CHECK(maxLagNew <= maxLagRef + 1);
+}
+
 int main() {
+  testPositionLoop();
   testStepPulses();
   testPdoPacking();
   testHomingMethods();

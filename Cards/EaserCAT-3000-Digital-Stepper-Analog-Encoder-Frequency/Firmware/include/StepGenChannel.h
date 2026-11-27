@@ -7,6 +7,11 @@
 #define DIR_PIN 1  /* output phase used for DIR signal */
 #define PICKOFF 28 /* bit location in DDS accum */
 
+#include <stdint.h>
+
+// Positions are fixed point in steps with PICKOFF fraction bits (the accumulator's
+// format without its half step offset), velocities and accelerations float.
+
 typedef struct
 {
     /* stuff that is both read and written by makepulses */
@@ -34,17 +39,15 @@ typedef struct
                                         /* stuff that is not accessed by makepulses */
     int pos_mode;                       /* 1 = position mode, 0 = velocity mode */
     unsigned int step_space;            /* parameter: min step pulse spacing */
-    double old_pos_cmd;                 /* previous position command (counts) */
+    int64_t old_pos_cmd;                /* previous position command (fixed point steps) */
     int count;                          /* pin: captured feedback in counts */
-    double pos_scale;          /* param: steps per position unit */
-    double old_scale;          /* stored scale value */
-    double scale_recip;        /* reciprocal value used for scaling */
-    double vel_cmd;            /* pin: velocity command (pos units/sec) */
-    double pos_cmd;            /* pin: position command (position units) */
-    double pos_fb;             /* pin: position feedback (position units) */
-    double freq;               /* param: frequency command */
-    double maxvel;             /* param: max velocity, (pos units/sec) */
-    double maxaccel;           /* param: max accel (pos units/sec^2) */
+    /* no scale: positions are in steps, the EtherCAT master scales */
+    float vel_cmd;             /* velocity command (steps/sec) */
+    int64_t pos_cmd;           /* position command (fixed point steps) */
+    int64_t pos_fb;            /* position feedback (fixed point steps) */
+    float freq;                /* frequency command (steps/sec) */
+    float maxvel;              /* max velocity (steps/sec), 0 = step timing only */
+    float maxaccel;            /* max accel (steps/sec^2), 0 = unlimited */
     unsigned int old_step_len; /* used to detect parameter changes */
     unsigned int old_step_space;
     unsigned int old_dir_hold_dly;

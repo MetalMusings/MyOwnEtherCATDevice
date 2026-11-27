@@ -13,6 +13,8 @@
 #define CIA402AXIS_H
 
 #include <stdint.h>
+
+#include "StepGenLoop.h"  // fixed point positions
 extern "C" {
 #include "utypes.h"
 }
@@ -66,23 +68,23 @@ struct AxisInputs {
   bool posLimit = false;           // positive limit switch active
   bool negLimit = false;           // negative limit switch active
   bool homeChanged = false;        // the home switch changed state since the last cycle
-  double homeChangePosition = 0.0; // step generator position (steps) latched at that change
+  int64_t homeChangePosition = 0;  // step generator position latched at that change (fixed point)
 };
 
 // Position feedback from the step generator, in internal (motor) direction.
 struct MotionFeedback {
-  double position;  // steps
-  double velocity;  // steps/s
+  int64_t position;  // fixed point steps (StepGenLoop.h)
+  float velocity;    // steps/s
 };
 
 // What the step generator shall do during the next cycle, internal direction.
 struct MotionCommand {
   bool enable;          // false: no step pulses at all
   bool positionMode;    // true: follow position, false: follow velocity
-  double position;      // steps, used when positionMode
-  double velocity;      // steps/s, used when !positionMode
-  double maxVelocity;   // steps/s, 0 = only limited by step timing
-  double maxAccel;      // steps/s^2, 0 = unlimited
+  int64_t position;     // fixed point steps, used when positionMode
+  float velocity;       // steps/s, used when !positionMode
+  float maxVelocity;    // steps/s, 0 = only limited by step timing
+  float maxAccel;       // steps/s^2, 0 = unlimited
   bool resync;          // drop velocity feed forward this cycle (mode change, enable)
 };
 
@@ -96,7 +98,7 @@ class Cia402Axis {
   //   outputsValid : the master's outputs (RxPDO) are valid, i.e. ESM is in OP
   //   newOutputs   : the RxPDO has been updated during this cycle
   //   in           : the axis' switches
-  MotionCommand cycle(const MotionFeedback &fb, double dtSeconds, bool outputsValid,
+  MotionCommand cycle(const MotionFeedback &fb, float dtSeconds, bool outputsValid,
                       bool newOutputs, const AxisInputs &in = AxisInputs());
 
   // ESM left OP (watchdog, master request, error). Reacts according to 0x6007.
@@ -124,20 +126,20 @@ class Cia402Axis {
     bool fast;          // 0x6099:01, else 0x6099:02
     bool untilActive;   // move until the home switch is active, else until inactive
   };
-  void startHoming(const AxisInputs &in, double posSign, const MotionFeedback &fb);
+  void startHoming(const AxisInputs &in, int posSign, const MotionFeedback &fb);
   void brakeHoming(BrakeReason why);
-  void homingCycle(const MotionFeedback &fb, double dt, const AxisInputs &in,
-                   double posSign, bool startBit, bool halt, MotionCommand &cmd);
+  void homingCycle(const MotionFeedback &fb, float dt, const AxisInputs &in,
+                   int posSign, bool startBit, bool halt, MotionCommand &cmd);
   bool homingActive() const {
     return homingPhase == HomingPhase::Moving || homingPhase == HomingPhase::Braking;
   }
-  double rampDeceleration(int16_t optionCode) const;
+  float rampDeceleration(int16_t optionCode) const;
   int64_t unwrapTarget(int32_t raw) const;
 
   Cia402Axis_t *od = nullptr;
   Cia402State fsaState = Cia402State::NotReadyToSwitchOn;
   StopKind stopKind = StopKind::None;
-  double stopDecel = 0.0;          // deceleration used by the active stop ramp
+  float stopDecel = 0.0f;          // deceleration used by the active stop ramp
   bool stopDisableAtEnd = true;    // quick stop: go to Switch on disabled when stopped
   bool lastFaultResetBit = false;
   bool pendingCommLost = false;
@@ -149,7 +151,7 @@ class Cia402Axis {
   int64_t lastTargetDelta = 0;     // for extrapolation when a frame is missed
   uint8_t missedFrames = 0;
   bool resyncNext = true;
-  double followingErrorTime = 0.0; // seconds the following error has been outside window
+  float followingErrorTime = 0.0f; // seconds the following error has been outside window
   int64_t homeShift = 0;           // added to the step position to give the position actual value
   bool homed = false;              // homing attained (kept until the next homing starts)
   bool homingFailed = false;       // homing error
@@ -158,8 +160,8 @@ class Cia402Axis {
   BrakeReason brakeReason = BrakeReason::Interrupt;
   HomingMove moves[3] = {};
   uint8_t nMoves = 0, moveIdx = 0;
-  double homeEdge = 0.0;           // step position of the home switch edge
-  double homingElapsed = 0.0;      // seconds since homing started
+  int64_t homeEdge = 0;            // step position of the home switch edge (fixed point)
+  float homingElapsed = 0.0f;      // seconds since homing started
   bool cspSyncWait = false;        // csp after a mode change: wait until the target is near
   bool limitHold = false;          // csp: stopped by a limit switch, waiting for the target to come back
   int8_t holdDir = 0;

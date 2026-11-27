@@ -7,7 +7,7 @@
 #define MAX_CYCLE 18
 #define USER_STEP_TYPE 13
 
-#include "StepGenChannel.h"
+#include "StepGenLoop.h"
 
 #define MAX_STEP_TYPE 15
 
@@ -42,6 +42,7 @@ public:
     long old_dtns;             // update_freq funct period in nsec */
     double dt;                 // update_freq period in seconds */
     double recip_dt;           // recprocal of period, avoids divides */
+    StepLoopTiming loopTiming = {}; // the above as float, for the position loop
     volatile uint64_t cnt = 0; // Debug counter
     long basePeriodNs = 10000; // Actual period of the makeAllPulses() calls in ns
     uint32_t stepPinName[MAX_CHAN] = {0}; // PinName of the step outputs, for fast GPIO
@@ -58,8 +59,10 @@ public:
     //   posMode: true = position command, false = velocity command
     //   resync : restart the position loop without velocity feed forward (avoids a
     //            velocity step after enable or a mode change)
-    void setChannel(int ch, bool enable, bool posMode, double posCmd, double velCmd,
-                    double maxVel, double maxAccel, bool resync);
+    //   posCmd : fixed point steps (StepGenLoop.h), velCmd steps/s, maxVel steps/s
+    //            (0 = step timing only), maxAccel steps/s^2 (0 = unlimited)
+    void setChannel(int ch, bool enable, bool posMode, int64_t posCmd, float velCmd,
+                    float maxVel, float maxAccel, bool resync);
     // Step timing in ns. 0 means one base period (the minimum).
     void setTiming(int ch, uint32_t stepLen, uint32_t stepSpace, uint32_t dirSetup,
                    uint32_t dirHold);

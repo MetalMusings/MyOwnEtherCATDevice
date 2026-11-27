@@ -336,6 +336,7 @@ struct CycleProfile {
   uint32_t rawPipe75, pipeSame, cr1, cr2, sr;
   uint32_t pack75, unpack54, core400Active;  // 100 x 4 channels stepping, on copies
   uint32_t pack75Old, unpack54Old;
+  uint32_t upd, axCycle, axTiming, axSet;  // parts of 'axes', summed over the 4 axes
 };
 static void spiPipelined(const uint8_t *tx, uint8_t *rx, uint16_t n) {
   SPI_TypeDef *sp = SPI1;
@@ -470,7 +471,7 @@ static void profileBench() {
 
 void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
   uint32_t p0 = PT();
-  double dt = cycleNs * 1e-9;
+  float dt = (float)cycleNs * 1e-9f;
 
   if (commLostPending) {
     commLostPending = false;
@@ -480,6 +481,10 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
   updateInputs(micros());
   uint32_t p1 = PT();
   Step->updatePositions();
+#ifdef CYCLE_PROFILE
+  uint32_t a0 = PT(), sumCycle = 0, sumTiming = 0, sumSet = 0;
+  prof.upd = a0 - p1;
+#endif
   uint8_t errorRegister = 0;
   for (int i = 0; i < N_AXES; i++) {
     stepgen_t &sg = Step->stepgen_array[i];
@@ -492,13 +497,27 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
     if (a.HomeInput >= 1 && a.HomeInput <= 8) {
       const InputState &st = inputState[a.HomeInput - 1];
       in.homeChanged = st.changed;
-      in.homeChangePosition = st.latched ? (double)st.latchCount[i] : sg.pos_fb;
+      in.homeChangePosition = st.latched ? stepgenFxFromSteps(st.latchCount[i]) : sg.pos_fb;
     }
+#ifdef CYCLE_PROFILE
+    uint32_t b0 = PT();
+#endif
     MotionCommand cmd = Axes[i].cycle(fb, dt, outputsValid, newOutputs, in);
+#ifdef CYCLE_PROFILE
+    uint32_t b1 = PT();
+#endif
     StepTiming_t &t = Obj.StepTiming[i];
     Step->setTiming(i, t.StepLength, t.StepSpace, t.DirSetup, t.DirHold);
+#ifdef CYCLE_PROFILE
+    uint32_t b2 = PT();
+#endif
     Step->setChannel(i, cmd.enable, cmd.positionMode, cmd.position, cmd.velocity,
                      cmd.maxVelocity, cmd.maxAccel, cmd.resync);
+#ifdef CYCLE_PROFILE
+    sumCycle += b1 - b0;
+    sumTiming += b2 - b1;
+    sumSet += PT() - b2;
+#endif
     if (Axes[i].faulted()) errorRegister |= 0x01;  // generic error
 
     // 0x60C2 interpolation time period = cycle time (value * 10^index s)
@@ -516,6 +535,11 @@ void applicationCycle(uint32_t cycleNs, bool outputsValid, bool newOutputs) {
   }
   Obj.ErrorRegister = errorRegister;
   uint32_t p2 = PT();
+#ifdef CYCLE_PROFILE
+  prof.axCycle = sumCycle;
+  prof.axTiming = sumTiming;
+  prof.axSet = sumSet;
+#endif
 
   if (Obj.BasePeriod != requestedBasePeriod) setBasePeriod(Obj.BasePeriod);
   Step->updateFrequencies(cycleNs);

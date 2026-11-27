@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <stdio.h>
 #include "StepGen3.h"
+#include "StepGenLoop.h"
 #include "extend32to64.h"
 
 extern "C"
@@ -551,46 +552,12 @@ void StepGen3::make_pulses(void *arg, long period)
 
 void StepGen3::update_pos(void *arg, long period)
 {
-    long long int accum_a, accum_b;
-    stepgen_t *stepgen;
-    int n;
-
-    stepgen = (stepgen_t *)arg;
-
-    for (n = 0; n < num_chan; n++)
+    stepgen_t *stepgen = (stepgen_t *)arg;
+    for (int n = 0; n < num_chan; n++, stepgen++)
     {
-        /* 'accum' is a long long, and its remotely possible that
-           make_pulses could change it half-way through a read.
-           So we have a crude atomic read routine */
-        do
-        {
-            accum_a = stepgen->accum;
-            accum_b = stepgen->accum;
-        } while (accum_a != accum_b);
-        /* compute integer counts */
-        stepgen->count = accum_a >> PICKOFF;
-        /* check for change in scale value */
-        if (stepgen->pos_scale != stepgen->old_scale)
-        {
-            /* get ready to detect future scale changes */
-            stepgen->old_scale = stepgen->pos_scale;
-            /* validate the new scale value */
-            if ((stepgen->pos_scale < 1e-20) && (stepgen->pos_scale > -1e-20))
-            {
-                /* value too small, divide by zero is a bad thing */
-                stepgen->pos_scale = 1.0;
-            }
-            /* we will need the reciprocal, and the accum is fixed point with
-               fractional bits, so we precalc some stuff */
-            stepgen->scale_recip = (1.0 / (1L << PICKOFF)) / stepgen->pos_scale;
-        }
-        /* scale accumulator to make floating point position, after
-           removing the one-half count offset */
-        stepgen->pos_fb = (double)(accum_a - (1 << (PICKOFF - 1))) * stepgen->scale_recip;
-        /* move on to next channel */
-        stepgen++;
+        stepgen->pos_fb = stepgenPosition(stepgen);
+        stepgen->count = (int)((stepgen->pos_fb + (1LL << (PICKOFF - 1))) >> PICKOFF);
     }
-    /* done */
 }
 
 /* helper function - computes integral multiple of increment that is greater
@@ -608,66 +575,35 @@ void StepGen3::update_freq(void *arg, long period)
 {
     stepgen_t *stepgen;
     int n, newperiod;
-    long min_step_period;
-    long long int accum_a, accum_b;
-    double pos_cmd, vel_cmd, curr_pos, curr_vel, avg_v, max_freq, max_ac;
-    double match_ac, match_time, est_out, est_cmd, est_err, dp, dv, new_vel;
-    double desired_freq;
-    /*! \todo FIXME - while this code works just fine, there are a bunch of
-       internal variables, many of which hold intermediate results that
-       don't really need their own variables.  They are used either for
-       clarity, or because that's how the code evolved.  This algorithm
-       could use some cleanup and optimization. */
+
     /* this periodns stuff is a little convoluted because we need to
        calculate some constants here in this relatively slow thread but the
        constants are based on the period of the much faster 'make_pulses()'
-       thread. */
-    /* only recalc constants if period changes */
+       thread. Only recalculated when a period changes. */
     newperiod = 0;
     if (periodns != old_periodns)
     {
-        /* get ready to detect future period changes */
         old_periodns = periodns;
-        /* recompute various constants that depend on periodns */
         periodfp = periodns * 0.000000001;
         freqscale = (1L << PICKOFF) * periodfp;
         accelscale = freqscale * periodfp;
+        loopTiming.freqscale = (float)freqscale;
+        loopTiming.accelscale = (float)accelscale;
         /* force re-evaluation of the timing parameters */
         newperiod = 1;
     }
-    /* now recalc constants related to the period of this funct */
-    /* only recalc constants if period changes */
     if (period != old_dtns)
     {
-        /* get ready to detect future period changes */
         old_dtns = period;
         /* dT is the period of this thread, used for the position loop */
         dt = period * 0.000000001;
-        /* calc the reciprocal once here, to avoid multiple divides later */
         recip_dt = 1.0 / dt;
+        loopTiming.dt = (float)dt;
+        loopTiming.recipDt = (float)recip_dt;
     }
-
-    /* point at stepgen data */
     stepgen = (stepgen_t *)arg;
-
-    /* loop thru generators */
     for (n = 0; n < num_chan; n++)
     {
-        /* check for scale change */
-        if (stepgen->pos_scale != stepgen->old_scale)
-        {
-            /* get ready to detect future scale changes */
-            stepgen->old_scale = stepgen->pos_scale;
-            /* validate the new scale value */
-            if ((stepgen->pos_scale < 1e-20) && (stepgen->pos_scale > -1e-20))
-            {
-                /* value too small, divide by zero is a bad thing */
-                stepgen->pos_scale = 1.0;
-            }
-            /* we will need the reciprocal, and the accum is fixed point with
-               fractional bits, so we precalc some stuff */
-            stepgen->scale_recip = (1.0 / (1L << PICKOFF)) / stepgen->pos_scale;
-        }
         if (newperiod)
         {
             /* period changed, force recalc of timing parameters */
@@ -690,13 +626,11 @@ void StepGen3::update_freq(void *arg, long period)
         }
         if (stepgen->step_space != stepgen->old_step_space)
         {
-            /* make integer multiple of periodns */
             stepgen->old_step_space = ulceil(stepgen->step_space, periodns);
             stepgen->step_space = stepgen->old_step_space;
         }
         if (stepgen->dir_setup != stepgen->old_dir_setup)
         {
-            /* make integer multiple of periodns */
             stepgen->old_dir_setup = ulceil(stepgen->dir_setup, periodns);
             stepgen->dir_setup = stepgen->old_dir_setup;
         }
@@ -713,211 +647,10 @@ void StepGen3::update_freq(void *arg, long period)
             stepgen->old_dir_hold_dly = ulceil(stepgen->dir_hold_dly, periodns);
             stepgen->dir_hold_dly = stepgen->old_dir_hold_dly;
         }
-        /* test for disabled stepgen */
-        if (stepgen->enable == 0)
-        {
-            /* disabled: keep updating old_pos_cmd (if in pos ctrl mode) */
-            if (stepgen->pos_mode)
-            {
-                stepgen->old_pos_cmd = stepgen->pos_cmd * stepgen->pos_scale;
-            }
-            /* set velocity to zero */
-            stepgen->freq = 0;
-            stepgen->addval = 0;
-            stepgen->target_addval = 0;
-            /* and skip to next one */
-            stepgen++;
-            continue;
-        }
-        /* calculate frequency limit */
-        min_step_period = stepgen->step_len + stepgen->step_space;
-        max_freq = 1.0 / (min_step_period * 0.000000001);
-        /* check for user specified frequency limit parameter */
-        if (stepgen->maxvel <= 0.0)
-        {
-            /* set to zero if negative */
-            stepgen->maxvel = 0.0;
-        }
-        else
-        {
-            /* parameter is non-zero, compare to max_freq */
-            desired_freq = stepgen->maxvel * fabs(stepgen->pos_scale);
-            if (desired_freq > max_freq)
-            {
-                /* parameter is too high, complain about it */
-                if (!stepgen->printed_error)
-                {
-                    printf("STEPGEN: Channel %d: The requested maximum velocity of %d steps/sec is too high.\n",
-                           n, (int)desired_freq);
-                    printf("STEPGEN: The maximum possible frequency is %d steps/second\n",
-                           (int)max_freq);
-                    stepgen->printed_error = 1;
-                }
-                /* parameter is too high, limit it */
-                stepgen->maxvel = max_freq / fabs(stepgen->pos_scale);
-            }
-            else
-            {
-                /* lower max_freq to match parameter */
-                max_freq = stepgen->maxvel * fabs(stepgen->pos_scale);
-            }
-        }
-        /* set internal accel limit to its absolute max, which is
-           zero to full speed in one thread period */
-        max_ac = max_freq * recip_dt;
-        /* check for user specified accel limit parameter */
-        if (stepgen->maxaccel <= 0.0)
-        {
-            /* set to zero if negative */
-            stepgen->maxaccel = 0.0;
-        }
-        else
-        {
-            /* parameter is non-zero, compare to max_ac */
-            if ((stepgen->maxaccel * fabs(stepgen->pos_scale)) > max_ac)
-            {
-                /* parameter is too high, lower it */
-                stepgen->maxaccel = max_ac / fabs(stepgen->pos_scale);
-            }
-            else
-            {
-                /* lower limit to match parameter */
-                max_ac = stepgen->maxaccel * fabs(stepgen->pos_scale);
-            }
-        }
-        /* at this point, all scaling, limits, and other parameter
-           changes have been handled - time for the main control */
-        if (stepgen->pos_mode)
-        {
-            /* calculate position command in counts */
-            pos_cmd = stepgen->pos_cmd * stepgen->pos_scale;
-            /* calculate velocity command in counts/sec */
-            vel_cmd = (pos_cmd - stepgen->old_pos_cmd) * recip_dt;
-            stepgen->old_pos_cmd = pos_cmd;
-            /* 'accum' is a long long, and its remotely possible that
-               make_pulses could change it half-way through a read.
-               So we have a crude atomic read routine */
-            do
-            {
-                accum_a = stepgen->accum;
-                accum_b = stepgen->accum;
-            } while (accum_a != accum_b);
-            /* convert from fixed point to double, after subtracting
-               the one-half step offset */
-            curr_pos = (accum_a - (1 << (PICKOFF - 1))) * (1.0 / (1L << PICKOFF));
-            /* get velocity in counts/sec */
-            curr_vel = stepgen->freq;
-            /* At this point we have good values for pos_cmd, curr_pos,
-               vel_cmd, curr_vel, max_freq and max_ac, all in counts,
-               counts/sec, or counts/sec^2.  Now we just have to do
-               something useful with them. */
-            /* determine which way we need to ramp to match velocity */
-            if (vel_cmd > curr_vel)
-            {
-                match_ac = max_ac;
-            }
-            else
-            {
-                match_ac = -max_ac;
-            }
-            /* determine how long the match would take */
-            match_time = (vel_cmd - curr_vel) / match_ac;
-            /* calc output position at the end of the match */
-            avg_v = (vel_cmd + curr_vel) * 0.5;
-            est_out = curr_pos + avg_v * match_time;
-            /* calculate the expected command position at that time */
-            est_cmd = pos_cmd + vel_cmd * (match_time - 1.5 * dt);
-            /* calculate error at that time */
-            est_err = est_out - est_cmd;
-            if (match_time < dt)
-            {
-                /* we can match velocity in one period */
-                if (fabs(est_err) < 0.0001)
-                {
-                    /* after match the position error will be acceptable */
-                    /* so we just do the velocity match */
-                    new_vel = vel_cmd;
-                }
-                else
-                {
-                    /* try to correct position error */
-                    new_vel = vel_cmd - 0.5 * est_err * recip_dt;
-                    /* apply accel limits */
-                    if (new_vel > (curr_vel + max_ac * dt))
-                    {
-                        new_vel = curr_vel + max_ac * dt;
-                    }
-                    else if (new_vel < (curr_vel - max_ac * dt))
-                    {
-                        new_vel = curr_vel - max_ac * dt;
-                    }
-                }
-            }
-            else
-            {
-                /* calculate change in final position if we ramp in the
-                   opposite direction for one period */
-                dv = -2.0 * match_ac * dt;
-                dp = dv * match_time;
-                /* decide which way to ramp */
-                if (fabs(est_err + dp * 2.0) < fabs(est_err))
-                {
-                    match_ac = -match_ac;
-                }
-                /* and do it */
-                new_vel = curr_vel + match_ac * dt;
-            }
-            /* apply frequency limit */
-            if (new_vel > max_freq)
-            {
-                new_vel = max_freq;
-            }
-            else if (new_vel < -max_freq)
-            {
-                new_vel = -max_freq;
-            }
-            /* end of position mode */
-        }
-        else
-        {
-            /* velocity mode is simpler */
-            /* calculate velocity command in counts/sec */
-            vel_cmd = stepgen->vel_cmd * stepgen->pos_scale;
-            /* apply frequency limit */
-            if (vel_cmd > max_freq)
-            {
-                vel_cmd = max_freq;
-            }
-            else if (vel_cmd < -max_freq)
-            {
-                vel_cmd = -max_freq;
-            }
-            /* calc max change in frequency in one period */
-            dv = max_ac * dt;
-            /* apply accel limit */
-            if (vel_cmd > (stepgen->freq + dv))
-            {
-                new_vel = stepgen->freq + dv;
-            }
-            else if (vel_cmd < (stepgen->freq - dv))
-            {
-                new_vel = stepgen->freq - dv;
-            }
-            else
-            {
-                new_vel = vel_cmd;
-            }
-            /* end of velocity mode */
-        }
-        stepgen->freq = new_vel;
-        /* calculate new addval */
-        stepgen->target_addval = stepgen->freq * freqscale;
-        /* calculate new deltalim */
-        stepgen->deltalim = max_ac * accelscale;
-        /* move on to next channel */
+        /* the position/velocity loop, in fixed point and float (StepGenLoop.h) */
+        stepgenUpdateFreq(stepgen, loopTiming);
         stepgen++;
     }
-    /* done */
 }
 
 /***********************************************************************
@@ -956,9 +689,6 @@ int StepGen3::export_stepgen(int num, stepgen_t *addr, int step_type, int pos_mo
 
 
     /* set default parameter values */
-    addr->pos_scale = 1.0;
-    addr->old_scale = 0.0;
-    addr->scale_recip = 0.0;
     addr->freq = 0.0;
     addr->maxvel = 0.0;
     addr->maxaccel = 0.0;
@@ -1094,18 +824,16 @@ StepGen3::StepGen3(void)
     }
     rtapi_app_main();
     // Positions are handled in steps, scaling is done by the EtherCAT master
-    for (int i = 0; i < num_chan; i++)
-        stepgen_array[i].pos_scale = 1.0;
 }
 
-void StepGen3::setChannel(int ch, bool enable, bool posMode, double posCmd, double velCmd,
-                          double maxVel, double maxAccel, bool resync)
+void StepGen3::setChannel(int ch, bool enable, bool posMode, int64_t posCmd, float velCmd,
+                          float maxVel, float maxAccel, bool resync)
 {
     stepgen_t *s = &stepgen_array[ch];
     if (posMode && (!s->pos_mode || resync))
     {
         // No velocity feed forward from an old command in the first cycle
-        s->old_pos_cmd = posCmd * s->pos_scale;
+        s->old_pos_cmd = posCmd;
     }
     s->pos_mode = posMode ? 1 : 0;
     s->pos_cmd = posCmd;

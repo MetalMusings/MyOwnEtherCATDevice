@@ -11,26 +11,26 @@ public:
     int64_t unwrapEncoder(uint16_t in);
     void indexPulse(void);
     uint8_t indexHappened();
-    double currentPos();
-    double frequency(uint64_t time);
+    float currentPos();
+    float frequency(uint64_t time);
     uint8_t getIndexState();
-    void setScale(double scale);
+    void setScale(float scale);
     void setLatch(uint8_t latchEnable);
 
 private:
     int64_t previousEncoderCounterValue = 0;
-    double PosScaleRes = 1.0;
-    double CurPosScale = 1.0;
+    float PosScaleRes = 1.0f;
+    float CurPosScale = 1.0f;
     uint8_t oldLatchCEnable = 0;
     volatile uint8_t indexPulseFired = 0;
     volatile uint8_t pleaseZeroTheCounter = 0;
     Encoder EncoderInit;
     uint8_t indexPin;
 
-    CircularBuffer<double_t, RINGBUFFERLEN> Pos;
+    CircularBuffer<int64_t, RINGBUFFERLEN> Pos;  // counts, scaled when used
     CircularBuffer<uint64_t, RINGBUFFERLEN> TDelta; // micros(), extended to 64 bit
-    double curPos;
-    double oldFrequency;
+    int64_t curCount = 0;
+    float oldFrequency = 0.0f;
 
     TIM_TypeDef *tim_base;
 };
